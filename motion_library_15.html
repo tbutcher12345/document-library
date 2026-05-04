@@ -383,7 +383,7 @@ const PASSWORD='Butcher2026';
 // PDF Service URL — update after Railway deployment
 const PDF_SERVICE_URL = localStorage.getItem('pdf_service_url') || '';
 
-window.doLogin=function(){var v=document.getElementById('pwd').value;if(v===PASSWORD){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';sessionStorage.setItem('bl_auth','1')}else{document.getElementById('login-error').style.display='block'}}
+window.doLogin=function(){var v=document.getElementById('pwd').value;if(v==='Butcher2026'){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';sessionStorage.setItem('bl_auth','1')}else{document.getElementById('login-error').style.display='block'}}
 function doLogout(){sessionStorage.removeItem('bl_auth');document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';document.getElementById('pwd').value=''}
 if(sessionStorage.getItem('bl_auth')==='1'){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block'}
 
