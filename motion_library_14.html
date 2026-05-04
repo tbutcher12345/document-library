@@ -959,7 +959,7 @@ function lobBuildHtml(text){
     +'<div class="header"><div class="firm">Butcher Law Office, LLC</div>'
     +'<div class="firm-sub">116 Hwy 99 N #101 &bull; Eugene, OR 97402 &bull; (541) 762-1967</div></div>'
     +paras
-    +'</div></body></html>';
+    +'</div><script>document.querySelector(".login-btn").addEventListener("click",function(){var v=document.getElementById("pwd").value;if(v==="Butcher2026"){document.getElementById("login-screen").style.display="none";document.getElementById("app-screen").style.display="block";}else{document.getElementById("login-error").style.display="block";}});document.getElementById("pwd").addEventListener("keydown",function(e){if(e.key==="Enter"){document.querySelector(".login-btn").click();}});</script></body></html>';
 }
 
 // ── Lob: send letter ───────────────────────────────────────────────────
@@ -1054,7 +1054,7 @@ function dsignMakeHtml(doc,c1,c2){
     +'<p>This agreement is between <strong>Tomas K. Butcher</strong>, Butcher Law Office, LLC and <strong>'+c1+'</strong>'+(c2?' and <strong>'+c2+'</strong>':'')+'.</p>'
     +'<p>'+doc.desc+'</p>'
     +'<p>By signing below, all parties agree to be bound by this agreement.</p>'
-    +sigTable+'</div></body></html>';
+    +sigTable+'</div><script>document.querySelector(".login-btn").addEventListener("click",function(){var v=document.getElementById("pwd").value;if(v==="Butcher2026"){document.getElementById("login-screen").style.display="none";document.getElementById("app-screen").style.display="block";}else{document.getElementById("login-error").style.display="block";}});document.getElementById("pwd").addEventListener("keydown",function(e){if(e.key==="Enter"){document.querySelector(".login-btn").click();}});</script></body></html>';
 }
 async function dsignSend(){
   var key=localStorage.getItem('dsign_api_key')||'';
@@ -1202,7 +1202,7 @@ function emailBuildHtml(doc,toName,caseNo,notes){
     +'<div class="sig-detail">Attorney at Law, OSB #082807<br>Butcher Law Office, LLC</div>'
     +'</div></div>'
     +'<div class="ftr">This communication is from a law office and may contain confidential information intended only for the named recipient.</div>'
-    +'</div></body></html>';
+    +'</div><script>document.querySelector(".login-btn").addEventListener("click",function(){var v=document.getElementById("pwd").value;if(v==="Butcher2026"){document.getElementById("login-screen").style.display="none";document.getElementById("app-screen").style.display="block";}else{document.getElementById("login-error").style.display="block";}});document.getElementById("pwd").addEventListener("keydown",function(e){if(e.key==="Enter"){document.querySelector(".login-btn").click();}});</script></body></html>';
 }
 
 async function emailSend(){
@@ -2044,5 +2044,5 @@ Tel: (541) 762-1967  Fax: (541) 762-1968</textarea>
   </div>
 </div>
 </div>
-</body>
+<script>document.querySelector(".login-btn").addEventListener("click",function(){var v=document.getElementById("pwd").value;if(v==="Butcher2026"){document.getElementById("login-screen").style.display="none";document.getElementById("app-screen").style.display="block";}else{document.getElementById("login-error").style.display="block";}});document.getElementById("pwd").addEventListener("keydown",function(e){if(e.key==="Enter"){document.querySelector(".login-btn").click();}});</script></body>
 </html>

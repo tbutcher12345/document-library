@@ -1073,5 +1073,5 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape'){closeModal
   </div>
 </div>
 
-</body>
+<script>document.querySelector(".login-btn").addEventListener("click",function(){var v=document.getElementById("pwd").value;if(v==="Butcher2026"){document.getElementById("login-screen").style.display="none";document.getElementById("app-screen").style.display="block";}else{document.getElementById("login-error").style.display="block";}});document.getElementById("pwd").addEventListener("keydown",function(e){if(e.key==="Enter"){document.querySelector(".login-btn").click();}});</script></body>
 </html>

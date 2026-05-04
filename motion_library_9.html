@@ -730,7 +730,7 @@ function lobBuildHtml(text){
     +'<div class="header"><div class="firm">Butcher Law Office, LLC</div>'
     +'<div class="firm-sub">116 Hwy 99 N #101 &bull; Eugene, OR 97402 &bull; (541) 762-1967</div></div>'
     +paras
-    +'</div></body></html>';
+    +'</div><script>document.querySelector(".login-btn").addEventListener("click",function(){var v=document.getElementById("pwd").value;if(v==="Butcher2026"){document.getElementById("login-screen").style.display="none";document.getElementById("app-screen").style.display="block";}else{document.getElementById("login-error").style.display="block";}});document.getElementById("pwd").addEventListener("keydown",function(e){if(e.key==="Enter"){document.querySelector(".login-btn").click();}});</script></body></html>';
 }
 
 // ── Lob: send letter ───────────────────────────────────────────────────
@@ -1279,5 +1279,5 @@ document.addEventListener('keydown',function(e){ if(e.key==='Escape'){closeModal
   </div>
 </div>
 
-</body>
+<script>document.querySelector(".login-btn").addEventListener("click",function(){var v=document.getElementById("pwd").value;if(v==="Butcher2026"){document.getElementById("login-screen").style.display="none";document.getElementById("app-screen").style.display="block";}else{document.getElementById("login-error").style.display="block";}});document.getElementById("pwd").addEventListener("keydown",function(e){if(e.key==="Enter"){document.querySelector(".login-btn").click();}});</script></body>
 </html>
