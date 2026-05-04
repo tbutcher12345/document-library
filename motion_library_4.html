@@ -261,7 +261,7 @@ footer{margin-top:64px;padding:24px 32px;border-top:1px solid var(--rule);text-a
 </div>
 <script>
 const PASSWORD='Butcher2026';
-function doLogin(){var v=document.getElementById('pwd').value;if(v===PASSWORD){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';sessionStorage.setItem('bl_auth','1')}else{document.getElementById('login-error').style.display='block'}}
+window.doLogin=function(){var v=document.getElementById('pwd').value;if(v===PASSWORD){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';sessionStorage.setItem('bl_auth','1')}else{document.getElementById('login-error').style.display='block'}}
 function doLogout(){sessionStorage.removeItem('bl_auth');document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';document.getElementById('pwd').value=''}
 if(sessionStorage.getItem('bl_auth')==='1'){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block'}
 const ATTY={attorney_name:'Tomas K. Butcher',attorney_bar:'082807',firm_name:'Butcher Law Office, LLC',firm_address:'116 Hwy 99 N #101',firm_city_state:'Eugene, OR 97402',firm_phone:'541 762-1967',firm_email:'tom@butcherlawoffice.com'};
