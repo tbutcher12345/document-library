@@ -186,7 +186,7 @@ footer{margin-top:64px;padding:24px 32px;border-top:1px solid var(--rule);text-a
 </style>
 </head>
 <body>
-<div id="login-screen"><div class="login-box"><div class="login-logo">Butcher Law Office</div><div class="login-sub">Document Library &mdash; Staff Access</div><label for="pwd">Password</label><input type="password" id="pwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"><button class="login-btn" onclick="doLogin()">Sign In</button><div class="login-error" id="login-error">Incorrect password.</div></div></div>
+<div id="login-screen"><div class="login-box"><div class="login-logo">Butcher Law Office</div><div class="login-sub">Document Library &mdash; Staff Access</div><label for="pwd">Password</label><input type="password" id="pwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')window.doLogin()"><button class="login-btn" onclick="window.doLogin()">Sign In</button><div class="login-error" id="login-error">Incorrect password.</div></div></div>
 <div id="app-screen">
   <header><div class="header-left"><div class="firm-seal">BL</div><div><div class="firm-name">Butcher Law Office</div><div class="firm-tagline">Document Library</div></div></div><div class="header-right"><div class="header-badge">District of Oregon</div><button class="logout-btn" onclick="doLogout()">Sign Out</button></div></header>
   <div class="container">

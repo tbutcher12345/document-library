@@ -143,8 +143,8 @@ footer{margin-top:64px;padding:24px 32px;border-top:1px solid var(--rule);text-a
     <div class="login-logo">Butcher Law Office</div>
     <div class="login-sub">Document Library &mdash; Staff Access</div>
     <label for="pwd">Password</label>
-    <input type="password" id="pwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
-    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <input type="password" id="pwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')window.doLogin()">
+    <button class="login-btn" onclick="window.doLogin()">Sign In</button>
     <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
   </div>
 </div>
