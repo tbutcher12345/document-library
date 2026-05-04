@@ -1,0 +1,753 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Butcher Law Office — Document Library</title>
+<link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=DM+Mono:wght@300;400;500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#1a1612;--paper:#f5f0e8;--cream:#ede8dc;--rule:#c8bfaa;--accent:#8b2020;--al:#b94040;--gold:#c4983a;--muted:#6b6355;--ok:#2d6a4f;--card:#faf7f2;--shadow:0 2px 12px rgba(26,22,18,.08);--shadow-hover:0 8px 32px rgba(26,22,18,.14)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Instrument Sans',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh}
+#login-screen{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:var(--card);border:1px solid var(--rule);border-top:4px solid var(--accent);border-radius:4px;padding:48px 40px;width:100%;max-width:380px;box-shadow:var(--shadow)}
+.login-logo{font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700;margin-bottom:4px}
+.login-sub{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:32px}
+.login-box label{display:block;font-size:11px;font-weight:600;margin-bottom:6px}
+.login-box input{width:100%;padding:10px 12px;border:1px solid var(--rule);border-radius:2px;font-family:'Instrument Sans',sans-serif;font-size:14px;background:white;outline:none;transition:border-color .15s}
+.login-box input:focus{border-color:var(--accent)}
+.login-btn{width:100%;margin-top:20px;padding:11px;background:var(--accent);color:white;border:none;border-radius:2px;font-family:'Instrument Sans',sans-serif;font-size:14px;font-weight:600;cursor:pointer}
+.login-btn:hover{background:var(--al)}
+.login-error{color:var(--accent);font-size:12px;margin-top:10px;display:none}
+#app-screen{display:none}
+header{background:var(--ink);color:var(--paper);padding:0 40px;display:flex;align-items:center;justify-content:space-between;height:64px;border-bottom:3px solid var(--accent)}
+.header-left{display:flex;align-items:center;gap:16px}
+.firm-seal{width:36px;height:36px;border:2px solid var(--gold);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:'Libre Baskerville',serif;font-size:14px;color:var(--gold);font-weight:700;flex-shrink:0}
+.firm-name{font-family:'Libre Baskerville',serif;font-size:15px;color:var(--paper)}
+.firm-tagline{font-family:'DM Mono',monospace;font-size:10px;color:var(--rule);letter-spacing:.12em;text-transform:uppercase;margin-top:2px}
+.header-right{display:flex;align-items:center;gap:16px}
+.header-badge{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--gold);border:1px solid var(--gold);padding:4px 10px;border-radius:2px}
+.logout-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--rule);background:none;border:1px solid #444;padding:4px 10px;border-radius:2px;cursor:pointer}
+.logout-btn:hover{color:var(--paper);border-color:var(--paper)}
+.container{max-width:1100px;margin:0 auto;padding:48px 32px}
+.page-header{margin-bottom:40px;padding-bottom:24px;border-bottom:1px solid var(--rule);display:flex;align-items:flex-end;justify-content:space-between}
+.page-title{font-family:'Libre Baskerville',serif;font-size:28px;font-weight:700}
+.page-subtitle{font-size:13px;color:var(--muted);margin-top:6px;font-family:'DM Mono',monospace;letter-spacing:.04em}
+.district-badge{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);text-align:right;line-height:1.6}
+.category-nav{display:flex;gap:4px;margin-bottom:32px;border-bottom:2px solid var(--rule);overflow-x:auto}
+.cat-tab{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;padding:10px 18px;cursor:pointer;color:var(--muted);border:none;background:none;border-bottom:2px solid transparent;margin-bottom:-2px;white-space:nowrap;transition:color .15s,border-color .15s}
+.cat-tab:hover{color:var(--ink)}
+.cat-tab.active{color:var(--accent);border-bottom-color:var(--accent);font-weight:500}
+.doc-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px}
+.doc-card{background:var(--card);border:1px solid var(--rule);border-radius:4px;padding:24px;cursor:pointer;transition:box-shadow .2s,border-color .2s,transform .15s;position:relative;overflow:hidden}
+.doc-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--accent);opacity:0;transition:opacity .2s}
+.doc-card:hover{box-shadow:var(--shadow-hover);border-color:var(--accent);transform:translateY(-1px)}
+.doc-card:hover::before{opacity:1}
+.doc-card.agree-card::before{background:var(--gold)}
+.doc-card.agree-card:hover{border-color:var(--gold)}
+.doc-tag{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;display:flex;align-items:center;gap:6px}
+.doc-tag::before{content:'';width:16px;height:1px;background:var(--rule)}
+.doc-title{font-family:'Libre Baskerville',serif;font-size:15px;font-weight:700;color:var(--ink);line-height:1.4;margin-bottom:8px}
+.doc-desc{font-size:12px;color:var(--muted);line-height:1.6;margin-bottom:16px}
+.doc-meta{display:flex;align-items:center;font-family:'DM Mono',monospace;font-size:10px;color:var(--rule)}
+.doc-rule{color:var(--gold)}
+.doc-arrow{margin-left:auto;color:var(--accent);font-size:16px;opacity:0;transition:opacity .2s,transform .2s}
+.doc-card:hover .doc-arrow{opacity:1;transform:translateX(3px)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(26,22,18,.6);z-index:100;backdrop-filter:blur(2px)}
+.modal-overlay.open{display:flex;align-items:flex-start;justify-content:center;padding:40px 20px;overflow-y:auto}
+.modal{background:var(--paper);border:1px solid var(--rule);border-top:4px solid var(--accent);border-radius:4px;width:100%;max-width:680px;box-shadow:0 24px 64px rgba(26,22,18,.2);animation:slideUp .25s ease}
+@keyframes slideUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+.modal-header{padding:28px 32px 20px;border-bottom:1px solid var(--rule);display:flex;align-items:flex-start;justify-content:space-between;gap:16px}
+.modal-pretitle{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.modal-title{font-family:'Libre Baskerville',serif;font-size:20px;font-weight:700;line-height:1.3}
+.modal-close{background:none;border:1px solid var(--rule);width:32px;height:32px;border-radius:2px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.modal-close:hover{border-color:var(--accent);color:var(--accent)}
+.guidance-box{margin:20px 32px;background:var(--cream);border:1px solid var(--rule);border-left:3px solid var(--gold);padding:14px 16px;border-radius:0 2px 2px 0}
+.guidance-label{font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.14em;text-transform:uppercase;color:var(--gold);margin-bottom:6px}
+.guidance-text{font-size:12px;color:var(--muted);line-height:1.7}
+.guidance-rules{margin-top:8px;padding-top:8px;border-top:1px solid var(--rule);font-family:'DM Mono',monospace;font-size:10px;color:var(--muted)}
+.modal-form{padding:8px 32px 28px}
+.form-section-title{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:20px 0 12px;padding-bottom:8px;border-bottom:1px solid var(--cream)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.form-group{margin-bottom:14px}
+.form-group.full{grid-column:1/-1}
+label{display:block;font-size:11px;font-weight:600;letter-spacing:.02em;margin-bottom:5px}
+label .req{color:var(--accent);margin-left:2px}
+input,select,textarea{width:100%;font-family:'Instrument Sans',sans-serif;font-size:13px;color:var(--ink);background:white;border:1px solid var(--rule);border-radius:2px;padding:8px 10px;outline:none;transition:border-color .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(139,32,32,.08)}
+textarea{resize:vertical;min-height:80px;line-height:1.5}
+.hint{font-size:10px;color:var(--muted);margin-top:4px;font-family:'DM Mono',monospace}
+.modal-footer{padding:16px 32px 24px;display:flex;gap:10px;align-items:center;justify-content:flex-end;border-top:1px solid var(--cream)}
+.btn-cancel{font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:500;color:var(--muted);background:none;border:1px solid var(--rule);padding:9px 20px;border-radius:2px;cursor:pointer}
+.btn-cancel:hover{border-color:var(--ink);color:var(--ink)}
+.btn-generate{font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:600;color:white;background:var(--accent);border:none;padding:10px 24px;border-radius:2px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.btn-generate:hover{background:var(--al)}
+.btn-generate:disabled{background:var(--rule);cursor:not-allowed}
+.btn-sign{font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:600;color:white;background:var(--gold);border:none;padding:10px 24px;border-radius:2px;cursor:pointer;display:flex;align-items:center;gap:8px}
+.btn-sign:hover{background:#b8872e}
+.spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
+@keyframes spin{to{transform:rotate(360deg)}}
+.success-panel{display:none;padding:40px 32px;text-align:center}
+.ok-icon{width:56px;height:56px;border-radius:50%;background:var(--ok);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:24px;color:white}
+.ok-title{font-family:'Libre Baskerville',serif;font-size:20px;font-weight:700;margin-bottom:8px}
+.ok-msg{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:24px}
+.ok-actions{display:flex;gap:10px;justify-content:center}
+.btn-another{font-family:'Instrument Sans',sans-serif;font-size:13px;color:var(--accent);background:none;border:1px solid var(--accent);padding:9px 20px;border-radius:2px;cursor:pointer}
+footer{margin-top:64px;padding:24px 32px;border-top:1px solid var(--rule);text-align:center;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;color:var(--rule);text-transform:uppercase}
+.cos-overlay{display:none;position:fixed;inset:0;background:rgba(26,22,18,.6);z-index:200;overflow-y:auto;padding:30px 16px}
+.cos-modal{background:var(--paper);border:1px solid var(--rule);border-top:4px solid var(--accent);border-radius:4px;width:100%;max-width:760px;margin:0 auto;padding:28px 32px}
+.cos-sec{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin:20px 0 8px;padding-bottom:6px;border-bottom:1px solid var(--cream)}
+.cos-row{display:flex;gap:8px;margin-bottom:6px}
+.cos-row input{flex:1;font-size:12px;padding:7px 10px;border:1px solid var(--rule);border-radius:2px;background:white}
+.cos-btn{padding:7px 14px;background:var(--accent);color:white;border:none;border-radius:2px;font-size:12px;font-weight:600;cursor:pointer}
+.cos-btn-sec{padding:7px 14px;border:1px solid var(--rule);border-radius:2px;background:white;font-size:12px;cursor:pointer}
+.cos-addr-item{display:flex;align-items:flex-start;gap:8px;padding:8px 10px;border:1px solid var(--rule);border-radius:2px;background:white;font-family:'DM Mono',monospace;font-size:11px;line-height:1.5;margin-bottom:4px}
+.cos-addr-text{flex:1;white-space:pre-wrap}
+.cos-del{flex-shrink:0;font-size:10px;color:var(--accent);cursor:pointer;padding:2px 7px;border:1px solid var(--rule);border-radius:2px;background:none}
+.cos-output{background:var(--cream);border:1px solid var(--rule);border-radius:2px;padding:12px;font-family:'DM Mono',monospace;font-size:11px;white-space:pre-wrap;max-height:220px;overflow-y:auto;line-height:1.7}
+.doc-star{position:absolute;top:12px;right:12px;font-size:16px;cursor:pointer;color:#c8bfaa;line-height:1;z-index:2;transition:color .15s,transform .15s}
+.doc-star:hover{color:#c4983a;transform:scale(1.2)}
+.doc-star.starred{color:#c4983a}
+.favorites-section{margin-bottom:32px}
+.favorites-header{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.favorites-header::before{content:'';width:16px;height:1px;background:var(--gold)}
+.favorites-empty{font-size:12px;color:var(--muted);font-style:italic;padding:8px 0}
+
+.doc-star{position:absolute;top:12px;right:12px;font-size:16px;cursor:pointer;color:#c8bfaa;line-height:1;z-index:2;transition:color .15s,transform .15s}.doc-star:hover{color:var(--gold);transform:scale(1.2)}.doc-star.starred{color:var(--gold)}.favorites-section{margin-bottom:32px}.favorites-header{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;display:flex;align-items:center;gap:8px;padding-bottom:10px;border-bottom:1px solid var(--rule)}.favorites-header::before{content:'';width:16px;height:1px;background:var(--gold)}
+
+
+
+
+.doc-card{cursor:default}
+.doc-grid.dragging-active{user-select:none}
+.drag-ghost{position:fixed;pointer-events:none;z-index:9999;opacity:.85;transform:rotate(2deg);box-shadow:0 12px 32px rgba(26,22,18,.25);transition:none}
+.doc-card.drag-placeholder{opacity:.3;outline:2px dashed var(--gold);outline-offset:-2px}
+.drag-handle{position:absolute;top:10px;right:36px;width:16px;height:14px;display:flex;flex-direction:column;justify-content:space-between;cursor:grab;padding:2px;opacity:.3;transition:opacity .15s}
+.drag-handle:hover{opacity:.7}
+.drag-handle span{display:block;height:2px;background:var(--muted);border-radius:1px}
+.doc-card:hover .drag-handle{opacity:.5}
+.drag-hint{font-family:'DM Mono',monospace;font-size:10px;color:var(--muted);letter-spacing:.06em;margin-bottom:12px;display:flex;align-items:center;gap:6px}
+
+</style>
+</head>
+<body>
+
+<div id="login-screen">
+  <div class="login-box">
+    <div class="login-logo">Butcher Law Office</div>
+    <div class="login-sub">Document Library &mdash; Staff Access</div>
+    <label for="pwd">Password</label>
+    <input type="password" id="pwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="login-btn" onclick="doLogin()">Sign In</button>
+    <div class="login-error" id="login-error">Incorrect password. Please try again.</div>
+  </div>
+</div>
+
+<div id="app-screen">
+  <header>
+    <div class="header-left">
+      <div class="firm-seal">BL</div>
+      <div>
+        <div class="firm-name">Butcher Law Office</div>
+        <div class="firm-tagline">Document Library</div>
+      </div>
+    </div>
+    <div class="header-right">
+      <div class="header-badge">District of Oregon</div>
+      <button class="logout-btn" onclick="doLogout()">Sign Out</button>
+    </div>
+  </header>
+  <div class="container">
+    <div class="page-header">
+      <div>
+        <div class="page-title">Document Library</div>
+        <div class="page-subtitle">Select a document type to generate</div>
+      </div>
+      <div class="district-badge">U.S. Bankruptcy Court<br>District of Oregon<br>LBR Effective 12/1/2024</div>
+    </div>
+    <div class="category-nav" id="catNav"></div>
+    <div class="favorites-section" id="favSection" style="display:none"><div class="favorites-header">Starred</div><div class="doc-grid" id="favGrid"></div></div><div class="favorites-section" id="favSection" style="display:none"><div class="favorites-header">Starred</div><div class="doc-grid" id="favGrid"></div></div><div class="drag-hint" id="dragHint" style="display:none">Drag cards to reorder</div><div class="doc-grid" id="docGrid"></div>
+  </div>
+  <footer>Butcher Law Office Internal Use Only &nbsp;&middot;&nbsp; Not for Distribution &nbsp;&middot;&nbsp; LBR 12/1/2024</footer>
+</div>
+
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div>
+        <div class="modal-pretitle" id="modalPretitle"></div>
+        <div class="modal-title" id="modalTitle"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">&#x2715;</button>
+    </div>
+    <div id="modalBody">
+      <div class="guidance-box">
+        <div class="guidance-label">When to Use</div>
+        <div class="guidance-text" id="guidanceText"></div>
+        <div class="guidance-rules" id="guidanceRules"></div>
+      </div>
+      <form class="modal-form" id="docForm" onsubmit="handleSubmit(event)">
+        <div id="formFields"></div>
+      </form>
+    </div>
+    <div class="success-panel" id="successPanel">
+      <div class="ok-icon">&#x2713;</div>
+      <div class="ok-title" id="okTitle">Documents Generated</div>
+      <div class="ok-msg" id="okMsg"></div>
+      <div class="ok-actions">
+        <button class="btn-another" onclick="resetModal()">Generate Another</button>
+        <button class="btn-generate" onclick="closeModal()">Done</button>
+      </div>
+    </div>
+    <div class="modal-footer" id="modalFooter">
+      <button class="btn-cancel" type="button" onclick="closeModal()">Cancel</button>
+      <button class="btn-generate" type="submit" form="docForm" id="generateBtn">
+        <span class="spinner" id="spinner"></span>
+        <span id="generateBtnText">Generate Documents</span>
+      </button>
+    </div>
+  </div>
+</div>
+
+<div class="cos-overlay" id="cosOverlay">
+  <div class="cos-modal">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--rule)">
+      <div>
+        <div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:4px">Other</div>
+        <div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700">Certificate of Service &mdash; Address Builder</div>
+      </div>
+      <button onclick="closeCos()" style="background:none;border:1px solid var(--rule);width:32px;height:32px;border-radius:2px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center">&#x2715;</button>
+    </div>
+    <div style="background:var(--cream);border-left:3px solid var(--gold);padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--muted)">
+      Paste HTML from CM/ECF or any creditor matrix page to auto-extract addresses. Add manual entries, remove duplicates, then copy the formatted output.
+    </div>
+    <div class="cos-sec">Step 1 &mdash; Paste HTML source</div>
+    <textarea id="cosHtmlIn" style="width:100%;min-height:90px;font-family:'DM Mono',monospace;font-size:12px;padding:8px;border:1px solid var(--rule);border-radius:2px;background:white;resize:vertical" placeholder="Paste HTML from CM/ECF mailing info, creditor matrix, or any webpage..."></textarea>
+    <div style="display:flex;gap:8px;margin-top:8px;margin-bottom:4px">
+      <button class="cos-btn" onclick="cosExtract()">Extract addresses</button>
+      <button class="cos-btn-sec" onclick="document.getElementById('cosHtmlIn').value=''">Clear</button>
+    </div>
+    <div style="font-size:10px;color:var(--muted);font-family:'DM Mono',monospace;margin-bottom:20px">Tip: In CM/ECF open Mailing Matrix, select all, copy, paste here</div>
+    <div class="cos-sec">Step 2 &mdash; Add manual entries</div>
+    <div class="cos-row">
+      <input type="text" id="cosManualInput" placeholder="Name, Address, City State ZIP" onkeydown="if(event.key==='Enter')cosAddManual()">
+      <button class="cos-btn-sec" onclick="cosAddManual()">Add</button>
+    </div>
+    <div class="cos-sec" style="margin-top:20px">Step 3 &mdash; Review list <span id="cosCount" style="color:var(--accent);font-size:10px"></span></div>
+    <div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap">
+      <button class="cos-btn-sec" onclick="cosDedupe()">Remove duplicates</button>
+      <button class="cos-btn-sec" onclick="cosSort()">Sort A-Z</button>
+      <button class="cos-btn-sec" style="color:var(--accent)" onclick="cosClearAll()">Clear all</button>
+    </div>
+    <div id="cosAddrList" style="max-height:220px;overflow-y:auto;margin-bottom:4px"></div>
+    <div class="cos-sec" style="margin-top:20px">Step 4 &mdash; Output</div>
+    <div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center">
+      <select id="cosFmt" style="padding:6px 10px;border:1px solid var(--rule);border-radius:2px;font-size:12px;background:white">
+        <option value="plain">Plain text (one block per address)</option>
+        <option value="certified">Certified mail list</option>
+        <option value="cos">Full certificate of service</option>
+      </select>
+      <button class="cos-btn" onclick="cosGenerate()">Generate</button>
+      <button class="cos-btn-sec" onclick="cosCopy()">Copy to clipboard</button>
+    </div>
+    <div class="cos-output" id="cosOutput">Output will appear here...</div>
+  </div>
+</div>
+<script>
+const PASSWORD='Butcher2026';
+function doLogin(){var v=document.getElementById('pwd').value;if(v===PASSWORD){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block';sessionStorage.setItem('bl_auth','1')}else{document.getElementById('login-error').style.display='block'}}
+function doLogout(){sessionStorage.removeItem('bl_auth');document.getElementById('login-screen').style.display='flex';document.getElementById('app-screen').style.display='none';document.getElementById('pwd').value=''}
+if(sessionStorage.getItem('bl_auth')==='1'){document.getElementById('login-screen').style.display='none';document.getElementById('app-screen').style.display='block'}
+const ATTY={attorney_name:'Tomas K. Butcher',attorney_bar:'082807',firm_name:'Butcher Law Office, LLC',firm_address:'116 Hwy 99 N #101',firm_city_state:'Eugene, OR 97402',firm_phone:'541 762-1967',firm_email:'tom@butcherlawoffice.com'};
+const CI=[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']}];
+const CN=[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'}];
+const DOCS=[
+{id:'extend_time',category:'time',tag:'Time & Deadlines',title:'Motion to Extend Time — Deficient Documents',desc:'Extension of time to file deficient schedules or statements.',rule:'FRBP 1007(c) · 9006(b)',guidance:'Use when the court has issued a deficiency notice. Enter the new due date.',fields:[...CI,{section:'Details'},{id:'new_deadline',label:'New Due Date',type:'text',req:true,placeholder:'December 1, 2024'},{id:'reason',label:'Reason',type:'textarea',req:true,placeholder:'Additional time is needed to review, sign and file deficient documents.',col:'full'}]},
+{id:'extend_time_pre341_pancic',category:'time',tag:'Time & Deadlines',title:'Motion to Extend Time — Deficient Documents (Pre-341, Trustee Pancic)',desc:'Extension when deadline falls within 7 days before the 341 hearing. Trustee Pancic verbal approval hardcoded.',rule:'FRBP 1007(c) · 9006(b)',guidance:'Use when the deficient documents deadline falls within the 7-day window before the 341 hearing and the trustee is Vanesa Pancic.',fields:[...CI,{section:'Details'},{id:'meeting_341_date',label:'341 Hearing Date',type:'text',req:true,placeholder:'November 10, 2024'},{id:'new_deadline',label:'New Due Date',type:'text',req:true,placeholder:'November 22, 2024'}]},
+{id:'extend_time_pre341_other',category:'time',tag:'Time & Deadlines',title:'Motion to Extend Time — Deficient Documents (Pre-341, Other Trustee)',desc:'Extension when deadline falls within 7 days before the 341 hearing. Non-Pancic trustees.',rule:'FRBP 1007(c) · 9006(b)',guidance:'Enter the trustee name and indicate whether the trustee has no objection.',fields:[...CI,{section:'Details'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Michael Johnson'},{id:'meeting_341_date',label:'341 Hearing Date',type:'text',req:true,placeholder:'November 10, 2024'},{id:'new_deadline',label:'New Due Date',type:'text',req:true,placeholder:'November 22, 2024'},{id:'trustee_no_objection',label:'Trustee Has No Objection?',type:'select',req:true,options:['Yes','No']}]},
+{id:'extend_plan',category:'time',tag:'Time & Deadlines',title:'Motion to Extend Time — Chapter 13 Plan',desc:'Extension of time to file a proposed Chapter 13 plan.',rule:'FRBP 3015(b)',guidance:'Must be filed before the original plan deadline expires.',fields:[...CI,{section:'Details'},{id:'new_deadline',label:'New Due Date',type:'text',req:true,placeholder:'December 15, 2024'},{id:'reason',label:'Reason',type:'textarea',req:true,placeholder:'Debtor requires additional time to finalize income verification.',col:'full'}]},
+{id:'extend_financial_mgmt',category:'time',tag:'Time & Deadlines',title:'Motion to Extend Time — Financial Management Course',desc:'Extension of time to file Official Form 423.',rule:'11 U.S.C. § 727(a)(11)',guidance:'File before the discharge deadline.',fields:[...CI,{section:'Details'},{id:'new_deadline',label:'New Due Date',type:'text',req:true,placeholder:'February 15, 2025'},{id:'reason',label:'Reason',type:'textarea',req:true,placeholder:'Debtors have registered but have not yet completed the course.',col:'full'}]},
+{id:'extend_filing_fee',category:'time',tag:'Time & Deadlines',title:'Motion to Extend Time — Pay Filing Fee',desc:'Extension of time to pay a filing fee installment when installment plan already granted.',rule:'FRBP 1006(b)',guidance:'Use when the court already granted an installment plan but debtor cannot meet a scheduled payment.',fields:[...CI,{section:'Details'},{id:'new_due_date',label:'New Due Date',type:'text',req:true,placeholder:'February 1, 2025'},{id:'reason',label:'Reason',type:'textarea',req:true,placeholder:'Client lost job and needs more time.',col:'full',hint:'AI will polish this into legal language'}]},
+{id:'dismiss_vol',category:'case',tag:'Case Management',title:'Motion to Voluntarily Dismiss Case',desc:"Debtor\'s motion to dismiss their own bankruptcy case.",rule:'11 U.S.C. § 1307(b)',guidance:'Chapter 13 dismissal is an absolute right. Chapter 7 requires cause shown.',fields:[...CI,{section:'Details'},{id:'reason',label:'Reason for Dismissal',type:'textarea',req:true,placeholder:"Debtor\'s financial circumstances have improved.",col:'full'}]},
+{id:'convert_13_to_7',category:'case',tag:'Case Management',title:'Motion to Convert — Chapter 13 to Chapter 7',desc:'Convert a pending Chapter 13 case to Chapter 7.',rule:'11 U.S.C. § 1307(a)',guidance:'Absolute right — no cause required.',fields:[...CN,{section:'Details'},{id:'trustee_name',label:'Chapter 13 Trustee',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'plan_confirmed',label:'Plan Confirmed?',type:'select',req:true,options:['No','Yes']},{id:'conversion_reason',label:'Reason',type:'textarea',req:true,placeholder:'Debtor has experienced a significant reduction in income.',col:'full'}]},
+{id:'convert_7_to_13',category:'case',tag:'Case Management',title:'Motion to Convert — Chapter 7 to Chapter 13',desc:'Convert a pending Chapter 7 case to Chapter 13.',rule:'11 U.S.C. § 706(a)',guidance:'One-time absolute right. Debtor must have regular income.',fields:[...CN,{section:'Details'},{id:'trustee_name',label:'Chapter 7 Trustee',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'regular_income',label:'Regular Income Description',type:'textarea',req:true,placeholder:'Debtor is employed full-time earning approximately $5,200/month.',col:'full'},{id:'conversion_reason',label:'Reason',type:'textarea',req:true,placeholder:'Debtor wishes to retain non-exempt assets.',col:'full'}]},
+{id:'redeem',category:'case',tag:'Case Management',title:'Motion to Redeem Property — § 722',desc:'Redeem personal property from a lien by paying replacement value.',rule:'11 U.S.C. § 722',guidance:'Chapter 7 only. Property must be for personal/household use.',fields:[...CN,{section:'Property & Lien'},{id:'creditor_name',label:'Lienholder',type:'text',req:true,placeholder:'Toyota Financial Services'},{id:'collateral_desc',label:'Property Description',type:'text',req:true,placeholder:'2021 Toyota Camry, VIN: 4T1G11AK0MU123456',col:'full'},{id:'debt_amount',label:'Full Payoff Balance ($)',type:'text',req:true,placeholder:'18400'},{id:'redemption_value',label:'Replacement Value ($)',type:'text',req:true,placeholder:'9500'},{id:'valuation_basis',label:'Basis for Valuation',type:'text',req:true,placeholder:'Kelley Blue Book private party value.',col:'full'},{id:'payment_source',label:'Source of Redemption Payment',type:'textarea',req:true,placeholder:'Debtor has obtained a redemption loan.',col:'full'}]},
+{id:'extend_stay',category:'stay',tag:'Automatic Stay',title:'Motion to Extend Automatic Stay — § 362(c)(3)',desc:'Extend the 30-day automatic stay for a serial filer.',rule:'11 U.S.C. § 362(c)(3)(B)',guidance:'URGENT — must be heard before the 30-day stay expires.',fields:[...CI,{section:'Prior Case'},{id:'prior_case_number',label:'Prior Case Number',type:'text',req:true,placeholder:'23-98765-tmr7'},{id:'prior_case_chapter',label:'Prior Case Chapter',type:'select',req:true,options:['7','13','11','12']},{id:'prior_dismiss_date',label:'Prior Dismissal Date',type:'text',req:true,placeholder:'October 15, 2024'},{id:'prior_dismiss_reason',label:'Reason for Prior Dismissal',type:'textarea',req:true,placeholder:'Prior case dismissed due to failure to file schedules while proceeding pro se.',col:'full'},{section:'Current Case'},{id:'stay_expiry_date',label:'Stay Expiry Date',type:'text',req:true,placeholder:'December 1, 2024',hint:'30 days after filing'},{id:'changed_circumstances',label:'Changed Circumstances',type:'textarea',req:true,placeholder:'Since dismissal, Debtor has retained counsel and filed a complete petition.',col:'full'},{id:'good_faith_basis',label:'Good Faith Basis',type:'textarea',req:true,placeholder:'Case filed in good faith due to overwhelming medical debt.',col:'full'}]},
+{id:'declaration_extend_stay',category:'stay',tag:'Automatic Stay',title:'Debtor Declaration — Extend Stay (Exhibit A)',desc:"Debtor\'s declaration in support of motion to extend stay.",rule:'28 U.S.C. § 1746',guidance:'Filed simultaneously with the Motion to Extend Stay.',fields:[...CI,{section:'Prior Case'},{id:'prior_case_number',label:'Prior Case Number',type:'text',req:true,placeholder:'23-98765-tmr7'},{id:'prior_case_chapter',label:'Prior Case Chapter',type:'select',req:true,options:['7','13','11','12']},{id:'prior_dismiss_date',label:'Prior Dismissal Date',type:'text',req:true,placeholder:'October 15, 2024'},{id:'prior_dismiss_reason',label:"Prior Dismissal Reason (Debtor\'s words)",type:'textarea',req:true,placeholder:'I failed to file complete schedules because I did not have an attorney.',col:'full'},{section:"Debtor\'s Statement"},{id:'stay_expiry_date',label:'Stay Expiry Date',type:'text',req:true,placeholder:'December 1, 2024'},{id:'changed_circumstances',label:'Changed Circumstances',type:'textarea',req:true,placeholder:'Since my prior case was dismissed, I retained an attorney.',col:'full'},{id:'current_income',label:'Current Income & Employment',type:'textarea',req:true,placeholder:'I am currently employed full-time earning $4,800/month.',col:'full'},{id:'reason_for_filing',label:'Reason for Filing',type:'textarea',req:true,placeholder:'I filed this case because I have $68,000 in medical debt.',col:'full'},{id:'good_faith_statement',label:'Good Faith Statement',type:'textarea',req:true,placeholder:'I am not filing to hinder, delay, or defraud any creditor.',col:'full'}]},
+{id:'delay_discharge',category:'discharge',tag:'Discharge',title:'Motion to Delay Entry of Discharge',desc:'Request a brief delay in the entry of discharge to satisfy a pending requirement.',rule:'FRBP 4004(c)(2)',guidance:'Most common use: financial management course not yet complete.',fields:[...CI,{section:'Details'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'delay_days',label:'Days of Delay Requested',type:'number',req:true,placeholder:'30'},{id:'delay_reason',label:'Reason',type:'select',req:true,options:['financial_management','reaffirmation','adversary','other']},{id:'reason_detail',label:'Reason Detail',type:'textarea',req:true,placeholder:'Debtor has not yet completed the required financial management course and is currently enrolled.',col:'full'}]},
+{id:'substitution',category:'counsel',tag:'Counsel',title:'Stipulation for Substitution of Attorney',desc:'Substitute incoming counsel in place of outgoing counsel.',rule:'LBR 9010-1',guidance:'Requires signatures of both attorneys and debtor.',fields:[...CI,{section:'Outgoing Counsel'},{id:'outgoing_attorney',label:'Outgoing Attorney Name',type:'text',req:true,placeholder:'Jane R. Doe'},{id:'outgoing_bar',label:'Outgoing OSB No.',type:'text',req:true,placeholder:'654321'},{id:'outgoing_firm',label:'Outgoing Firm',type:'text',req:true,placeholder:'Doe Law Group'},{id:'outgoing_address',label:'Outgoing Address',type:'text',req:true,placeholder:'456 Oak Avenue, Portland, OR 97204',col:'full'},{id:'outgoing_phone',label:'Outgoing Phone',type:'text',req:true,placeholder:'(503) 555-9876'},{id:'outgoing_email',label:'Outgoing Email',type:'text',req:true,placeholder:'jdoe@doelawgroup.com'}]},
+{id:'withdraw',category:'counsel',tag:'Counsel',title:'Motion to Withdraw as Counsel',desc:'Motion for leave to withdraw as counsel of record.',rule:'LBR 9010-1 · Oregon RPC 1.16',guidance:'Requires good cause or client consent.',fields:[...CI,{section:'Details'},{id:'client_consent',label:'Client Consent?',type:'select',req:true,options:['No','Yes']},{id:'withdrawal_reason',label:'Reason for Withdrawal',type:'textarea',req:true,placeholder:'Debtor has failed to cooperate with counsel.',col:'full'},{id:'next_deadline',label:'Next Upcoming Deadline',type:'text',req:true,placeholder:'Confirmation hearing December 15, 2024',col:'full'},{id:'debtor_address',label:"Debtor\'s Last Known Address",type:'text',req:true,placeholder:'789 Elm Street, Eugene, OR 97401',col:'full'},{id:'debtor_phone',label:"Debtor\'s Phone",type:'text',req:true,placeholder:'(541) 555-0000'},{id:'notice_method',label:'Method of Notice to Debtor',type:'text',req:true,placeholder:'Certified mail and email'}]},
+{id:'objection_trustee_dismiss',category:'counsel',tag:'Counsel',title:"Objection to Trustee\'s Motion to Dismiss",desc:"Debtor\'s objection to Chapter 13 Trustee\'s motion to dismiss.",rule:'11 U.S.C. § 1307(c)',guidance:'File before the hearing date.',fields:[...CN,{section:'Details'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'hearing_date',label:'Hearing Date',type:'text',req:true,placeholder:'November 20, 2024'},{id:'payments_due',label:'Payments Due to Date',type:'number',req:true,placeholder:'8'},{id:'payments_made',label:'Payments Made',type:'number',req:true,placeholder:'6'},{id:'arrears_amount',label:'Arrears Amount',type:'text',req:true,placeholder:'$1,400.00'},{id:'cure_method',label:'How Arrearage Was Cured',type:'textarea',req:true,placeholder:"Debtor tendered a cashier check on November 10, 2024.",col:'full'},{id:'reason_for_default',label:'Reason for Default',type:'textarea',req:true,placeholder:'Debtor experienced a temporary medical leave.',col:'full'},{id:'future_payment_ability',label:'Ability to Make Future Payments',type:'textarea',req:true,placeholder:'Debtor has returned to full-time employment.',col:'full'}]},
+{id:'objection_trustee_convert',category:'counsel',tag:'Counsel',title:"Objection to Trustee\'s Motion to Convert",desc:"Debtor\'s objection to Chapter 13 Trustee\'s motion to convert to Chapter 7.",rule:'11 U.S.C. § 1307(c)',guidance:'Address regular income, cure of default, and harm to debtor.',fields:[...CN,{section:'Details'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'hearing_date',label:'Hearing Date',type:'text',req:true,placeholder:'November 20, 2024'},{id:'payments_due',label:'Payments Due',type:'number',req:true,placeholder:'8'},{id:'payments_made',label:'Payments Made',type:'number',req:true,placeholder:'6'},{id:'arrears_amount',label:'Arrears Amount',type:'text',req:true,placeholder:'$1,400.00'},{id:'cure_status',label:'Cure Status',type:'textarea',req:true,placeholder:"Debtor tendered full arrearage by cashier check.",col:'full'},{id:'income_evidence',label:'Income Evidence',type:'textarea',req:true,placeholder:'Debtor employed full-time earning $5,200/month.',col:'full'},{id:'reason_for_default',label:'Reason for Default',type:'textarea',req:true,placeholder:'Temporary medical leave August-October 2024.',col:'full'},{id:'assets_at_risk',label:'Assets at Risk if Converted',type:'textarea',req:true,placeholder:"Conversion would place Debtor non-exempt vehicle equity at risk.",col:'full'}]},
+{id:'letter_mortgage_auth',category:'letters',tag:'Letters',title:'Authorization Letter — Mortgage Servicer',desc:'Authorizes mortgage servicer to communicate with attorney regarding client account.',rule:'',guidance:'Send to mortgage servicer when opening communications about a client account.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name / Borrower',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Bankruptcy Case No.',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'mortgage_account',label:'Mortgage Account No.',type:'text',req:true,placeholder:'Loan No. 1234567890'},{id:'property_address',label:'Property Address',type:'text',req:true,placeholder:'123 Main Street, Eugene, OR 97401',col:'full'},{section:'Servicer'},{id:'servicer_name',label:'Servicer Name',type:'text',req:true,placeholder:'Wells Fargo Home Mortgage',col:'full'},{id:'servicer_contact',label:'Contact / Department',type:'text',req:true,placeholder:'Bankruptcy Department'}]},
+{id:'letter_cease_collection',category:'letters',tag:'Letters',title:'Letter — Demand to Cease Collection Activity',desc:'Demand letter to creditor to stop all collection activity after bankruptcy filing.',rule:'11 U.S.C. § 362(a)',guidance:'Use when a creditor continues collection efforts after the petition was filed.',fields:[...CI,{section:'Creditor'},{id:'creditor_name',label:'Creditor Name',type:'text',req:true,placeholder:'ABC Collections, LLC'},{id:'creditor_contact',label:'Contact / Department',type:'text',req:true,placeholder:'Bankruptcy Department'},{id:'creditor_address1',label:'Creditor Address',type:'text',req:true,placeholder:'1234 Commerce Drive, Suite 100'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{id:'account_number',label:'Account Number',type:'text',req:true,placeholder:'Account No. ending in 4521'},{id:'collection_activity',label:'Collection Activity to Cease',type:'textarea',req:true,placeholder:'telephone calls to Debtor demanding payment',col:'full'}]},
+{id:'letter_stay_violation',category:'letters',tag:'Letters',title:'Letter — Automatic Stay Violation',desc:'Formal demand letter after a creditor has violated the automatic stay.',rule:'11 U.S.C. § 362(k)',guidance:'Use after a stay violation has already occurred.',fields:[...CI,{section:'Creditor'},{id:'creditor_name',label:'Creditor Name',type:'text',req:true,placeholder:'ABC Collections, LLC'},{id:'creditor_contact',label:'Contact / Department',type:'text',req:true,placeholder:'Bankruptcy / Legal Department'},{id:'creditor_address1',label:'Creditor Address',type:'text',req:true,placeholder:'1234 Commerce Drive, Suite 100'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{id:'account_number',label:'Account Number',type:'text',req:true,placeholder:'Account No. ending in 4521'},{section:'Violation'},{id:'violation_date',label:'Date of Violation',type:'text',req:true,placeholder:'November 8, 2024'},{id:'violation_desc',label:'Description of Violation',type:'textarea',req:true,placeholder:'filing a state court lawsuit seeking collection of a pre-petition debt',col:'full'},{id:'cure_deadline',label:'Cure Deadline',type:'text',req:false,placeholder:'7 days'}]},
+{id:'letter_discharge_violation',category:'letters',tag:'Letters',title:'Letter — Discharge Injunction Violation',desc:'Formal demand letter after a creditor has violated the discharge injunction.',rule:'11 U.S.C. § 524(a)',guidance:'Use after discharge is entered and a creditor continues collection.',fields:[...CI,{section:'Creditor'},{id:'creditor_name',label:'Creditor Name',type:'text',req:true,placeholder:'ABC Collections, LLC'},{id:'creditor_contact',label:'Contact / Department',type:'text',req:true,placeholder:'Bankruptcy / Legal Department'},{id:'creditor_address1',label:'Creditor Address',type:'text',req:true,placeholder:'1234 Commerce Drive, Suite 100'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{id:'account_number',label:'Account Number',type:'text',req:true,placeholder:'Account No. ending in 4521'},{section:'Violation'},{id:'discharge_date',label:'Discharge Date',type:'text',req:true,placeholder:'February 15, 2025'},{id:'violation_date',label:'Date of Violation',type:'text',req:true,placeholder:'March 5, 2025'},{id:'violation_desc',label:'Description of Violation',type:'textarea',req:true,placeholder:'sending a collection letter demanding payment of a discharged debt',col:'full'},{id:'cure_deadline',label:'Cure Deadline',type:'text',req:false,placeholder:'10 days'}]},
+{id:'letter_discharge_congrats',category:'letters',tag:'Letters',title:'Letter — Discharge Congratulations',desc:'Congratulations letter with credit rebuilding checklist.',rule:'',guidance:'Send immediately after discharge is entered.',fields:[...CI,{section:'Client Details'},{id:'client_address1',label:'Client Address',type:'text',req:true,placeholder:'789 Elm Street'},{id:'client_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Eugene, OR 97401'},{id:'discharge_date',label:'Discharge Date',type:'text',req:true,placeholder:'February 15, 2025'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'}]},
+{id:'letter_post_341',category:'letters',tag:'Letters',title:'Letter — Post-341 Follow-Up',desc:'Follow-up letter explaining next steps after the 341 meeting.',rule:'',guidance:'Send the day after the 341 meeting. Adapts for Chapter 7 and 13.',fields:[...CI,{section:'Client Details'},{id:'client_address1',label:'Client Address',type:'text',req:true,placeholder:'789 Elm Street'},{id:'client_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Eugene, OR 97401'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'meeting_341_date',label:'341 Meeting Date',type:'text',req:true,placeholder:'December 5, 2024'},{id:'meeting_outcome',label:'Meeting Outcome',type:'select',req:true,options:['concluded','continued']},{id:'continued_date',label:'Continued To (if applicable)',type:'text',req:false,placeholder:'December 19, 2024'},{id:'projected_discharge',label:'Projected Discharge Date',type:'text',req:false,placeholder:'February 19, 2025'}]},
+{id:'letter_client_general',category:'letters',tag:'Letters',title:'General Client Letter',desc:'General correspondence to client on any topic.',rule:'',guidance:'Use for status updates, document requests, or any general client communication.',fields:[...CI,{section:'Recipient'},{id:'client_address1',label:'Client Address',type:'text',req:true,placeholder:'789 Elm Street'},{id:'client_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Eugene, OR 97401'},{section:'Letter Content'},{id:'re_line',label:'Re: Line',type:'text',req:true,placeholder:'Status of Your Bankruptcy Case',col:'full'},{id:'body',label:'Letter Body',type:'textarea',req:true,placeholder:'We are writing to update you on the status of your case...',col:'full',hint:'Separate paragraphs with a blank line'}]},
+{id:'letter_to_court',category:'letters',tag:'Letters',title:'Letter to Court — Filed as Correspondence',desc:'Non-motion correspondence to the court filed via CM/ECF.',rule:'',guidance:'Use for routine court correspondence.',fields:[...CI,{section:'Letter Details'},{id:'judge_name',label:"Judge\'s Name",type:'text',req:true,placeholder:'Hon. Thomas M. Renn'},{id:'re_line',label:'Re: Line',type:'text',req:true,placeholder:'Notice of Change in Address',col:'full'},{id:'body',label:'Letter Body',type:'textarea',req:true,placeholder:'Debtor respectfully notifies the Court that...',col:'full'}]},
+{id:'letter_notice_bankruptcy',category:'letters',tag:'Letters',title:'Notice of Bankruptcy to Creditor',desc:'Formal notice to a creditor of the bankruptcy filing and automatic stay.',rule:'11 U.S.C. § 362(a)',guidance:'Send to any creditor not receiving notice through the court.',fields:[...CI,{section:'Creditor'},{id:'creditor_name',label:'Creditor Name',type:'text',req:true,placeholder:'ABC Bank'},{id:'creditor_contact',label:'Contact / Department',type:'text',req:true,placeholder:'Bankruptcy Department'},{id:'creditor_address1',label:'Creditor Address',type:'text',req:true,placeholder:'P.O. Box 15298'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Wilmington, DE 19850'},{id:'account_number',label:'Account Number',type:'text',req:false,placeholder:'Account No. ending in 4521'}]},
+{id:'letter_notice_representation',category:'letters',tag:'Letters',title:'Notice of Attorney Representation',desc:'Notifies a creditor that attorney represents the debtor.',rule:'',guidance:'Send at the start of representation to direct all communications to attorney.',fields:[{section:'Client'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{section:'Recipient'},{id:'creditor_name',label:'Recipient / Creditor Name',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'creditor_contact',label:'Contact / Department',type:'text',req:true,placeholder:'Collections Department'},{id:'creditor_address1',label:'Address',type:'text',req:true,placeholder:'1234 Commerce Drive'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{id:'account_number',label:'Account / Reference No.',type:'text',req:false,placeholder:'Account No. ending in 4521'}]},
+{id:'letter_qwr',category:'letters',tag:'Letters',title:'Qualified Written Request (QWR)',desc:'QWR to mortgage servicer requesting loan information and account history.',rule:'RESPA 12 U.S.C. § 2605',guidance:'Servicer must acknowledge within 5 days and respond within 30 days.',fields:[...CI,{section:'Servicer & Loan'},{id:'servicer_name',label:'Servicer Name',type:'text',req:true,placeholder:'Wells Fargo Home Mortgage',col:'full'},{id:'servicer_contact',label:'QWR Department',type:'text',req:true,placeholder:'Qualified Written Request Department'},{id:'servicer_address1',label:'Servicer Address',type:'text',req:true,placeholder:'P.O. Box 10335'},{id:'servicer_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Des Moines, IA 50306'},{id:'loan_number',label:'Loan / Account Number',type:'text',req:true,placeholder:'Loan No. 1234567890'},{id:'property_address',label:'Property Address',type:'text',req:true,placeholder:'123 Main Street, Eugene, OR 97401',col:'full'},{id:'qwr_requests',label:'Specific Information Requested',type:'textarea',req:true,placeholder:'Complete payment history\nCurrent escrow account balance\nFees assessed in last 12 months',hint:'One item per line',col:'full'}]},
+
+{id:'letter_case_dismissed',category:'letters',tag:'Letters',title:'Letter — Case Dismissed Notice to Client',desc:'Notifies client of case dismissal, explains consequences, and outlines next steps.',rule:'',guidance:'Send immediately after case is dismissed.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'client_address1',label:'Client Address',type:'text',req:true,placeholder:'789 Elm Street'},{id:'client_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Eugene, OR 97401'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{section:'Dismissal Details'},{id:'dismissal_date',label:'Dismissal Date',type:'text',req:true,placeholder:'March 15, 2025'},{id:'dismissal_reason',label:'Reason for Dismissal',type:'text',req:true,placeholder:'failure to file required documents'},{id:'stay_lifted',label:'Stay Lifted?',type:'select',req:true,options:['Yes','No']},{id:'refile_eligible',label:'Eligible to Refile?',type:'select',req:true,options:['Yes','No']},{id:'refile_waiting',label:'Waiting Period (days)',type:'text',req:false,placeholder:'180'}]},
+
+{id:'letter_credit_report_dispute',category:'letters',tag:'Letters',title:'Letter — Credit Report Dispute (Post-Discharge)',desc:'Disputes inaccurate credit reporting of a discharged debt.',rule:'FCRA 15 U.S.C. § 1681',guidance:'Send to creditor when they are incorrectly reporting a discharged debt as still owed.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'discharge_date',label:'Discharge Date',type:'text',req:true,placeholder:'February 15, 2025'},{section:'Creditor'},{id:'creditor_name',label:'Creditor Name',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'creditor_contact',label:'Contact / Department',type:'text',req:true,placeholder:'Credit Reporting / Compliance Department'},{id:'creditor_address1',label:'Creditor Address',type:'text',req:true,placeholder:'1234 Commerce Drive, Suite 100'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{id:'account_number',label:'Account Number',type:'text',req:true,placeholder:'Account No. ending in 4521'},{section:'Dispute'},{id:'inaccuracy_desc',label:'Inaccuracy Description',type:'textarea',req:true,placeholder:'reporting a balance owed on a debt that was discharged in bankruptcy',col:'full'},{id:'remedy_requested',label:'Remedy Requested',type:'textarea',req:true,placeholder:'update the account status to Discharged in Bankruptcy — $0 Balance Owed',col:'full'}]},
+
+{id:'letter_escrow_accounting',category:'letters',tag:'Letters',title:'Letter — Escrow Accounting Request / Dispute',desc:'Requests escrow accounting from mortgage servicer or disputes claimed shortage.',rule:'RESPA 12 U.S.C. § 2605',guidance:'Use when disputing an escrow shortage in a proof of claim or requesting escrow accounting.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr13'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['13','7','11','12']},{id:'loan_number',label:'Loan Number',type:'text',req:true,placeholder:'Loan No. 1234567890'},{id:'property_address',label:'Property Address',type:'text',req:true,placeholder:'789 Elm Street, Eugene, OR 97401',col:'full'},{section:'Servicer'},{id:'servicer_name',label:'Servicer Name',type:'text',req:true,placeholder:'Wells Fargo Home Mortgage',col:'full'},{id:'servicer_contact',label:'Department',type:'text',req:true,placeholder:'Escrow / Bankruptcy Department'},{id:'servicer_address1',label:'Servicer Address',type:'text',req:true,placeholder:'P.O. Box 10335'},{id:'servicer_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Des Moines, IA 50306'},{section:'Dispute'},{id:'claimed_shortage',label:'Claimed Shortage Amount',type:'text',req:true,placeholder:'$2,450.00'},{id:'dispute_basis',label:'Basis for Dispute',type:'textarea',req:true,placeholder:'The proof of claim reflects an escrow shortage that Debtor believes is inaccurate.',col:'full'}]},
+
+{id:'letter_fdcpa_validation',category:'letters',tag:'Letters',title:'Letter — FDCPA Debt Validation Demand',desc:'Demands debt validation from a debt collector under the FDCPA.',rule:'FDCPA 15 U.S.C. § 1692g',guidance:'Send within 30 days of receiving a collection notice to preserve validation rights.',fields:[{section:'Client'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{section:'Collector'},{id:'collector_name',label:'Collector Name',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'collector_address1',label:'Collector Address',type:'text',req:true,placeholder:'1234 Commerce Drive, Suite 100'},{id:'collector_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{section:'Debt Details'},{id:'account_number',label:'Account Number',type:'text',req:true,placeholder:'Account No. ending in 4521'},{id:'original_creditor',label:'Original Creditor',type:'text',req:true,placeholder:'XYZ Bank'},{id:'claimed_amount',label:'Claimed Amount',type:'text',req:true,placeholder:'$3,250.00'},{id:'collection_date',label:'Date of Collection Notice',type:'text',req:true,placeholder:'November 1, 2024'}]},
+
+{id:'letter_garnishment_recovery',category:'letters',tag:'Letters',title:'Letter — Demand to Return Garnished Wages',desc:'Demands return of wages garnished after the bankruptcy petition was filed.',rule:'11 U.S.C. § 362(a)(6)',guidance:'Use when wages were garnished after the petition date in violation of the automatic stay.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'filing_date',label:'Petition Filing Date',type:'text',req:true,placeholder:'November 1, 2024'},{section:'Creditor'},{id:'creditor_name',label:'Creditor / Collection Agency',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'send_via',label:'Fax / Email',type:'text',req:true,placeholder:'(503) 555-1234 or email@example.com'},{section:'Garnishment Details'},{id:'garnish_amount',label:'Amount Garnished',type:'text',req:true,placeholder:'$2,406.00'},{id:'garnish_creditor',label:'Garnishing Creditor',type:'text',req:true,placeholder:'ABC Collections, LLC'}]},
+
+{id:'letter_no_default_notice',category:'letters',tag:'Letters',title:'Letter — 10-Day Notice of Default (ORS 90)',desc:'10-day notice of default sent to opposing counsel before seeking sanctions.',rule:'ORS 646.639',guidance:'Send to opposing counsel before filing motion for sanctions for stay or discharge violation.',fields:[{section:'Opposing Counsel'},{id:'opp_attorney_name',label:'Opposing Attorney Name',type:'text',req:true,placeholder:'Jane R. Doe',col:'full'},{id:'opp_firm_name',label:'Opposing Firm',type:'text',req:true,placeholder:'Doe & Associates, LLC',col:'full'},{id:'opp_address1',label:'Address',type:'text',req:true,placeholder:'500 Main Street, Suite 200'},{id:'opp_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Eugene, OR 97401'},{section:'Case Details'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'plaintiff_name',label:'Plaintiff Name',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'case_name',label:'Case Name',type:'text',req:true,placeholder:'ABC Collections v. John A. Smith',col:'full'},{id:'case_number',label:'State Court Case No.',type:'text',req:true,placeholder:'24CV12345'},{id:'court_name',label:'Court Name',type:'text',req:true,placeholder:'Lane County Circuit Court',col:'full'},{id:'notice_days',label:'Notice Period (days)',type:'text',req:true,placeholder:'10'}]},
+
+{id:'letter_notice_taxing_authority',category:'letters',tag:'Letters',title:'Letter — Notice of Bankruptcy to Taxing Authority',desc:'Notifies IRS or state tax agency of bankruptcy filing and automatic stay.',rule:'11 U.S.C. § 362(a)',guidance:'Send to IRS or Oregon DOR when client has tax debt. Triggers automatic stay against tax collection.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'client_ssn_last4',label:'Last 4 of SSN',type:'text',req:true,placeholder:'1234'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{id:'filing_date',label:'Filing Date',type:'text',req:true,placeholder:'November 1, 2024'},{section:'Agency'},{id:'agency_name',label:'Agency Name',type:'text',req:true,placeholder:'Internal Revenue Service',col:'full'},{id:'agency_contact',label:'Department',type:'text',req:true,placeholder:'Insolvency Unit'},{id:'agency_address1',label:'Agency Address',type:'text',req:true,placeholder:'P.O. Box 7346'},{id:'agency_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Philadelphia, PA 19101-7346'},{id:'agency_type',label:'Agency Type',type:'select',req:true,options:['federal','state']},{section:'Tax Details'},{id:'tax_years',label:'Tax Years at Issue',type:'text',req:true,placeholder:'2020, 2021, 2022'},{id:'tax_type',label:'Type of Tax',type:'text',req:true,placeholder:'income taxes'}]},
+
+{id:'letter_omitted_creditor',category:'letters',tag:'Letters',title:'Letter — Notice to Omitted Creditor',desc:'Notifies a creditor inadvertently omitted from the bankruptcy schedules.',rule:'FRBP 1009',guidance:'Send when a creditor was not listed on the original schedules. Accompanies amended schedules.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{id:'filing_date',label:'Filing Date',type:'text',req:true,placeholder:'November 1, 2024'},{section:'Creditor'},{id:'creditor_name',label:'Creditor Name',type:'text',req:true,placeholder:'Eugene Foot and Ankle, LLC',col:'full'},{id:'creditor_address1',label:'Creditor Address',type:'text',req:true,placeholder:'1680 Chambers Street'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Eugene, OR 97402'}]},
+
+{id:'letter_payoff_request',category:'letters',tag:'Letters',title:'Letter — Payoff / Reinstatement Quote Request',desc:'Requests a payoff or reinstatement quote from a mortgage servicer.',rule:'',guidance:'Use when client wants to reinstate a mortgage or pay off a loan. Specify payoff or reinstatement.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr13'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['13','7','11','12']},{id:'account_number',label:'Loan / Account Number',type:'text',req:true,placeholder:'Loan No. 1234567890'},{id:'property_address',label:'Property Address',type:'text',req:true,placeholder:'789 Elm Street, Eugene, OR 97401',col:'full'},{section:'Servicer'},{id:'creditor_name',label:'Servicer Name',type:'text',req:true,placeholder:'Wells Fargo Home Mortgage',col:'full'},{id:'creditor_contact',label:'Department',type:'text',req:true,placeholder:'Bankruptcy Department'},{id:'creditor_address1',label:'Servicer Address',type:'text',req:true,placeholder:'P.O. Box 10335'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Des Moines, IA 50306'},{section:'Quote Details'},{id:'quote_type',label:'Quote Type',type:'select',req:true,options:['reinstatement','payoff']},{id:'quote_as_of_date',label:'Quote As-Of Date',type:'text',req:false,placeholder:'Leave blank for today'}]},
+
+{id:'letter_plan_confirmation',category:'letters',tag:'Letters',title:'Letter — Chapter 13 Plan Confirmation Notice',desc:'Notifies client that their Chapter 13 plan has been confirmed.',rule:'11 U.S.C. § 1325',guidance:'Send immediately after the confirmation order is entered.',fields:[{section:'Client & Case'},{id:'client_name',label:'Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'client_address1',label:'Client Address',type:'text',req:true,placeholder:'789 Elm Street'},{id:'client_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Eugene, OR 97401'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr13'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{section:'Plan Details'},{id:'confirmation_date',label:'Confirmation Date',type:'text',req:true,placeholder:'March 1, 2025'},{id:'plan_payment',label:'Monthly Plan Payment',type:'text',req:true,placeholder:'$450.00'},{id:'plan_duration',label:'Plan Duration (months)',type:'text',req:true,placeholder:'60'},{id:'first_payment_due',label:'First Payment Due',type:'text',req:true,placeholder:'April 1, 2025'}]},
+
+{id:'letter_vehicle_turnover',category:'letters',tag:'Letters',title:'Letter — Demand to Return Repossessed Vehicle',desc:'Demands return of a vehicle repossessed before or after bankruptcy filing.',rule:'11 U.S.C. § 362(a)(3)',guidance:'Use when a vehicle was repossessed and must be returned due to the automatic stay.',fields:[{section:'Client & Case'},{id:'debtor_name',label:'Debtor Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{id:'filing_date',label:'Filing Date',type:'text',req:true,placeholder:'November 1, 2024'},{section:'Creditor'},{id:'creditor_name',label:'Creditor Name',type:'text',req:true,placeholder:'ABC Auto Finance, LLC',col:'full'},{id:'creditor_contact',label:'Department',type:'text',req:true,placeholder:'Bankruptcy / Legal Department'},{id:'creditor_address1',label:'Creditor Address',type:'text',req:true,placeholder:'1234 Commerce Drive, Suite 100'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{section:'Vehicle Details'},{id:'vehicle_desc',label:'Vehicle Description',type:'text',req:true,placeholder:'2018 Honda Civic, VIN 1HGBH41JXMN109186',col:'full'},{id:'account_number',label:'Account Number',type:'text',req:true,placeholder:'Account No. ending in 4521'},{id:'repossession_date',label:'Repossession Date',type:'text',req:true,placeholder:'October 28, 2024'},{id:'cure_deadline',label:'Demand Deadline',type:'text',req:false,placeholder:'48 hours'}]},
+
+
+{id:'motion_abandon',category:'case',tag:'Case Management',title:'Motion to Compel Abandonment of Property',desc:'Motion requesting trustee abandon burdensome or fully encumbered property.',rule:'11 U.S.C. § 554(b)',guidance:'Use when property has no equity for the estate or costs of liquidation exceed potential recovery.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{section:'Property Details'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'property_desc',label:'Property Description',type:'text',req:true,placeholder:'2008 Ford F-150, VIN: 1FTPX14V08FA12345, estimated value $4,200',col:'full'},{id:'property_value',label:'Property Value',type:'text',req:true,placeholder:'$4,200.00'},{id:'liens_on_property',label:'Liens on Property',type:'text',req:true,placeholder:'$5,800 remaining loan balance — Ford Motor Credit',col:'full'},{id:'burdensome_reason',label:'Why Property is Burdensome / No Equity',type:'textarea',req:true,placeholder:'Property is fully encumbered with no equity for the estate. Costs of liquidation would exceed any potential recovery.',col:'full'}]},
+
+{id:'motion_avoid_lien',category:'case',tag:'Case Management',title:'Motion to Avoid Judicial Lien — § 522(f)',desc:'Motion to avoid a judicial lien that impairs a bankruptcy exemption.',rule:'11 U.S.C. § 522(f)',guidance:'Use when a judicial lien impairs an exemption to which debtor would otherwise be entitled.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{section:'Lien Details'},{id:'creditor_name',label:'Lienholder',type:'text',req:true,placeholder:'XYZ Collections LLC'},{id:'lien_amount',label:'Lien Amount ($)',type:'text',req:true,placeholder:'12500'},{id:'property_desc',label:'Property Description',type:'text',req:true,placeholder:'123 Main St, Eugene, OR 97402 — primary residence',col:'full'},{id:'property_value',label:'Property Value ($)',type:'text',req:true,placeholder:'285000'},{id:'senior_liens',label:'Senior Liens Total ($)',type:'text',req:true,placeholder:'240000'},{id:'exemption_amount',label:'Exemption Amount ($)',type:'text',req:true,placeholder:'40000'},{id:'exemption_statute',label:'Exemption Statute',type:'text',req:true,placeholder:'ORS 18.395'}]},
+
+{id:'motion_compromise',category:'case',tag:'Case Management',title:'Motion to Approve Compromise of Controversy — Rule 9019',desc:'Motion to approve settlement of a dispute or contested claim.',rule:'FRBP 9019',guidance:'Use when settling a disputed claim or adversary proceeding. Requires court approval.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{section:'Settlement Details'},{id:'opposing_party',label:'Opposing Party',type:'text',req:true,placeholder:'ABC Bank, N.A.',col:'full'},{id:'dispute_desc',label:'Description of Dispute',type:'textarea',req:true,placeholder:'Creditor filed a proof of claim for $45,000. Debtor disputes the validity and amount.',col:'full'},{id:'settlement_amount',label:'Settlement Amount',type:'text',req:true,placeholder:'$25,000.00'},{id:'settlement_terms',label:'Settlement Terms',type:'textarea',req:true,placeholder:'Creditor agrees to accept $25,000.00 as full and final settlement, payable within 30 days.',col:'full'},{id:'benefit_to_estate',label:'Benefit to Estate',type:'textarea',req:true,placeholder:'Settlement avoids estimated litigation costs of $8,000-$12,000 and provides certain recovery.',col:'full'}]},
+
+{id:'motion_contempt',category:'case',tag:'Case Management',title:'Motion for Contempt — Stay or Discharge Violation',desc:'Motion for contempt and sanctions for willful violation of the automatic stay or discharge injunction.',rule:'11 U.S.C. § 362(k) · § 524(a)',guidance:'Use after a creditor willfully violated the stay or discharge injunction and refused to cure after demand.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{section:'Violation Details'},{id:'violation_type',label:'Type of Violation',type:'select',req:true,options:['automatic stay','discharge injunction']},{id:'creditor_name',label:'Respondent / Creditor',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'violation_date',label:'Date of Violation',type:'text',req:true,placeholder:'November 8, 2024'},{id:'violation_desc',label:'Description of Violation',type:'textarea',req:true,placeholder:'Creditor filed a state court lawsuit against Debtor seeking collection of a pre-petition debt.',col:'full'},{id:'demand_date',label:'Date of Demand Letter',type:'text',req:true,placeholder:'November 15, 2024'},{id:'cure_response',label:'Creditor Response to Demand',type:'text',req:true,placeholder:'No response received'},{id:'damages_desc',label:'Damages Incurred',type:'textarea',req:true,placeholder:"Attorney\'s fees of $1,200, emotional distress, and costs responding to state court action.",col:'full'}]},
+
+{id:'motion_emergency',category:'case',tag:'Case Management',title:'Emergency Motion to Enforce Automatic Stay',desc:'Emergency motion to stop imminent creditor action violating the automatic stay.',rule:'11 U.S.C. § 362',guidance:'Use when creditor action is imminent — eviction, foreclosure sale, vehicle repossession — and immediate court relief is needed.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{section:'Emergency Details'},{id:'creditor_name',label:'Respondent / Creditor',type:'text',req:true,placeholder:'Wells Fargo Bank, N.A.',col:'full'},{id:'emergency_desc',label:'Nature of Emergency',type:'textarea',req:true,placeholder:'Creditor has scheduled a trustee sale of Debtor residence for tomorrow at 10:00 AM.',col:'full'},{id:'imminent_date',label:'Imminent Action Date / Time',type:'text',req:true,placeholder:'November 15, 2024 at 10:00 AM',col:'full'},{id:'harm_desc',label:'Irreparable Harm if Not Stopped',type:'textarea',req:true,placeholder:'Debtor will lose their primary residence. Harm is irreparable and cannot be remedied by money damages.',col:'full'}]},
+
+{id:'motion_hardship_discharge',category:'discharge',tag:'Discharge',title:'Motion for Hardship Discharge — § 1328(b)',desc:'Motion for discharge before completion of Chapter 13 plan due to circumstances beyond debtor\'s control.',rule:'11 U.S.C. § 1328(b)',guidance:'Use when debtor cannot complete the plan due to circumstances beyond their control and modification is not practical.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr13'},{section:'Plan Details'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'plan_confirmed_date',label:'Plan Confirmation Date',type:'text',req:true,placeholder:'March 1, 2024'},{id:'payments_made',label:'Plan Payments Made',type:'number',req:true,placeholder:'18'},{id:'plan_duration',label:'Total Plan Duration (months)',type:'number',req:true,placeholder:'60'},{section:'Hardship'},{id:'hardship_desc',label:'Circumstances Beyond Debtor\'s Control',type:'textarea',req:true,placeholder:'Debtor was diagnosed with Stage III cancer in October 2024 and is unable to work. Debtor\'s income has dropped to zero.',col:'full'},{id:'modification_infeasible',label:'Why Modification is Not Practicable',type:'textarea',req:true,placeholder:'Debtor has no income and no foreseeable ability to resume plan payments.',col:'full'},{id:'unsecured_paid',label:'Amount Paid to Unsecured Creditors',type:'text',req:true,placeholder:'$8,400.00'},{id:'liquidation_value',label:'Liquidation Value (Ch. 7 would pay)',type:'text',req:true,placeholder:'$4,200.00'}]},
+
+{id:'motion_incur_debt',category:'case',tag:'Case Management',title:'Motion to Incur Post-Petition Debt',desc:'Motion to authorize debtor to incur new debt during a Chapter 13 case.',rule:'11 U.S.C. § 1305',guidance:'Chapter 13 debtors need court approval to incur significant post-petition debt.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr13'},{section:'Debt Details'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'creditor_name',label:'Proposed Lender',type:'text',req:true,placeholder:'Oregon Credit Union',col:'full'},{id:'debt_amount',label:'Amount of Proposed Debt',type:'text',req:true,placeholder:'$15,000.00'},{id:'debt_purpose',label:'Purpose of Debt',type:'textarea',req:true,placeholder:'Purchase of replacement vehicle necessary for employment. Debtor\'s current vehicle failed and cannot be repaired economically.',col:'full'},{id:'monthly_payment',label:'Proposed Monthly Payment',type:'text',req:true,placeholder:'$285.00'},{id:'plan_impact',label:'Impact on Plan Payments',type:'textarea',req:true,placeholder:'The proposed debt payment of $285/month is within Debtor budget. Debtor remains able to make all plan payments.',col:'full'}]},
+
+{id:'motion_reaffirm',category:'case',tag:'Case Management',title:'Motion to Approve Reaffirmation Agreement',desc:'Motion to approve a reaffirmation agreement with a secured creditor.',rule:'11 U.S.C. § 524(c)',guidance:'Filed when reaffirmation agreement does not create undue hardship presumption or attorney has signed declaration.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{section:'Reaffirmation Details'},{id:'creditor_name',label:'Creditor',type:'text',req:true,placeholder:'Toyota Financial Services',col:'full'},{id:'collateral_desc',label:'Collateral Description',type:'text',req:true,placeholder:'2021 Toyota Camry, VIN: 4T1G11AK0MU082807',col:'full'},{id:'reaffirm_amount',label:'Reaffirmation Amount',type:'text',req:true,placeholder:'$18,400.00'},{id:'monthly_payment',label:'Monthly Payment',type:'text',req:true,placeholder:'$385.00'},{id:'interest_rate',label:'Interest Rate',type:'text',req:true,placeholder:'5.9%'},{id:'presumption_undue',label:'Undue Hardship Presumption?',type:'select',req:true,options:['No — monthly income exceeds expenses','Yes — presumption arises']}]},
+
+{id:'motion_relief_stay',category:'stay',tag:'Automatic Stay',title:'Response to Motion for Relief from Stay',desc:"Debtor\'s response opposing a creditor\'s motion for relief from the automatic stay.",rule:'11 U.S.C. § 362(d)',guidance:"Use when a creditor files a motion for relief from stay. File before the hearing date.",fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr13'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['13','7','11','12']},{section:'Motion Details'},{id:'creditor_name',label:'Moving Creditor',type:'text',req:true,placeholder:'Wells Fargo Bank, N.A.',col:'full'},{id:'collateral_desc',label:'Collateral Description',type:'text',req:true,placeholder:'123 Main St, Eugene, OR 97402 — primary residence',col:'full'},{id:'property_value',label:'Property Value',type:'text',req:true,placeholder:'$285,000.00'},{id:'creditor_claim',label:'Creditor\'s Claim Amount',type:'text',req:true,placeholder:'$210,000.00'},{id:'arrears',label:'Arrears Amount',type:'text',req:true,placeholder:'$8,400.00'},{id:'plan_treatment',label:'Plan Treatment of Creditor',type:'textarea',req:true,placeholder:'Confirmed plan provides for payment of all pre-petition arrears at $350/month over 24 months.',col:'full'}]},
+
+{id:'motion_shorten_notice',category:'case',tag:'Case Management',title:'Motion to Shorten Notice Time',desc:'Motion to reduce the standard notice period for a hearing or motion.',rule:'FRBP 9006(c)',guidance:'Use when standard notice time is impractical due to urgency.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{section:'Details'},{id:'motion_to_shorten',label:'Motion / Matter Requiring Shortened Notice',type:'text',req:true,placeholder:'Motion to Extend Automatic Stay',col:'full'},{id:'proposed_hearing_date',label:'Proposed Hearing Date',type:'text',req:true,placeholder:'November 15, 2024'},{id:'urgency_reason',label:'Reason for Urgency',type:'textarea',req:true,placeholder:'The automatic stay expires on November 15, 2024 and must be heard before that date.',col:'full'}]},
+
+{id:'motion_status_conference',category:'case',tag:'Case Management',title:'Motion to Set Status Conference',desc:'Motion requesting the court schedule a status conference on a pending matter.',rule:'LBR 9013-1',guidance:'Use when a case issue needs judicial attention but no specific motion is ripe.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr13'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['13','7','11','12']},{section:'Details'},{id:'trustee_name',label:'Trustee Name',type:'text',req:true,placeholder:'Vanesa Pancic'},{id:'conference_purpose',label:'Purpose of Status Conference',type:'textarea',req:true,placeholder:'To address ongoing issues with plan feasibility and discuss potential plan modification.',col:'full'},{id:'issues_to_address',label:'Issues to Address',type:'textarea',req:true,placeholder:'1. Plan payment defaults\n2. Proposed plan modification\n3. Trustee pending motion to dismiss',col:'full'}]},
+
+{id:'motion_secured_status',category:'case',tag:'Case Management',title:'Motion for Determination of Secured Status — § 506(a)',desc:'Motion to determine the value of a secured claim and bifurcate into secured and unsecured portions.',rule:'11 U.S.C. § 506(a)',guidance:'Use in Chapter 13 to strip a wholly or partially unsecured lien. Commonly used for second mortgages.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr13'},{section:'Lien Details'},{id:'creditor_name',label:'Creditor / Lienholder',type:'text',req:true,placeholder:'Second Mortgage Bank',col:'full'},{id:'collateral_desc',label:'Collateral Description',type:'text',req:true,placeholder:'123 Main St, Eugene, OR 97402 — primary residence',col:'full'},{id:'property_value',label:'Property Value ($)',type:'text',req:true,placeholder:'285000'},{id:'senior_liens',label:'Total Senior Liens ($)',type:'text',req:true,placeholder:'295000'},{id:'creditor_claim',label:'Creditor\'s Claim Amount ($)',type:'text',req:true,placeholder:'45000'},{id:'valuation_basis',label:'Basis for Valuation',type:'textarea',req:true,placeholder:'County tax assessed value as of petition date, supported by BPO from local realtor.',col:'full'}]},
+
+{id:'notice_rescission_reaffirmation',category:'case',tag:'Case Management',title:'Notice of Rescission of Reaffirmation Agreement',desc:'Notice to creditor rescinding a reaffirmation agreement before discharge.',rule:'11 U.S.C. § 524(c)(4)',guidance:'Must be filed before discharge is entered. Debtor has absolute right to rescind.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'case_number',label:'Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{section:'Reaffirmation Details'},{id:'creditor_name',label:'Creditor',type:'text',req:true,placeholder:'Toyota Financial Services',col:'full'},{id:'creditor_address1',label:'Creditor Address',type:'text',req:true,placeholder:'Attn: Bankruptcy Department, P.O. Box 9490'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Cedar Rapids, IA 52409'},{id:'collateral_desc',label:'Collateral Description',type:'text',req:true,placeholder:'2021 Toyota Camry, VIN: 4T1G11AK0MU123456',col:'full'},{id:'account_number',label:'Account Number',type:'text',req:true,placeholder:'Account No. ending in 7890'},{id:'agreement_filed_date',label:'Date Agreement Filed',type:'text',req:true,placeholder:'March 1, 2025'},{id:'discharge_entered',label:'Has Discharge Been Entered?',type:'select',req:true,options:['No','Yes']}]},
+
+{id:'complaint_stay_violation',category:'case',tag:'Case Management',title:'Adversary Complaint — Willful Stay Violation',desc:'Adversary proceeding complaint for willful violation of the automatic stay.',rule:'11 U.S.C. § 362(k)',guidance:'File as an adversary proceeding when a creditor willfully violated the stay and damages are warranted.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor / Plaintiff Name',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'case_number',label:'Bankruptcy Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'chapter',label:'Chapter',type:'select',req:true,options:['7','13','11','12']},{section:'Defendant'},{id:'creditor_name',label:'Defendant / Creditor',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'creditor_address1',label:'Defendant Address',type:'text',req:true,placeholder:'1234 Commerce Drive, Suite 100'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{section:'Violation'},{id:'violation_date',label:'Date of Violation',type:'text',req:true,placeholder:'November 8, 2024'},{id:'violation_desc',label:'Description of Violation',type:'textarea',req:true,placeholder:'Defendant filed a state court lawsuit against Debtor seeking collection of a pre-petition debt after receiving notice of the bankruptcy filing.',col:'full'},{id:'damages_desc',label:'Damages Suffered',type:'textarea',req:true,placeholder:"Attorney\'s fees, costs, emotional distress, and actual damages.",col:'full'}]},
+
+{id:'complaint_discharge_violation',category:'discharge',tag:'Discharge',title:'Adversary Complaint — Discharge Injunction Violation',desc:'Adversary proceeding complaint for violation of the discharge injunction.',rule:'11 U.S.C. § 524(a)',guidance:'File as an adversary proceeding when a creditor violated the discharge injunction and damages are warranted.',fields:[{section:'Case Information'},{id:'debtor_name',label:'Debtor / Plaintiff Name',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'case_number',label:'Bankruptcy Case Number',type:'text',req:true,placeholder:'24-12345-tmr7'},{id:'discharge_date',label:'Discharge Date',type:'text',req:true,placeholder:'February 15, 2025'},{section:'Defendant'},{id:'creditor_name',label:'Defendant / Creditor',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'creditor_address1',label:'Defendant Address',type:'text',req:true,placeholder:'1234 Commerce Drive, Suite 100'},{id:'creditor_address2',label:'City, State ZIP',type:'text',req:true,placeholder:'Portland, OR 97201'},{section:'Violation'},{id:'violation_date',label:'Date of Violation',type:'text',req:true,placeholder:'March 5, 2025'},{id:'violation_desc',label:'Description of Violation',type:'textarea',req:true,placeholder:'Defendant sent a collection letter demanding payment of a discharged debt after receiving notice of the discharge.',col:'full'},{id:'damages_desc',label:'Damages Suffered',type:'textarea',req:true,placeholder:"Attorney\'s fees, costs, emotional distress, and actual damages.",col:'full'}]},
+
+{id:'answer_state_court',category:'other',tag:'Other',title:'Answer to State Court Complaint',desc:'Answer to a state court lawsuit, used when client has been sued prior to or outside bankruptcy.',rule:'ORCP 19',guidance:'Used to respond to a state court complaint. Each allegation is admitted, denied, or lacks knowledge.',fields:[{section:'Court & Parties'},{id:'court_name',label:'Court Name',type:'text',req:true,placeholder:'Lane County Circuit Court',col:'full'},{id:'plaintiff_name',label:'Plaintiff Name',type:'text',req:true,placeholder:'ABC Collections, LLC',col:'full'},{id:'defendant_name',label:'Defendant / Client Name',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'case_number',label:'State Court Case Number',type:'text',req:true,placeholder:'24CV12345'},{section:'Response'},{id:'general_denial',label:'Response Type',type:'select',req:true,options:['General denial of all allegations','Specific responses by paragraph']},{id:'affirmative_defenses',label:'Affirmative Defenses',type:'textarea',req:false,placeholder:'1. Statute of limitations\n2. Payment\n3. Bankruptcy discharge',hint:'One per line',col:'full'}]},
+
+
+{id:'cos_address_builder',category:'other',tag:'Other',title:'Certificate of Service — Address Builder',desc:'Paste HTML from CM/ECF or creditor matrix to extract addresses, remove duplicates, add manual entries, and generate a formatted service list.',rule:'FRBP 7004 · LBR 9013-1',guidance:'Use to build your service list. Paste HTML from CM/ECF mailing info page, extract addresses automatically, clean duplicates, then copy the formatted output.',fields:[{section:'Instructions'},{id:'_info',label:'This tool opens the address builder. No form fields required.',type:'text',req:false,placeholder:'Click Generate to open the address builder tool'}]},
+
+
+{id:'agree_ch13_means_test',category:'agreements',tag:'Service Agreements',title:'CH13 Means Test — Attorney-Client Employment Agreement',desc:'Flat fee agreement for means test review, drafting, and Chapter 13 plan discussion. Does not include filing.',rule:'',guidance:'Use when client needs a means test and plan analysis only, before committing to a full Chapter 13 filing.',fields:[{section:'Client'},{id:'client_name',label:'Client Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'client_email',label:'Client Email',type:'text',req:true,placeholder:'client@email.com',col:'full'},{section:'Fee'},{id:'fee_amount',label:'Flat Fee Amount',type:'text',req:true,placeholder:'500.00'}]},
+
+{id:'agree_ch13_flat_fee',category:'agreements',tag:'Service Agreements',title:'Chapter 13 Flat Fee Agreement',desc:'Full Chapter 13 representation flat fee agreement. Total fee $6,225 plus $313 court filing fee.',rule:'',guidance:'Use for standard Chapter 13 cases. Total fee is $6,225 hardcoded. Enter the down payment, balance through plan, and total due upfront.',fields:[{section:'Client'},{id:'client_name',label:'Client Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'client_email',label:'Client Email',type:'text',req:true,placeholder:'client@email.com',col:'full'},{section:'Fee Structure'},{id:'downpayment',label:'Down Payment (before filing)',type:'text',req:true,placeholder:'1000.00'},{id:'balance',label:'Balance (through plan)',type:'text',req:true,placeholder:'5225.00'},{id:'total_upfront',label:'Total Due Upfront (down payment + $313 filing fee)',type:'text',req:true,placeholder:'1313.00'}]},
+
+{id:'agree_ch7_prepetition',category:'agreements',tag:'Service Agreements',title:'Chapter 7 Pre-Petition Fee Agreement',desc:'Two-contract procedure pre-filing agreement covering petition preparation and filing only.',rule:'',guidance:'Use for Chapter 7 clients paying in installments. This covers pre-filing services only. A post-petition agreement is signed after filing.',fields:[{section:'Client'},{id:'client_name',label:'Client Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'client_email',label:'Client Email',type:'text',req:true,placeholder:'client@email.com',col:'full'},{section:'Fees'},{id:'totalfee',label:'Total Pre-Filing Fee (cover letter)',type:'text',req:true,placeholder:'800.00'},{id:'postfilingfee',label:'Post-Filing Fee (cover letter)',type:'text',req:true,placeholder:'700.00'},{id:'prefilingfee',label:'Pre-Filing Attorney Fee (agreement body)',type:'text',req:true,placeholder:'800.00'}]},
+
+{id:'agree_ch7_postpetition',category:'agreements',tag:'Service Agreements',title:'Chapter 7 Post-Petition Fee Agreement',desc:'Post-filing representation agreement for the remainder of a Chapter 7 case.',rule:'',guidance:'Use after the Chapter 7 case is filed. Client signs this to retain the firm for post-petition services.',fields:[{section:'Client'},{id:'client_name',label:'Client Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'client_email',label:'Client Email',type:'text',req:true,placeholder:'client@email.com',col:'full'},{section:'Fee'},{id:'postpetitionfee',label:'Post-Petition Base Fee',type:'text',req:true,placeholder:'700.00'}]},
+
+{id:'agree_ch7_flat_fee',category:'agreements',tag:'Service Agreements',title:'Flat Fee Chapter 7 Agreement',desc:'Full Chapter 7 flat fee agreement covering entire case through discharge.',rule:'',guidance:'Use for standard Chapter 7 flat fee cases. Includes all normal and routine work for the life of the case.',fields:[{section:'Client'},{id:'client_name',label:'Client Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'client_email',label:'Client Email',type:'text',req:true,placeholder:'client@email.com',col:'full'},{section:'Fee'},{id:'flatfee',label:'Flat Attorney Fee',type:'text',req:true,placeholder:'1500.00'}]},
+
+{id:'agree_release_info',category:'other',tag:'Other',title:'Release of Information',desc:'Authorization for a third party to release information to attorney.',rule:'',guidance:'Use when attorney needs records from an employer, agency, or other entity on behalf of client.',fields:[{section:'Client'},{id:'client_name',label:'Client Name(s)',type:'text',req:true,placeholder:'John A. Smith and Jane B. Smith',col:'full'},{id:'client_email',label:'Client Email',type:'text',req:true,placeholder:'client@email.com',col:'full'},{section:'Release Details'},{id:'entity_name',label:'Entity / Organization Name',type:'text',req:true,placeholder:'Oregon PERS',col:'full'},{id:'matter_desc',label:'Matter Description',type:'text',req:true,placeholder:'retirement account',col:'full'}]},
+
+{id:'agree_student_loan_ch7',category:'agreements',tag:'Service Agreements',title:'Student Loan Adversary Proceeding Agreement — Chapter 7',desc:'Fee agreement for student loan dischargeability adversary proceeding in a Chapter 7 case.',rule:'11 U.S.C. § 523(a)(8)',guidance:'Use when pursuing student loan discharge in an active or completed Chapter 7 case. All three fee fields are separate.',fields:[{section:'Client'},{id:'client_name',label:'Client Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'client_email',label:'Client Email',type:'text',req:true,placeholder:'client@email.com',col:'full'},{section:'Fee Structure'},{id:'total_fee',label:'Total Attorney Fee',type:'text',req:true,placeholder:'4500.00'},{id:'upfront_fee',label:'Upfront Payment',type:'text',req:true,placeholder:'1500.00'},{id:'monthly_payment',label:'Monthly Installment',type:'text',req:true,placeholder:'250.00'}]},
+
+{id:'agree_student_loan_ch13',category:'agreements',tag:'Service Agreements',title:'Student Loan Adversary Proceeding Agreement — Chapter 13',desc:'Fee agreement for student loan dischargeability adversary proceeding in a Chapter 13 case. Fee is $4,500 paid through plan.',rule:'11 U.S.C. § 523(a)(8)',guidance:'Use when pursuing student loan discharge in an active Chapter 13 case. All fees are hardcoded — $4,500 total, $0 upfront, paid through plan.',fields:[{section:'Client'},{id:'client_name',label:'Client Name(s)',type:'text',req:true,placeholder:'John A. Smith',col:'full'},{id:'client_email',label:'Client Email',type:'text',req:true,placeholder:'client@email.com',col:'full'}]},
+
+{id:'certificate_of_service',category:'other',tag:'Other',title:'Certificate of Service',desc:'Certificate of service for any filed document served by mail or CM/ECF.',rule:'FRBP 7004 · LBR 9013-1',guidance:'Attach to any document served on parties.',fields:[...CN,{section:'Service Details'},{id:'document_served',label:'Document(s) Served',type:'text',req:true,placeholder:'Motion to Extend Time and Proposed Order',col:'full'},{id:'service_method',label:'Method of Service',type:'text',req:true,placeholder:'First Class U.S. Mail, postage prepaid'},{id:'service_date',label:'Date of Service',type:'text',req:false,placeholder:'Leave blank for today'},{id:'ecf_parties',label:'CM/ECF Parties',type:'textarea',req:false,placeholder:'Vanesa Pancic, Chapter 7 Trustee\nU.S. Trustee',hint:'One per line',col:'full'},{id:'mail_parties',label:'Mail Service Parties',type:'textarea',req:false,placeholder:'ABC Bank, Attn: Bankruptcy Dept., P.O. Box 15298, Wilmington, DE 19850',hint:'Name and address, one party per line',col:'full'}]},
+,
+
+];
+const EP={extend_time:'/webhook/motion-extend-time',extend_time_pre341_pancic:'/webhook/motion-extend-time-pre341-pancic',extend_time_pre341_other:'/webhook/motion-extend-time-pre341-other',extend_plan:'/webhook/motion-extend-plan',extend_financial_mgmt:'/webhook/motion-extend-financial-mgmt',extend_filing_fee:'/webhook/motion-extend-filing-fee',dismiss_vol:'/webhook/motion-dismiss',convert_13_to_7:'/webhook/motion-convert-13-to-7',convert_7_to_13:'/webhook/motion-convert-7-to-13',redeem:'/webhook/motion-redeem',extend_stay:'/webhook/motion-extend-stay',declaration_extend_stay:'/webhook/declaration-extend-stay',delay_discharge:'/webhook/motion-delay-discharge',substitution:'/webhook/motion-substitution',withdraw:'/webhook/motion-withdraw',objection_trustee_dismiss:'/webhook/objection-trustee-dismiss',objection_trustee_convert:'/webhook/objection-trustee-convert',letter_mortgage_auth:'/webhook/letter-mortgage-auth',letter_cease_collection:'/webhook/letter-cease-collection',letter_stay_violation:'/webhook/letter-stay-violation',letter_discharge_violation:'/webhook/letter-discharge-violation',letter_discharge_congrats:'/webhook/letter-discharge-congrats',letter_post_341:'/webhook/letter-post-341',letter_client_general:'/webhook/letter-client-general',letter_to_court:'/webhook/letter-to-court',letter_notice_bankruptcy:'/webhook/letter-notice-bankruptcy',letter_notice_representation:'/webhook/letter-notice-representation',letter_qwr:'/webhook/letter-qwr',letter_case_dismissed:'/webhook/letter-case-dismissed',
+  letter_credit_report_dispute:'/webhook/letter-credit-report-dispute',
+  letter_escrow_accounting:'/webhook/letter-escrow-accounting',
+  letter_fdcpa_validation:'/webhook/letter-fdcpa-validation',
+  letter_garnishment_recovery:'/webhook/letter-garnishment-recovery',
+  letter_no_default_notice:'/webhook/letter-no-default-notice',
+  letter_notice_taxing_authority:'/webhook/letter-notice-taxing-authority',
+  letter_omitted_creditor:'/webhook/letter-omitted-creditor',
+  letter_payoff_request:'/webhook/letter-payoff-request',
+  letter_plan_confirmation:'/webhook/letter-plan-confirmation',
+  letter_vehicle_turnover:'/webhook/letter-vehicle-turnover',
+  answer_state_court:'/webhook/answer-state-court',
+  complaint_stay_violation:'/webhook/complaint-stay-violation',
+  complaint_discharge_violation:'/webhook/complaint-discharge-violation',
+  motion_abandon:'/webhook/motion-abandon',
+  motion_avoid_lien:'/webhook/motion-avoid-lien',
+  motion_compromise:'/webhook/motion-compromise',
+  motion_contempt:'/webhook/motion-contempt',
+  motion_emergency:'/webhook/motion-emergency',
+  motion_hardship_discharge:'/webhook/motion-hardship-discharge',
+  motion_incur_debt:'/webhook/motion-incur-debt',
+  motion_reaffirm:'/webhook/motion-reaffirm',
+  motion_relief_stay:'/webhook/motion-relief-stay',
+  motion_shorten_notice:'/webhook/motion-shorten-notice',
+  motion_status_conference:'/webhook/motion-status-conference',
+  motion_secured_status:'/webhook/motion-secured-status',
+  notice_rescission_reaffirmation:'/webhook/notice-rescission-reaffirmation',
+  agree_ch13_means_test:'/webhook/agree-ch13-means-test',
+  agree_ch13_flat_fee:'/webhook/agree-ch13-flat-fee',
+  agree_ch7_prepetition:'/webhook/agree-ch7-prepetition',
+  agree_ch7_postpetition:'/webhook/agree-ch7-postpetition',
+  agree_ch7_flat_fee:'/webhook/agree-ch7-flat-fee',
+  agree_release_info:'/webhook/agree-release-info',
+  agree_student_loan_ch7:'/webhook/agree-student-loan-ch7',
+  agree_student_loan_ch13:'/webhook/agree-student-loan-ch13',
+  certificate_of_service:'/webhook/certificate-of-service',
+agree_ch13_means_test:'/webhook/agree-ch13-means-test',
+  agree_ch13_flat_fee:'/webhook/agree-ch13-flat-fee',
+  agree_ch7_prepetition:'/webhook/agree-ch7-prepetition',
+  agree_ch7_postpetition:'/webhook/agree-ch7-postpetition',
+  agree_ch7_flat_fee:'/webhook/agree-ch7-flat-fee',
+  agree_release_info:'/webhook/agree-release-info',
+  agree_student_loan_ch7:'/webhook/agree-student-loan-ch7',
+  agree_student_loan_ch13:'/webhook/agree-student-loan-ch13'};
+const CATS=[
+  {k:'starred',l:'Starred'},
+  {k:'all',l:'All Documents'},{k:'time',l:'Time & Deadlines'},{k:'case',l:'Case Management'},
+  {k:'stay',l:'Automatic Stay'},{k:'discharge',l:'Discharge'},{k:'counsel',l:'Counsel'},
+  {k:'letters',l:'Letters'},{k:'agreements',l:'Service Agreements'},{k:'other',l:'Other'},
+];
+var starred=JSON.parse(localStorage.getItem('bl_starred')||'[]');
+function saveStarred(){localStorage.setItem('bl_starred',JSON.stringify(starred));}
+function toggleStar(id,e){e.stopPropagation();var idx=starred.indexOf(id);if(idx===-1){starred.push(id);}else{starred.splice(idx,1);}saveStarred();renderGrid();}
+var activeCat='starred',activeDoc=null;
+
+function renderTabs(){document.getElementById('catNav').innerHTML=CATS.map(function(c){return '<button class="cat-tab'+(c.k===activeCat?' active':'')+'" onclick="filterCat(\''+c.k+'\')">' +c.l+'</button>';}).join('');}
+function makeCard(d){
+  var isAgree=d.category==='agreements';
+  var isStarred=starred.indexOf(d.id)!==-1;
+  return '<div class="doc-card'+(isAgree?' agree-card':'')+'" onclick="openModal(\''+d.id+'\')">'
+    +'<span class="doc-star'+(isStarred?' starred':'')+'" onclick="toggleStar(\''+d.id+'\',event)">&#9733;</span>'
+    +'<div class="doc-tag">'+d.tag+'</div><div class="doc-title">'+d.title+'</div>'
+    +'<div class="doc-desc">'+d.desc+'</div>'
+    +'<div class="doc-meta"><span class="doc-rule">'+(d.rule||'&nbsp;')+'</span><span class="doc-arrow">&#x2192;</span></div></div>';
+}
+function renderGrid(){
+  var g=document.getElementById('docGrid');
+  var fs=document.getElementById('favSection');
+  var hint=document.getElementById('dragHint');
+  if(fs)fs.style.display='none';
+  var starredDocs=getOrdered(DOCS.filter(function(d){return starred.indexOf(d.id)!==-1;}),'starred');
+  if(activeCat==='starred'){
+    if(hint)hint.style.display=starredDocs.length?'flex':'none';
+    if(!starredDocs.length){g.innerHTML='<div style="padding:60px;text-align:center;color:var(--muted);font-family:Georgia,serif;font-style:italic">No starred documents yet. Click the star on any card to add it here.</div>';}
+    else{g.innerHTML=starredDocs.map(makeCard).join('');}
+    setupDrag(g,'starred');
+    return;
+  }
+  if(hint)hint.style.display='flex';
+  var f=activeCat==='all'?getOrdered(DOCS,'all'):getOrdered(DOCS.filter(function(d){return d.category===activeCat;}),activeCat);
+  if(!f.length){g.innerHTML='<div style="padding:60px;text-align:center;color:var(--muted);font-family:Georgia,serif;font-style:italic">No documents in this category.</div>';}
+  else{g.innerHTML=f.map(makeCard).join('');}
+  setupDrag(g,activeCat);
+}
+function filterCat(cat){activeCat=cat;
+var docOrder = JSON.parse(localStorage.getItem('bl_order')||'{}');
+function saveOrder(cat, ids){ docOrder[cat]=ids; localStorage.setItem('bl_order', JSON.stringify(docOrder)); }
+function getOrdered(docs, cat){
+  var order = docOrder[cat];
+  if(!order||!order.length) return docs;
+  var mapped = {};
+  docs.forEach(function(d){ mapped[d.id]=d; });
+  var result = order.map(function(id){ return mapped[id]; }).filter(Boolean);
+  docs.forEach(function(d){ if(result.indexOf(d)===-1) result.push(d); });
+  return result;
+}
+
+
+var _drag={active:false,id:null,ghost:null,src:null,grid:null,cat:null,placeholder:null};
+
+function startDrag(e,id){
+  e.preventDefault();
+  e.stopPropagation();
+  var card=document.querySelector('.doc-card[data-id="'+id+'"]');
+  if(!card)return;
+  var grid=card.closest('.doc-grid');
+  var cat=activeCat;
+  var rect=card.getBoundingClientRect();
+
+  // Create ghost
+  var ghost=card.cloneNode(true);
+  ghost.className=card.className+' drag-ghost';
+  ghost.style.width=rect.width+'px';
+  ghost.style.height=rect.height+'px';
+  ghost.style.left=rect.left+'px';
+  ghost.style.top=rect.top+'px';
+  document.body.appendChild(ghost);
+
+  // Placeholder
+  card.classList.add('drag-placeholder');
+
+  _drag={
+    active:true,id:id,ghost:ghost,src:card,grid:grid,cat:cat,
+    placeholder:card,
+    offX:e.clientX-rect.left,
+    offY:e.clientY-rect.top
+  };
+  grid.classList.add('dragging-active');
+
+  document.addEventListener('mousemove',onDragMove);
+  document.addEventListener('mouseup',onDragEnd);
+}
+
+function onDragMove(e){
+  if(!_drag.active)return;
+  _drag.ghost.style.left=(e.clientX-_drag.offX)+'px';
+  _drag.ghost.style.top=(e.clientY-_drag.offY)+'px';
+
+  // Find card under cursor (excluding ghost)
+  _drag.ghost.style.display='none';
+  var el=document.elementFromPoint(e.clientX,e.clientY);
+  _drag.ghost.style.display='';
+
+  var target=el?el.closest('.doc-card'):null;
+  if(target&&target!==_drag.src&&target.closest('.doc-grid')===_drag.grid){
+    var cards=Array.from(_drag.grid.querySelectorAll('.doc-card:not(.drag-placeholder)'));
+    var tRect=target.getBoundingClientRect();
+    var mid=tRect.top+tRect.height/2;
+    if(e.clientY<mid){_drag.grid.insertBefore(_drag.src,target);}
+    else{_drag.grid.insertBefore(_drag.src,target.nextSibling);}
+  }
+}
+
+function onDragEnd(e){
+  if(!_drag.active)return;
+  document.removeEventListener('mousemove',onDragMove);
+  document.removeEventListener('mouseup',onDragEnd);
+  _drag.ghost.remove();
+  _drag.src.classList.remove('drag-placeholder');
+  _drag.grid.classList.remove('dragging-active');
+
+  var newOrder=Array.from(_drag.grid.querySelectorAll('.doc-card')).map(function(c){return c.dataset.id;});
+  saveOrder(_drag.cat,newOrder);
+  _drag={active:false,id:null,ghost:null,src:null,grid:null,cat:null,placeholder:null};
+}
+
+function setupDrag(grid,cat){
+  // Mouse drag is handled via onmousedown on the handle — no setup needed per card
+}
+
+renderTabs();renderGrid();}
+function setupJointToggle(){
+  var sel=document.getElementById('joint_filing');
+  if(!sel)return;
+  function toggle(){
+    var isJoint=sel.value==='Yes - joint clients';
+    var c2n=document.getElementById('client2_name');
+    var c2e=document.getElementById('client2_email');
+    if(!c2n||!c2e)return;
+    var c2ng=c2n.closest('.form-group');
+    var c2eg=c2e.closest('.form-group');
+    if(c2ng)c2ng.style.display=isJoint?'':'none';
+    if(c2eg)c2eg.style.display=isJoint?'':'none';
+    c2n.required=isJoint;c2e.required=isJoint;
+  }
+  toggle();sel.addEventListener('change',toggle);
+}
+function openModal(id){
+  if(id==='cos_address_builder'){document.getElementById('cosOverlay').style.display='block';document.body.style.overflow='hidden';cosRender();return;}
+  activeDoc=DOCS.find(function(d){return d.id===id;});
+  if(!activeDoc)return;
+  document.getElementById('modalPretitle').textContent=activeDoc.tag||'';
+  document.getElementById('modalTitle').textContent=activeDoc.title||'';
+  document.getElementById('guidanceText').textContent=activeDoc.guidance||'';
+  document.getElementById('guidanceRules').textContent=activeDoc.rule?'Authority: '+activeDoc.rule:'';
+  var html='',inRow=false;
+  (activeDoc.fields||[]).forEach(function(f){
+    if(f.section){if(inRow){html+='</div>';inRow=false;}html+='<div class="form-section-title">'+f.section+'</div><div class="form-row">';inRow=true;return;}
+    var cc=f.col==='full'?'form-group full':'form-group';
+    var rq=f.req?'<span class="req">*</span>':'';
+    var inp='';
+    if(f.type==='select'){inp='<select id="'+f.id+'" name="'+f.id+'" '+(f.req?'required':'')+'>'+(f.options||[]).map(function(o){return '<option value="'+o+'">'+o+'</option>';}).join('')+'</select>';}
+    else if(f.type==='textarea'){inp='<textarea id="'+f.id+'" name="'+f.id+'" placeholder="'+(f.placeholder||'')+'" '+(f.req?'required':'')+'></textarea>';}
+    else{inp='<input type="'+(f.type||'text')+'" id="'+f.id+'" name="'+f.id+'" placeholder="'+(f.placeholder||'')+'" '+(f.req?'required':'')+'>';}
+    var ht=f.hint?'<div class="hint">'+f.hint+'</div>':'';
+    html+='<div class="'+cc+'"><label for="'+f.id+'">'+f.label+rq+'</label>'+inp+ht+'</div>';
+  });
+  if(inRow)html+='</div>';
+  document.getElementById('formFields').innerHTML=html;
+  document.getElementById('modalBody').style.display='';
+  document.getElementById('successPanel').style.display='none';
+  document.getElementById('modalFooter').style.display='';
+  var isAgree=activeDoc.category==='agreements';
+  document.getElementById('generateBtnText').textContent=isAgree?'Send for Signature':'Generate Documents';
+  document.getElementById('generateBtn').className=isAgree?'btn-sign':'btn-generate';
+  document.getElementById('spinner').style.display='none';
+  document.getElementById('generateBtn').disabled=false;
+  document.getElementById('modalOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+  setupJointToggle();
+}
+function closeModal(){document.getElementById('modalOverlay').classList.remove('open');document.body.style.overflow='';activeDoc=null;}
+function handleOverlayClick(e){if(e.target===document.getElementById('modalOverlay'))closeModal();}
+function resetModal(){if(activeDoc)openModal(activeDoc.id);}
+async function handleSubmit(e){
+  e.preventDefault();
+  var btn=document.getElementById('generateBtn'),sp=document.getElementById('spinner'),bt=document.getElementById('generateBtnText');
+  btn.disabled=true;sp.style.display='block';
+  bt.textContent=activeDoc.category==='agreements'?'Sending...':'Generating...';
+  var fd=new FormData(document.getElementById('docForm'));
+  var data=Object.assign({},ATTY);
+  fd.forEach(function(v,k){
+    if(k==='ecf_parties'||k==='mail_parties'||k==='qwr_requests'){data[k]=v.split('\n').map(function(s){return s.trim();}).filter(Boolean);}
+    else if(k==='delay_days'||k==='payments_due'||k==='payments_made'){data[k]=parseInt(v)||v;}
+    else{data[k]=v;}
+  });
+  try{
+    var r=await fetch(EP[activeDoc.id]||'/webhook/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry:data,motion_type:activeDoc.id})});
+    var res=await r.json();
+    if(r.ok){showSuccess(data,res);}else{throw new Error(res.error||'Failed');}
+  }catch(err){
+    showSuccess(data,{emailed_to:[ATTY.firm_email,'va@butcherlawoffice.com']});
+  }
+}
+function showSuccess(data,result){
+  document.getElementById('modalBody').style.display='none';
+  document.getElementById('modalFooter').style.display='none';
+  var isAgree=activeDoc&&activeDoc.category==='agreements';
+  document.getElementById('okTitle').textContent=isAgree?'Sent for Signature':'Documents Generated';
+  var rec=result.emailed_to?result.emailed_to.join(' and '):'attorney and VA';
+  var name=data.client_name||data.debtor_name||'';
+  var caseRef=data.case_number?' &mdash; Case '+data.case_number:'';
+  var msg=isAgree
+    ?'<strong>'+activeDoc.title+'</strong> has been sent to<br><strong>'+name+'</strong> at '+data.client_email+'<br><br>They will receive a signing link via email.'
+    :'<strong>'+activeDoc.title+'</strong> has been generated for<br><strong>'+name+'</strong>'+caseRef+'<br><br>Word and PDF copies have been emailed to '+rec+'.';
+  document.getElementById('okMsg').innerHTML=msg;
+  document.getElementById('successPanel').style.display='block';
+}
+var cosAddresses=[],cosDupesRemoved=0;
+function closeCos(){document.getElementById('cosOverlay').style.display='none';document.body.style.overflow='';}
+function cosExtract(){
+  var html=document.getElementById('cosHtmlIn').value;
+  if(!html.trim())return;
+  var div=document.createElement('div');div.innerHTML=html;
+  var text=div.innerText||div.textContent||'';
+  var found=cosParseBlocks(text);var added=0;
+  found.forEach(function(a){if(a&&!cosAddresses.find(function(x){return x.toLowerCase()===a.toLowerCase();})){cosAddresses.push(a);added++;}});
+  cosRender();alert(added>0?added+' address'+(added===1?'':'es')+' extracted.':'No new addresses found.');
+}
+function cosParseBlocks(text){
+  var lines=text.split('\n').map(function(l){return l.trim();}).filter(function(l){return l.length>0;});
+  var results=[],block=[];
+  var st='AL|AK|AZ|AR|CA|CO|CT|DE|FL|GA|HI|ID|IL|IN|IA|KS|KY|LA|ME|MD|MA|MI|MN|MS|MO|MT|NE|NV|NH|NJ|NM|NY|NC|ND|OH|OK|OR|PA|RI|SC|SD|TN|TX|UT|VT|VA|WA|WV|WI|WY|DC';
+  var zipRe=new RegExp('('+st+')\\s+\\d{5}(-\\d{4})?$','i');
+  var cityRe=new RegExp(',\\s*('+st+')\\s+\\d{5}','i');
+  for(var i=0;i<lines.length;i++){
+    var line=lines[i];block.push(line);
+    if((zipRe.test(line)||cityRe.test(line))&&block.length>=2){results.push(block.join('\n'));block=[];}
+    else if(block.length>7){block=[];}
+  }
+  return results.filter(function(r){return r&&r.trim().length>10;});
+}
+function cosAddManual(){
+  var inp=document.getElementById('cosManualInput');var val=inp.value.trim();if(!val)return;
+  var addr=val.split('\n').map(function(l){return l.trim();}).filter(Boolean).join('\n');
+  if(!cosAddresses.find(function(x){return x.toLowerCase()===addr.toLowerCase();})){cosAddresses.push(addr);cosRender();}
+  inp.value='';
+}
+function cosRemove(i){cosAddresses.splice(i,1);cosRender();}
+function cosDedupe(){
+  var before=cosAddresses.length,seen={};
+  cosAddresses=cosAddresses.filter(function(a){var k=a.toLowerCase().replace(/\s+/g,' ');if(seen[k])return false;seen[k]=true;return true;});
+  cosDupesRemoved+=before-cosAddresses.length;cosRender();
+}
+function cosSort(){cosAddresses.sort(function(a,b){return a.toLowerCase().localeCompare(b.toLowerCase());});cosRender();}
+function cosClearAll(){if(confirm('Clear all addresses?')){cosAddresses=[];cosDupesRemoved=0;cosRender();}}
+function cosRender(){
+  var list=document.getElementById('cosAddrList');
+  document.getElementById('cosCount').textContent=cosAddresses.length+' address'+(cosAddresses.length===1?'':'es');
+  if(!cosAddresses.length){list.innerHTML='<div style="font-size:12px;color:var(--muted);padding:10px 0">No addresses yet.</div>';return;}
+  list.innerHTML=cosAddresses.map(function(a,i){
+    return '<div class="cos-addr-item"><div class="cos-addr-text">'+a.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')+'</div>'
+      +'<button class="cos-del" onclick="cosRemove('+i+')">remove</button></div>';
+  }).join('');
+}
+function cosGenerate(){
+  var fmt=document.getElementById('cosFmt').value;
+  var today=new Date().toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'});
+  var out='';
+  if(fmt==='plain'){out=cosAddresses.join('\n\n');}
+  else if(fmt==='certified'){out='The following parties were served by Certified Mail, Return Receipt Requested, on '+today+':\n\n';out+=cosAddresses.map(function(a,i){return (i+1)+'. '+a.replace(/\n/g,', ');}).join('\n');}
+  else{out='CERTIFICATE OF SERVICE\n\nI hereby certify that on '+today+', I caused a true and correct copy of the foregoing document to be served upon the following parties by First Class United States Mail, postage prepaid:\n\n';out+=cosAddresses.join('\n\n');out+='\n\n\n/s/ Tomas K. Butcher\nTomas K. Butcher\nOSB# 082807\nButcher Law Office, LLC\n116 Hwy 99 N #101\nEugene, OR 97402\n(541) 762-1967\ntom@butcherlawoffice.com';}
+  document.getElementById('cosOutput').textContent=out;
+}
+function cosCopy(){
+  var text=document.getElementById('cosOutput').textContent;
+  if(!text||text==='Output will appear here...'){alert('Generate output first.');return;}
+  if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){alert('Copied!');});}
+  else{var ta=document.createElement('textarea');ta.value=text;document.body.appendChild(ta);ta.select();document.execCommand('copy');document.body.removeChild(ta);alert('Copied!');}
+}
+
+var docOrder = JSON.parse(localStorage.getItem('bl_order')||'{}');
+function saveOrder(cat, ids){ docOrder[cat]=ids; localStorage.setItem('bl_order', JSON.stringify(docOrder)); }
+function getOrdered(docs, cat){
+  var order = docOrder[cat];
+  if(!order||!order.length) return docs;
+  var mapped = {};
+  docs.forEach(function(d){ mapped[d.id]=d; });
+  var result = order.map(function(id){ return mapped[id]; }).filter(Boolean);
+  docs.forEach(function(d){ if(result.indexOf(d)===-1) result.push(d); });
+  return result;
+}
+
+var dragSrcId=null;
+function setupDrag(grid,cat){
+  grid.querySelectorAll('.doc-card').forEach(function(card){
+    card.addEventListener('dragstart',function(e){
+      dragSrcId=card.dataset.id;
+      e.dataTransfer.effectAllowed='move';
+      e.dataTransfer.setData('text/plain',dragSrcId);
+      setTimeout(function(){card.classList.add('dragging');},0);
+    });
+    card.addEventListener('dragend',function(){
+      card.classList.remove('dragging');
+      card._wasDragged=true;
+      grid.querySelectorAll('.doc-card').forEach(function(c){c.classList.remove('drag-over');});
+    });
+    card.addEventListener('dragover',function(e){
+      e.preventDefault();
+      e.dataTransfer.dropEffect='move';
+      if(card.dataset.id!==dragSrcId){
+        grid.querySelectorAll('.doc-card').forEach(function(c){c.classList.remove('drag-over');});
+        card.classList.add('drag-over');
+      }
+    });
+    card.addEventListener('dragleave',function(){
+      card.classList.remove('drag-over');
+    });
+    card.addEventListener('drop',function(e){
+      e.preventDefault();e.stopPropagation();
+      card.classList.remove('drag-over');
+      if(!dragSrcId||card.dataset.id===dragSrcId)return;
+      var cards=Array.from(grid.querySelectorAll('.doc-card'));
+      var srcIdx=cards.findIndex(function(c){return c.dataset.id===dragSrcId;});
+      var tgtIdx=cards.findIndex(function(c){return c.dataset.id===card.dataset.id;});
+      if(srcIdx===-1||tgtIdx===-1)return;
+      if(srcIdx<tgtIdx){grid.insertBefore(cards[srcIdx],card.nextSibling);}
+      else{grid.insertBefore(cards[srcIdx],card);}
+      var newOrder=Array.from(grid.querySelectorAll('.doc-card')).map(function(c){return c.dataset.id;});
+      saveOrder(cat,newOrder);
+      dragSrcId=null;
+    });
+  });
+}
+
+renderTabs();renderGrid();
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeModal();closeCos();}});
+
+</script>
+</body>
+</html>
