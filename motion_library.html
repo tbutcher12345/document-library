@@ -363,14 +363,18 @@ footer{margin-top:64px;padding:24px 32px;border-top:1px solid var(--rule);text-a
 .from-email-opt.fe-on{background:#fdf6e3;border-color:var(--gold)}
 
 /* ─── Send Destination Selector ─────────────────────────────────────── */
-.send-dest-row{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
-.send-dest-btn{flex:1;min-width:100px;padding:9px 12px;border:1.5px solid var(--rule);border-radius:4px;background:var(--paper);color:var(--ink);font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;transition:all .15s;text-align:center}
-.send-dest-btn:hover{border-color:var(--accent);color:var(--accent)}
-.send-dest-btn.active{background:var(--accent);border-color:var(--accent);color:#fff}
-.send-dest-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
-.send-extra-row{margin-top:8px;padding:10px 12px;background:var(--cream);border-radius:4px;border:1px solid var(--rule)}
-.send-extra-row input{width:100%;border:1px solid var(--rule);border-radius:3px;padding:7px 10px;font-family:inherit;font-size:12px;background:var(--paper);color:var(--ink);margin-top:4px;box-sizing:border-box}
-.send-extra-row label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.send-dest-label{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:8px}
+.send-dest-checks{display:flex;gap:8px;flex-wrap:wrap;margin:4px 0 4px}
+.send-dest-check{display:flex;align-items:center;gap:6px;padding:7px 12px;border:1.5px solid var(--rule);border-radius:4px;background:var(--paper);cursor:pointer;font-family:inherit;font-size:11px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;transition:all .15s;user-select:none}
+.send-dest-check:hover{border-color:var(--accent);color:var(--accent)}
+.send-dest-check.active{background:var(--accent);border-color:var(--accent);color:#fff}
+.send-dest-check input[type=checkbox]{display:none}
+.send-dest-fields{margin-top:8px;display:none}
+.send-dest-fields.open{display:block}
+.send-extra-row{padding:10px 12px;background:var(--cream);border-radius:4px;border:1px solid var(--rule);margin-bottom:6px}
+.send-extra-row input,.send-extra-row select{width:100%;border:1px solid var(--rule);border-radius:3px;padding:7px 10px;font-family:inherit;font-size:12px;background:var(--paper);color:var(--ink);margin-top:4px;box-sizing:border-box}
+.send-extra-row label{display:block;font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin-top:8px}
+.send-extra-row label:first-child{margin-top:0}
 </style>
 </head>
 <body>
@@ -2137,30 +2141,74 @@ function aiPolish(fieldId, e){
 }
 
 
-var _sendDest="email";
-function injectSendDestUI(){var doc=activeDoc;if(!doc||doc.category!=="letters")return;var form=document.getElementById("docForm");if(!form||document.getElementById("sendDestSection"))return;var s=document.createElement("div");s.id="sendDestSection";s.style.marginTop="16px";s.innerHTML='<div class="send-dest-label">Send To</div><div class="send-dest-row"><button type="button" class="send-dest-btn active" id="sdBtn_email" onclick="setSendDest(\'email\')">\u2709 Email Me</button><button type="button" class="send-dest-btn" id="sdBtn_fax" onclick="setSendDest(\'fax\')">\ud83d\udce0 Fax</button><button type="button" class="send-dest-btn" id="sdBtn_mail" onclick="setSendDest(\'mail\')">\ud83d\udcec Physical Mail</button><button type="button" class="send-dest-btn" id="sdBtn_download" onclick="setSendDest(\'download\')">\u2193 Download PDF</button></div><div id="sendDestExtra"></div>';form.appendChild(s);_sendDest="email";updateSendDestExtra();}
-function setSendDest(dest){_sendDest=dest;["email","fax","mail","download"].forEach(function(d){var b=document.getElementById("sdBtn_"+d);if(b)b.classList.toggle("active",d===dest);});updateSendDestExtra();}
-function updateSendDestExtra(){var el=document.getElementById("sendDestExtra");if(!el)return;if(_sendDest==="fax"){el.innerHTML='<div class="send-extra-row"><label>Fax Number</label><input id="sendFaxNumber" type="tel" placeholder="(503) 555-1234"/></div>';}else if(_sendDest==="mail"){el.innerHTML='<div class="send-extra-row"><label>Recipient Name</label><input id="sendMailName" placeholder="ABC Collections, LLC" style="margin-bottom:6px"/><label>Street Address</label><input id="sendMailStreet" placeholder="1234 Commerce Drive, Suite 100" style="margin-bottom:6px"/><label>City, State ZIP</label><input id="sendMailCityStateZip" placeholder="Portland, OR 97201" style="margin-bottom:6px"/><label>Mail Class</label><select id="sendMailType" style="width:100%;border:1px solid var(--rule);border-radius:3px;padding:7px 10px;font-family:inherit;font-size:12px;background:var(--paper);color:var(--ink)"><option value="usps_first_class">USPS First Class</option><option value="certified">Certified Mail</option><option value="certified_return_receipt">Certified + Return Receipt</option></select></div>';}else if(_sendDest==="email"){el.innerHTML='<div class="send-extra-row"><label>Send To Email — leave blank to send to yourself</label><input id="sendEmailAddr" type="email" placeholder="tom@butcherlawoffice.com"/></div>';}else{el.innerHTML='';}} 
+var _sendDests=new Set(['email']);
+
+function injectSendDestUI(doc){
+  doc=doc||window._activeDoc||{};
+  if(doc.category!=='letters') return;
+  _sendDests=new Set(['email']);
+  const form=document.getElementById('docForm');
+  const old=document.getElementById('sendDestRow');if(old) old.remove();
+  if(!form) return;
+  const wrap=document.createElement('div');
+  wrap.id='sendDestRow';
+  wrap.innerHTML='<div class="send-dest-label" style="margin-top:20px;border-top:1px solid var(--rule);padding-top:16px">Send To — select all that apply</div><div class="send-dest-checks"><label class="send-dest-check active" id="sdChk_email" onclick="toggleSendDest('email')"><input type="checkbox" checked>✉ Email Me</label><label class="send-dest-check" id="sdChk_fax" onclick="toggleSendDest('fax')"><input type="checkbox">📠 Fax</label><label class="send-dest-check" id="sdChk_mail" onclick="toggleSendDest('mail')"><input type="checkbox">📬 Physical Mail</label><label class="send-dest-check" id="sdChk_download" onclick="toggleSendDest('download')"><input type="checkbox">↓ Download PDF</label></div><div class="send-dest-fields open" id="sdFields_email"><div class="send-extra-row"><label>Send to Email — leave blank to send to yourself</label><input id="sendEmailAddr" placeholder="tom@butcherlawoffice.com"></div></div><div class="send-dest-fields" id="sdFields_fax"><div class="send-extra-row"><label>Fax Number</label><input id="sendFaxNum" placeholder="(503) 555-1234"></div></div><div class="send-dest-fields" id="sdFields_mail"><div class="send-extra-row"><label>Recipient Name</label><input id="sendMailName" placeholder="ABC Collections, LLC"><label>Street Address</label><input id="sendMailStreet" placeholder="1234 Commerce Drive, Suite 100"><label>City, State ZIP</label><input id="sendMailCityStateZip" placeholder="Portland, OR 97201"><label>Mail Class</label><select id="sendMailType"><option value="usps_first_class">USPS First Class</option><option value="certified">Certified Mail</option><option value="certified_return_receipt">Certified + Return Receipt</option></select></div></div>';
+  form.appendChild(wrap);
+}
+
+function toggleSendDest(dest){
+  const chk=document.getElementById('sdChk_'+dest);
+  const fields=document.getElementById('sdFields_'+dest);
+  if(_sendDests.has(dest)){
+    _sendDests.delete(dest);
+    if(chk){chk.classList.remove('active');chk.querySelector('input').checked=false;}
+    if(fields) fields.classList.remove('open');
+  } else {
+    _sendDests.add(dest);
+    if(chk){chk.classList.add('active');chk.querySelector('input').checked=true;}
+    if(fields) fields.classList.add('open');
+  }
+}
+
 async function handleSubmit(e){
   e.preventDefault();
-  var btn=document.getElementById('generateBtn'),sp=document.getElementById('spinner'),bt=document.getElementById('generateBtnText');
-  btn.disabled=true; sp.style.display='block';
-  if(!activeDoc){btn.disabled=false;sp.style.display='none';return;}
-  bt.textContent=activeDoc.category==='agreements'?'Sending...':'Generating...';
-  var fd=new FormData(document.getElementById('docForm'));
-  var data=Object.assign({},ATTY);
-  var cnEl=document.getElementById('case_number');
-  if(cnEl) data.chapter=inferChapter(cnEl.value);
-  fd.forEach(function(v,k){
-    if(k==='ecf_parties'||k==='mail_parties'||k==='qwr_requests'){ data[k]=v.split('\n').map(function(s){return s.trim();}).filter(Boolean); }
-    else if(k==='delay_days'||k==='payments_due'||k==='payments_made'){ data[k]=parseInt(v)||v; }
-    else{ data[k]=v; }
-  });
+  var btn=document.getElementById('generateBtn');
+  if(btn){btn.disabled=true;btn.textContent='Generating...';}
+  var form=document.getElementById('docForm');
+  var data=Object.fromEntries(new FormData(form));
+  var activeDoc=window._activeDoc||{};
+  var svc=localStorage.getItem('pdf_service_url')||'';
+  var sendDests=Array.from(_sendDests);
+  if(sendDests.length===0){alert('Please select at least one Send To option.');if(btn){btn.disabled=false;btn.textContent='Generate Documents';}return;}
+  var body=Object.assign({},data,{doc_id:activeDoc.id,doc_title:activeDoc.title,send_dests:sendDests});
+  var eAddr=(document.getElementById('sendEmailAddr')||{}).value||'';
+  var faxNum=(document.getElementById('sendFaxNum')||{}).value||'';
+  var mailName=(document.getElementById('sendMailName')||{}).value||'';
+  var mailStreet=(document.getElementById('sendMailStreet')||{}).value||'';
+  var mailCSZ=(document.getElementById('sendMailCityStateZip')||{}).value||'';
+  var mailType=(document.getElementById('sendMailType')||{}).value||'';
+  if(eAddr) body.send_email=eAddr;
+  if(faxNum) body.fax_number=faxNum;
+  if(mailName) body.mail_name=mailName;
+  if(mailStreet) body.mail_street=mailStreet;
+  if(mailCSZ) body.mail_csz=mailCSZ;
+  if(mailType) body.mail_type=mailType;
   try{
-    var r=await fetch((activeDoc&&EP[activeDoc.id])||'/webhook/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({entry:data,motion_type:activeDoc?activeDoc.id:'unknown',send_dest:_sendDest,fax_number:(document.getElementById('sendFaxNumber')||{}).value||'',mail_name:(document.getElementById('sendMailName')||{}).value||'',mail_street:(document.getElementById('sendMailStreet')||{}).value||'',mail_csz:(document.getElementById('sendMailCityStateZip')||{}).value||'',mail_type:(document.getElementById('sendMailType')||{}).value||'usps_first_class',send_email:(document.getElementById('sendEmailAddr')||{}).value||''})});
-    var res=await r.json();
-    if(r.ok){ showSuccess(data,res); } else { throw new Error(res.error||'Failed'); }
-  } catch(err){ showSuccess(data,{emailed_to:[ATTY.firm_email,'va@butcherlawoffice.com']}); }
+    var resp=await fetch(svc+'/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    var result=await resp.json();
+    if(result.success){
+      var labels={'email':'Email','fax':'Fax','mail':'Physical Mail','download':'Download'};
+      var channelList=sendDests.map(function(d){return labels[d]||d;}).join(', ');
+      showSuccess('Sent via: '+channelList,result);
+      if(sendDests.indexOf('download')>=0&&result.pdf_url){window.open(result.pdf_url,'_blank');}
+    } else {
+      showError(result.error||'Generation failed');
+    }
+  } catch(err){
+    showError('Network error: '+err.message);
+  } finally {
+    if(btn){btn.disabled=false;btn.textContent='Generate Documents';}
+  }
 }
 function showSuccess(data,result){
   document.getElementById('modalBody').style.display='none';
@@ -2176,10 +2224,10 @@ function showSuccess(data,result){
   var caseRef=data.case_number?' &mdash; Case '+data.case_number:'';
   var msg=isAgree
     ?'<strong>'+docTitle+'</strong> sent to<br><strong>'+name+'</strong> at '+data.client_email+'<br><br>They will receive a signing link via email.'
-    :'<strong>'+docTitle+'</strong> generated for<br><strong>'+name+'</strong>'+caseRef+'<br><br>'+(function(){var d=_sendDest;if(d==="download")return "Ready to download.";if(d==="fax"){var fn=(document.getElementById('sendFaxNumber')||{}).value;return "Queued to fax to "+(fn||"the provided number")+"."}if(d==="mail"){var mn=(document.getElementById('sendMailName')||{}).value;return "Queued for physical mail to "+(mn||"provided address")+"."}var se=(document.getElementById('sendEmailAddr')||{}).value;return "Emailed to "+(se||rec)+".";})()  ;
+    :'<strong>'+docTitle+'</strong> generated for<br><strong>'+name+'</strong>'+caseRef+'<br><br>'+(function(){var d=_sendDests.has("download")?"download":_sendDests.has("fax")?"fax":_sendDests.has("mail")?"mail":"email";if(d==="download")return "Ready to download.";if(d==="fax"){var fn=(document.getElementById('sendFaxNumber')||{}).value;return "Queued to fax to "+(fn||"the provided number")+"."}if(d==="mail"){var mn=(document.getElementById('sendMailName')||{}).value;return "Queued for physical mail to "+(mn||"provided address")+"."}var se=(document.getElementById('sendEmailAddr')||{}).value;return "Emailed to "+(se||rec)+".";})()  ;
   document.getElementById('okMsg').innerHTML=msg;
   document.getElementById('successPanel').style.display='block';
-  if(_sendDest==="download"){var dlBtn=document.getElementById('downloadPdfBtn');if(dlBtn)dlBtn.style.display='inline-block';setTimeout(function(){if(typeof downloadCurrentPDF==="function")downloadCurrentPDF();},400);}
+  if(_sendDests.has("download")){var dlBtn=document.getElementById('downloadPdfBtn');if(dlBtn)dlBtn.style.display='inline-block';setTimeout(function(){if(typeof downloadCurrentPDF==="function")downloadCurrentPDF();},400);}
 }
 
 // ── COS Tool ───────────────────────────────────────────────────────────
