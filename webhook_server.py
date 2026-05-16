@@ -436,77 +436,85 @@ def handle_request(motion_type):
         logger.info(f'Generating: {DOCS[motion_type]["label"]} â {data.get("debtor_name") or data.get("client_name")} {data.get("case_number")}')
         docx_bytes, pdf_bytes, base = generate_documents(motion_type, data)
         send_email(motion_type, data, docx_bytes, pdf_bytes, base)
-        send_dest = entry.get('send_dest', 'email')
+        # Support both legacy send_dest (string) and new send_dests (array)
+        raw_dests = entry.get('send_dests') or entry.get('send_dest', 'email')
+        if isinstance(raw_dests, str):
+            send_dests = [raw_dests]
+        else:
+            send_dests = list(raw_dests) if raw_dests else ['email']
+
         resp_data = {
             'status': 'success',
             'document': DOCS[motion_type]['label'],
             'case': data.get('case_number'),
             'debtor': data.get('debtor_name') or data.get('client_name'),
-            'send_dest': send_dest
+            'send_dests': send_dests
         }
 
-        if send_dest == 'fax':
-            fax_number = entry.get('fax_number', '')
-            if fax_number and pdf_bytes:
-                fax_resp = _send_fax_internal(
-                    fax_number=fax_number,
-                    pdf_b64=base64.b64encode(pdf_bytes).decode(),
-                    doc_title=DOCS[motion_type]['label'],
-                    client_name=data.get('debtor_name') or data.get('client_name', ''),
-                    case_no=data.get('case_number', '')
-                )
-                resp_data['fax_result'] = fax_resp
-            else:
-                resp_data['warning'] = 'Fax number or PDF missing; falling back to email'
-                send_email(motion_type, data, docx_bytes, pdf_bytes, base)
-                resp_data['emailed_to'] = [ATTORNEY_EMAIL, VA_EMAIL]
+        for dest in send_dests:
+            if dest == 'fax':
+                fax_number = entry.get('fax_number', '')
+                if fax_number and pdf_bytes:
+                    fax_resp = _send_fax_internal(
+                        fax_number=fax_number,
+                        pdf_b64=base64.b64encode(pdf_bytes).decode(),
+                        doc_title=DOCS[motion_type]['label'],
+                        debtor=data.get('debtor_name', '')
+                    )
+                    if not fax_resp.get('ok'):
+                        resp_data['fax_error'] = fax_resp.get('error', 'Fax failed')
+                    else:
+                        resp_data['fax_sent_to'] = fax_number
 
-        elif send_dest == 'mail':
-            if pdf_bytes:
-                mail_resp = _send_mail_internal(
-                    pdf_b64=base64.b64encode(pdf_bytes).decode(),
-                    doc_title=DOCS[motion_type]['label'],
-                    client_name=data.get('debtor_name') or data.get('client_name', ''),
-                    case_no=data.get('case_number', ''),
-                    to_name=entry.get('mail_name', ''),
-                    to_street=entry.get('mail_street', ''),
-                    to_csz=entry.get('mail_csz', ''),
-                    mail_type=entry.get('mail_type', 'usps_first_class')
-                )
-                resp_data['mail_result'] = mail_resp
-            else:
-                resp_data['warning'] = 'PDF not available; falling back to email'
-                send_email(motion_type, data, docx_bytes, pdf_bytes, base)
-                resp_data['emailed_to'] = [ATTORNEY_EMAIL, VA_EMAIL]
+            elif dest == 'mail':
+                mail_name = entry.get('mail_name', '')
+                mail_street = entry.get('mail_street', '')
+                mail_csz = entry.get('mail_csz', '')
+                mail_type = entry.get('mail_type', 'usps_first_class')
+                if mail_name and mail_street and mail_csz and pdf_bytes:
+                    parts = mail_csz.rsplit(',', 1)
+                    if len(parts) == 2:
+                        city = parts[0].strip()
+                        sz = parts[1].strip().split()
+                        state = sz[0] if sz else ''
+                        zip_code = sz[1] if len(sz) > 1 else ''
+                    else:
+                        city = mail_csz
+                        state = 'OR'
+                        zip_code = ''
+                    mail_resp = _send_mail_internal(
+                        pdf_bytes=pdf_bytes,
+                        to_name=mail_name,
+                        to_address1=mail_street,
+                        to_city=city,
+                        to_state=state,
+                        to_zip=zip_code,
+                        mail_type=mail_type,
+                        doc_title=DOCS[motion_type]['label']
+                    )
+                    if not mail_resp.get('ok'):
+                        resp_data['mail_error'] = mail_resp.get('error', 'Mail failed')
+                    else:
+                        resp_data['mail_sent_to'] = mail_name
 
-        elif send_dest == 'download':
-            # Return PDF as base64 for browser download
-            if pdf_bytes:
-                resp_data['pdf_base64'] = base64.b64encode(pdf_bytes).decode()
-                resp_data['filename'] = base + '.pdf'
-            else:
-                resp_data['warning'] = 'PDF service unavailable'
+            elif dest == 'email':
+                send_email = entry.get('send_email') or ATTORNEY_EMAIL
+                if pdf_bytes:
+                    email_resp = _send_resend_doc(
+                        to_email=send_email,
+                        pdf_b64=base64.b64encode(pdf_bytes).decode(),
+                        doc_title=DOCS[motion_type]['label'],
+                        debtor=data.get('debtor_name', '')
+                    )
+                    if not email_resp.get('ok'):
+                        resp_data['email_error'] = email_resp.get('error', 'Email failed')
+                    else:
+                        resp_data['emailed_to'] = send_email
 
-        else:  # email (default)
-            send_dest_email = entry.get('send_email', '')
-            if send_dest_email:
-                # Override recipients if custom email provided
-                import smtplib as _smtp
-                orig_atty = ATTORNEY_EMAIL
-                # Use Resend to send to the custom address
-                _send_resend_doc(
-                    to_email=send_dest_email,
-                    doc_title=DOCS[motion_type]['label'],
-                    debtor=data.get('debtor_name') or data.get('client_name', ''),
-                    case_no=data.get('case_number', ''),
-                    pdf_bytes=pdf_bytes,
-                    docx_bytes=docx_bytes,
-                    base=base
-                )
-                resp_data['emailed_to'] = [send_dest_email]
-            else:
-                send_email(motion_type, data, docx_bytes, pdf_bytes, base)
-                resp_data['emailed_to'] = [ATTORNEY_EMAIL, VA_EMAIL]
+            elif dest == 'download':
+                # Download is handled client-side; include pdf_b64 in response
+                if pdf_bytes:
+                    resp_data['pdf_b64'] = base64.b64encode(pdf_bytes).decode()
 
         return jsonify(resp_data), 200
     except Exception as e:
