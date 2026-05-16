@@ -1,5 +1,5 @@
 """
-Butcher Law Office — Document Generator Server
+Butcher Law Office â Document Generator Server
 Serves the Document Library web app and handles all document generation webhooks.
 
 ENV VARIABLES (set in Railway):
@@ -33,6 +33,14 @@ LAWPAY_TRUST_ID     = os.environ.get('LAWPAY_TRUST_ID', 'ajUpcpeuTBKGIM4JMOGo2w'
 # Resend API key (for payment email)
 RESEND_API_KEY = os.environ.get('RESEND_API_KEY', 're_6CS7mGhu_CDgKBwA7c2P46uwLubnMM4zc')
 
+LOB_API_KEY    = os.environ.get('LOB_API_KEY', '')
+REDFAX_DOMAIN  = os.environ.get('REDFAX_DOMAIN', 'redfax.com')  # email-to-fax gateway domain
+FIRM_NAME      = os.environ.get('FIRM_NAME', 'Butcher Law Office LLC')
+FIRM_ADDRESS1  = os.environ.get('FIRM_ADDRESS1', '116 Hwy 99 N #101')
+FIRM_CITY      = os.environ.get('FIRM_CITY', 'Eugene')
+FIRM_STATE     = os.environ.get('FIRM_STATE', 'OR')
+FIRM_ZIP       = os.environ.get('FIRM_ZIP', '97402')
+
 # Dropbox Sign API key (for verifying webhook signatures)
 DSIGN_API_KEY = os.environ.get('DSIGN_API_KEY', '4270ba333e457cc394bd924de0bdebda30c603bb3d8bddb4cd445876629cce54')
 
@@ -40,7 +48,7 @@ DSIGN_API_KEY = os.environ.get('DSIGN_API_KEY', '4270ba333e457cc394bd924de0bdebd
 # Populated by the library when sending for signature
 pending_payments = {}
 
-# ── LawPay helpers ────────────────────────────────────────────────────────
+# ââ LawPay helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 def lawpay_create_payment_request(client_email, amount_cents, description, account_type='operating'):
     """Create a LawPay payment request. Returns (payment_link, request_id) or raises."""
@@ -111,7 +119,7 @@ p{{margin:0 0 12pt;line-height:1.65}}
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read())
 
-# ── Dropbox Sign webhook ──────────────────────────────────────────────────
+# ââ Dropbox Sign webhook ââââââââââââââââââââââââââââââââââââââââââââââââââ
 
 @app.route('/webhook/dropbox-sign', methods=['POST'])
 def dropbox_sign_webhook():
@@ -146,14 +154,14 @@ def dropbox_sign_webhook():
     # Look up pending payment
     payment = pending_payments.pop(sig_req_id, None)
     if not payment:
-        logger.info(f'No pending payment for {sig_req_id} — nothing to do')
+        logger.info(f'No pending payment for {sig_req_id} â nothing to do')
         return 'Hello API Event Received', 200
 
     client_name  = payment.get('client_name', '')
     client_email = payment.get('client_email', '')
     amount_str   = payment.get('amount', '0')
     account_type = payment.get('account_type', 'operating')
-    description  = payment.get('description', 'Legal Services — Fee Agreement')
+    description  = payment.get('description', 'Legal Services â Fee Agreement')
 
     try:
         amount_cents = round(float(amount_str) * 100)
@@ -171,7 +179,7 @@ def dropbox_sign_webhook():
 
     return 'Hello API Event Received', 200
 
-# ── Pending payment registration (called by the browser app) ─────────────
+# ââ Pending payment registration (called by the browser app) âââââââââââââ
 
 @app.route('/webhook/register-payment', methods=['POST'])
 def register_payment():
@@ -212,23 +220,23 @@ ATTORNEY_DEFAULTS = {
 
 DOCS = {
     'extend_time':               {'script': 'generate_motion_extend_time.js',                'label': 'Motion for Extension of Time to File Deficient Documents'},
-    'extend_time_pre341_pancic': {'script': 'generate_motion_extend_time_pre341_pancic.js',  'label': 'Motion for Extension of Time — Deficient Documents (Pre-341, Trustee Pancic)'},
-    'extend_time_pre341_other':  {'script': 'generate_motion_extend_time_pre341_other.js',   'label': 'Motion for Extension of Time — Deficient Documents (Pre-341)'},
+    'extend_time_pre341_pancic': {'script': 'generate_motion_extend_time_pre341_pancic.js',  'label': 'Motion for Extension of Time â Deficient Documents (Pre-341, Trustee Pancic)'},
+    'extend_time_pre341_other':  {'script': 'generate_motion_extend_time_pre341_other.js',   'label': 'Motion for Extension of Time â Deficient Documents (Pre-341)'},
     'extend_plan':               {'script': 'generate_motion_extend_plan.js',                'label': 'Motion for Extension of Time to File Chapter 13 Plan'},
     'extend_financial_mgmt':     {'script': 'generate_motion_extend_financial_mgmt.js',      'label': 'Motion for Extension of Time to File Financial Management Course Certificate'},
     'extend_filing_fee':         {'script': 'generate_motion_extend_filing_fee.js',          'label': 'Motion for Extension of Time to Pay Filing Fee'},
     'dismiss_vol':               {'script': 'generate_motion_dismiss.js',                    'label': 'Motion to Voluntarily Dismiss Case'},
     'convert_13_to_7':           {'script': 'generate_motion_convert_13_to_7.js',            'label': 'Motion to Convert Case from Chapter 13 to Chapter 7'},
     'convert_7_to_13':           {'script': 'generate_motion_convert_7_to_13.js',            'label': 'Motion to Convert Case from Chapter 7 to Chapter 13'},
-    'redeem':                    {'script': 'generate_motion_redeem.js',                     'label': 'Motion to Redeem Property — 11 U.S.C. § 722'},
-    'extend_stay':               {'script': 'generate_motion_extend_stay.js',                'label': 'Motion to Extend Automatic Stay — 11 U.S.C. § 362(c)(3)'},
-    'declaration_extend_stay':   {'script': 'generate_declaration_extend_stay.js',           'label': 'Debtor Declaration — Motion to Extend Stay'},
+    'redeem':                    {'script': 'generate_motion_redeem.js',                     'label': 'Motion to Redeem Property â 11 U.S.C. Â§ 722'},
+    'extend_stay':               {'script': 'generate_motion_extend_stay.js',                'label': 'Motion to Extend Automatic Stay â 11 U.S.C. Â§ 362(c)(3)'},
+    'declaration_extend_stay':   {'script': 'generate_declaration_extend_stay.js',           'label': 'Debtor Declaration â Motion to Extend Stay'},
     'delay_discharge':           {'script': 'generate_motion_delay_discharge.js',            'label': 'Motion to Delay Entry of Discharge'},
     'substitution':              {'script': 'generate_motion_substitution.js',               'label': 'Stipulation for Substitution of Attorney'},
     'withdraw':                  {'script': 'generate_motion_withdraw.js',                   'label': 'Motion to Withdraw as Counsel'},
     'objection_trustee_dismiss': {'script': 'generate_objection_trustee_dismiss.js',         'label': "Objection to Trustee's Motion to Dismiss"},
     'objection_trustee_convert': {'script': 'generate_objection_trustee_convert.js',         'label': "Objection to Trustee's Motion to Convert"},
-    'letter_mortgage_auth':      {'script': 'generate_letter_mortgage_auth.js',              'label': 'Authorization Letter — Mortgage Servicer'},
+    'letter_mortgage_auth':      {'script': 'generate_letter_mortgage_auth.js',              'label': 'Authorization Letter â Mortgage Servicer'},
     'certificate_of_service':    {'script': 'generate_certificate_of_service.js',            'label': 'Certificate of Service'},
 }
 
@@ -269,8 +277,8 @@ def send_email(motion_type, data, docx_bytes, pdf_bytes, base):
     case_no = data.get('case_number', 'Unknown')
     debtor  = data.get('debtor_name') or data.get('client_name', 'Unknown')
     today   = date.today().strftime('%B %d, %Y')
-    subject = f'{label} — {debtor} — Case {case_no}'
-    body    = f'{label}\n\nCase: {debtor}\nCase No.: {case_no}\nGenerated: {today}\n\nAttachments:\n  • {base}.docx\n  • {base}.pdf\n'
+    subject = f'{label} â {debtor} â Case {case_no}'
+    body    = f'{label}\n\nCase: {debtor}\nCase No.: {case_no}\nGenerated: {today}\n\nAttachments:\n  â¢ {base}.docx\n  â¢ {base}.pdf\n'
     recipients = [ATTORNEY_EMAIL, VA_EMAIL]
     msg = MIMEMultipart()
     msg['From'] = GMAIL_USER; msg['To'] = ', '.join(recipients); msg['Subject'] = subject
@@ -286,7 +294,135 @@ def send_email(motion_type, data, docx_bytes, pdf_bytes, base):
     with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
         s.login(GMAIL_USER, GMAIL_APP_PASSWORD)
         s.sendmail(GMAIL_USER, recipients, msg.as_string())
-    logger.info(f'Emailed: {label} — {debtor} ({case_no})')
+    logger.info(f'Emailed: {label} â {debtor} ({case_no})')
+
+
+# ── Internal send helpers ────────────────────────────────────────────────────
+def _send_fax_internal(fax_number, pdf_b64, doc_title, client_name='', case_no=''):
+    """Send a fax via RedFax email-to-fax gateway using Resend."""
+    if not RESEND_API_KEY:
+        return {'error': 'RESEND_API_KEY not configured'}
+    digits = ''.join(c for c in fax_number if c.isdigit())
+    if len(digits) == 10:
+        digits = '1' + digits
+    fax_email = f'{digits}@{REDFAX_DOMAIN}'
+    subject = doc_title
+    if client_name: subject += f' — {client_name}'
+    if case_no:     subject += f' (Case {case_no})'
+    import urllib.request as _ur, json as _json
+    body = {
+        'from':    f'{FIRM_NAME} <tom@butcherlawoffice.com>',
+        'to':      [fax_email],
+        'subject': subject,
+        'text':    f'{FIRM_NAME}\nFax transmission: {subject}',
+        'attachments': [{
+            'filename': doc_title.replace(' ', '_') + '.pdf',
+            'content':  pdf_b64
+        }]
+    }
+    req = _ur.Request(
+        'https://api.resend.com/emails',
+        data=_json.dumps(body).encode(),
+        headers={'Authorization': f'Bearer {RESEND_API_KEY}', 'Content-Type': 'application/json'},
+        method='POST'
+    )
+    try:
+        with _ur.urlopen(req) as resp:
+            result = _json.loads(resp.read())
+        logger.info(f'Fax queued: {doc_title} → {fax_email}')
+        return {'status': 'success', 'fax_to': fax_number, 'fax_email': fax_email, 'resend_id': result.get('id')}
+    except Exception as e:
+        logger.error(f'Fax send error: {e}')
+        return {'error': str(e)}
+
+
+def _send_mail_internal(pdf_b64, doc_title, client_name='', case_no='',
+                         to_name='', to_street='', to_csz='', mail_type='usps_first_class', color=False):
+    """Send physical mail via Lob API."""
+    if not LOB_API_KEY:
+        return {'error': 'LOB_API_KEY not configured'}
+    if not all([pdf_b64, to_name, to_street, to_csz]):
+        return {'error': 'Missing recipient address fields'}
+    import re as _re, json as _json, urllib.request as _ur, base64 as _b64
+    csz_match = _re.match(r'^(.+?),?\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$', to_csz.strip())
+    if not csz_match:
+        return {'error': f'Cannot parse city/state/zip from: {to_csz}'}
+    to_city, to_state, to_zip = csz_match.groups()
+    lob_body = {
+        'description': f'{doc_title} — {client_name or to_name}',
+        'to': {
+            'name':            to_name,
+            'address_line1':   to_street,
+            'address_city':    to_city.strip(),
+            'address_state':   to_state,
+            'address_zip':     to_zip,
+            'address_country': 'US'
+        },
+        'from': {
+            'name':            f'Tomas K. Butcher, {FIRM_NAME}',
+            'address_line1':   FIRM_ADDRESS1,
+            'address_city':    FIRM_CITY,
+            'address_state':   FIRM_STATE,
+            'address_zip':     FIRM_ZIP,
+            'address_country': 'US'
+        },
+        'file':              f'<html><head></head><body style="margin:0;padding:0"><pdf pages="all" src="data:application/pdf;base64,{pdf_b64}"/></body></html>',
+        'color':             color,
+        'double_sided':      False,
+        'address_placement': 'insert_blank_page',
+        'mail_type':         mail_type
+    }
+    auth_str = _b64.b64encode(f'{LOB_API_KEY}:'.encode()).decode()
+    req = _ur.Request(
+        'https://api.lob.com/v1/letters',
+        data=_json.dumps(lob_body).encode(),
+        headers={'Authorization': f'Basic {auth_str}', 'Content-Type': 'application/json'},
+        method='POST'
+    )
+    try:
+        with _ur.urlopen(req) as resp:
+            result = _json.loads(resp.read())
+        logger.info(f'Mail queued via Lob: {doc_title} → {to_name}, {to_city} {to_state}')
+        return {
+            'status': 'success',
+            'lob_id': result.get('id'),
+            'expected_delivery': result.get('expected_delivery_date'),
+            'mail_to': f'{to_name}, {to_street}, {to_city}, {to_state} {to_zip}'
+        }
+    except Exception as e:
+        logger.error(f'Lob mail error: {e}')
+        return {'error': str(e)}
+
+
+def _send_resend_doc(to_email, doc_title, debtor, case_no, pdf_bytes, docx_bytes, base):
+    """Send document via Resend to a custom email address."""
+    if not RESEND_API_KEY:
+        return
+    import urllib.request as _ur, json as _json, base64 as _b64
+    attachments = []
+    if docx_bytes:
+        attachments.append({'filename': base+'.docx', 'content': _b64.b64encode(docx_bytes).decode()})
+    if pdf_bytes:
+        attachments.append({'filename': base+'.pdf', 'content': _b64.b64encode(pdf_bytes).decode()})
+    body = {
+        'from':        f'{FIRM_NAME} <tom@butcherlawoffice.com>',
+        'to':          [to_email],
+        'subject':     f'{doc_title} — {debtor} — Case {case_no}',
+        'text':        f'{doc_title}\nCase: {debtor}\nCase No.: {case_no}',
+        'attachments': attachments
+    }
+    req = _ur.Request(
+        'https://api.resend.com/emails',
+        data=_json.dumps(body).encode(),
+        headers={'Authorization': f'Bearer {RESEND_API_KEY}', 'Content-Type': 'application/json'},
+        method='POST'
+    )
+    try:
+        with _ur.urlopen(req) as resp: pass
+        logger.info(f'Resend doc email sent to {to_email}')
+    except Exception as e:
+        logger.error(f'Resend doc email error: {e}')
+
 
 def handle_request(motion_type):
     try:
@@ -297,15 +433,87 @@ def handle_request(motion_type):
             if f in data:
                 try: data[f] = int(data[f])
                 except: pass
-        logger.info(f'Generating: {DOCS[motion_type]["label"]} — {data.get("debtor_name") or data.get("client_name")} {data.get("case_number")}')
+        logger.info(f'Generating: {DOCS[motion_type]["label"]} â {data.get("debtor_name") or data.get("client_name")} {data.get("case_number")}')
         docx_bytes, pdf_bytes, base = generate_documents(motion_type, data)
         send_email(motion_type, data, docx_bytes, pdf_bytes, base)
-        return jsonify({'status': 'success', 'document': DOCS[motion_type]['label'], 'case': data.get('case_number'), 'debtor': data.get('debtor_name') or data.get('client_name'), 'emailed_to': [ATTORNEY_EMAIL, VA_EMAIL]}), 200
+        send_dest = entry.get('send_dest', 'email')
+        resp_data = {
+            'status': 'success',
+            'document': DOCS[motion_type]['label'],
+            'case': data.get('case_number'),
+            'debtor': data.get('debtor_name') or data.get('client_name'),
+            'send_dest': send_dest
+        }
+
+        if send_dest == 'fax':
+            fax_number = entry.get('fax_number', '')
+            if fax_number and pdf_bytes:
+                fax_resp = _send_fax_internal(
+                    fax_number=fax_number,
+                    pdf_b64=base64.b64encode(pdf_bytes).decode(),
+                    doc_title=DOCS[motion_type]['label'],
+                    client_name=data.get('debtor_name') or data.get('client_name', ''),
+                    case_no=data.get('case_number', '')
+                )
+                resp_data['fax_result'] = fax_resp
+            else:
+                resp_data['warning'] = 'Fax number or PDF missing; falling back to email'
+                send_email(motion_type, data, docx_bytes, pdf_bytes, base)
+                resp_data['emailed_to'] = [ATTORNEY_EMAIL, VA_EMAIL]
+
+        elif send_dest == 'mail':
+            if pdf_bytes:
+                mail_resp = _send_mail_internal(
+                    pdf_b64=base64.b64encode(pdf_bytes).decode(),
+                    doc_title=DOCS[motion_type]['label'],
+                    client_name=data.get('debtor_name') or data.get('client_name', ''),
+                    case_no=data.get('case_number', ''),
+                    to_name=entry.get('mail_name', ''),
+                    to_street=entry.get('mail_street', ''),
+                    to_csz=entry.get('mail_csz', ''),
+                    mail_type=entry.get('mail_type', 'usps_first_class')
+                )
+                resp_data['mail_result'] = mail_resp
+            else:
+                resp_data['warning'] = 'PDF not available; falling back to email'
+                send_email(motion_type, data, docx_bytes, pdf_bytes, base)
+                resp_data['emailed_to'] = [ATTORNEY_EMAIL, VA_EMAIL]
+
+        elif send_dest == 'download':
+            # Return PDF as base64 for browser download
+            if pdf_bytes:
+                resp_data['pdf_base64'] = base64.b64encode(pdf_bytes).decode()
+                resp_data['filename'] = base + '.pdf'
+            else:
+                resp_data['warning'] = 'PDF service unavailable'
+
+        else:  # email (default)
+            send_dest_email = entry.get('send_email', '')
+            if send_dest_email:
+                # Override recipients if custom email provided
+                import smtplib as _smtp
+                orig_atty = ATTORNEY_EMAIL
+                # Use Resend to send to the custom address
+                _send_resend_doc(
+                    to_email=send_dest_email,
+                    doc_title=DOCS[motion_type]['label'],
+                    debtor=data.get('debtor_name') or data.get('client_name', ''),
+                    case_no=data.get('case_number', ''),
+                    pdf_bytes=pdf_bytes,
+                    docx_bytes=docx_bytes,
+                    base=base
+                )
+                resp_data['emailed_to'] = [send_dest_email]
+            else:
+                send_email(motion_type, data, docx_bytes, pdf_bytes, base)
+                resp_data['emailed_to'] = [ATTORNEY_EMAIL, VA_EMAIL]
+
+        return jsonify(resp_data), 200
     except Exception as e:
-        logger.error(f'Error — {motion_type}: {e}', exc_info=True)
+        logger.error(f'Error â {motion_type}: {e}', exc_info=True)
         return jsonify({'error': str(e)}), 500
 
-# ── ROUTES ──────────────────────────────────────────────────
+# ââ ROUTES ââââââââââââââââââââââââââââââââââââââââââââââââââ
 @app.route('/webhook/motion-extend-time',               methods=['POST'])
 def r01(): return handle_request('extend_time')
 @app.route('/webhook/motion-extend-time-pre341-pancic', methods=['POST'])
@@ -345,11 +553,196 @@ def r18(): return handle_request('letter_mortgage_auth')
 @app.route('/webhook/certificate-of-service',           methods=['POST'])
 def r19(): return handle_request('certificate_of_service')
 
+
+# ── Send via Fax (RedFax email-to-fax) ──────────────────────────────────────
+@app.route('/send/fax', methods=['POST'])
+def send_fax():
+    try:
+        payload    = request.get_json(force=True) or {}
+        fax_number = payload.get('fax_number', '').strip()
+        pdf_b64    = payload.get('pdf_base64', '')
+        doc_title  = payload.get('doc_title', 'Document')
+        client_name= payload.get('client_name', '')
+        case_no    = payload.get('case_number', '')
+
+        if not fax_number:
+            return jsonify({'error': 'fax_number is required'}), 400
+        if not pdf_b64:
+            return jsonify({'error': 'pdf_base64 is required'}), 400
+        if not RESEND_API_KEY:
+            return jsonify({'error': 'RESEND_API_KEY not configured'}), 500
+
+        # Normalize fax number: strip all non-digits
+        digits = ''.join(c for c in fax_number if c.isdigit())
+        if len(digits) == 10:
+            digits = '1' + digits  # add country code
+        fax_email = f'{digits}@{REDFAX_DOMAIN}'
+
+        pdf_bytes = base64.b64decode(pdf_b64)
+        subject   = f'{doc_title}'
+        if client_name: subject += f' — {client_name}'
+        if case_no:     subject += f' (Case {case_no})'
+
+        # Send via Resend with PDF attachment to fax gateway
+        import urllib.request as _ur, json as _json
+        body = {
+            'from': f'{FIRM_NAME} <tom@butcherlawoffice.com>',
+            'to':   [fax_email],
+            'subject': subject,
+            'text': f'{FIRM_NAME}\nFax transmission: {subject}',
+            'attachments': [{
+                'filename': f'{doc_title.replace(" ", "_")}.pdf',
+                'content':  pdf_b64
+            }]
+        }
+        req = _ur.Request(
+            'https://api.resend.com/emails',
+            data=_json.dumps(body).encode(),
+            headers={
+                'Authorization': f'Bearer {RESEND_API_KEY}',
+                'Content-Type': 'application/json'
+            },
+            method='POST'
+        )
+        with _ur.urlopen(req) as resp:
+            result = _json.loads(resp.read())
+
+        logger.info(f'Fax queued: {doc_title} → {fax_email}')
+        return jsonify({'status': 'success', 'fax_to': fax_number, 'fax_email': fax_email, 'resend_id': result.get('id')}), 200
+
+    except Exception as e:
+        logger.error(f'Fax error: {e}', exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
+# ── Send via Physical Mail (Lob) ─────────────────────────────────────────────
+@app.route('/send/mail', methods=['POST'])
+def send_mail():
+    try:
+        payload    = request.get_json(force=True) or {}
+        pdf_b64    = payload.get('pdf_base64', '')
+        doc_title  = payload.get('doc_title', 'Document')
+        client_name= payload.get('client_name', '')
+        case_no    = payload.get('case_number', '')
+        to_name    = payload.get('mail_name', '').strip()
+        to_street  = payload.get('mail_street', '').strip()
+        to_csz     = payload.get('mail_city_state_zip', '').strip()  # e.g. "Portland, OR 97201"
+        color      = payload.get('color', False)
+        mail_type  = payload.get('mail_type', 'usps_first_class')  # or 'certified'
+
+        if not LOB_API_KEY:
+            return jsonify({'error': 'LOB_API_KEY not configured'}), 500
+        if not all([pdf_b64, to_name, to_street, to_csz]):
+            return jsonify({'error': 'pdf_base64, mail_name, mail_street, mail_city_state_zip are required'}), 400
+
+        # Parse city/state/zip from "Portland, OR 97201" or "Portland OR 97201"
+        import re as _re
+        csz_match = _re.match(r'^(.+?),?\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$', to_csz.strip())
+        if not csz_match:
+            return jsonify({'error': f'Cannot parse city/state/zip: {to_csz}'}), 400
+        to_city, to_state, to_zip = csz_match.groups()
+
+        pdf_bytes  = base64.b64decode(pdf_b64)
+
+        import urllib.request as _ur, json as _json
+        from urllib.parse import urlencode as _ue
+
+        # Upload PDF to Lob
+        boundary = 'ButcherLawBoundary'
+        body_parts = []
+        body_parts.append(f'--{boundary}\r\nContent-Disposition: form-data; name="description"\r\n\r\n{doc_title}\r\n')
+        pdf_part = (
+            f'--{boundary}\r\n'
+            f'Content-Disposition: form-data; name="file"; filename="letter.pdf"\r\n'
+            f'Content-Type: application/pdf\r\n\r\n'
+        )
+        body = (
+            pdf_part.encode() + pdf_bytes +
+            f'\r\n--{boundary}--\r\n'.encode()
+        )
+
+        # Lob create letter endpoint
+        lob_body = {
+            'description':     f'{doc_title} — {client_name or to_name}',
+            'to[name]':        to_name,
+            'to[address_line1]': to_street,
+            'to[address_city]':  to_city.strip(),
+            'to[address_state]': to_state,
+            'to[address_zip]':   to_zip,
+            'to[address_country]': 'US',
+            'from[name]':          f'Tomas K. Butcher, {FIRM_NAME}',
+            'from[address_line1]': FIRM_ADDRESS1,
+            'from[address_city]':  FIRM_CITY,
+            'from[address_state]': FIRM_STATE,
+            'from[address_zip]':   FIRM_ZIP,
+            'from[address_country]': 'US',
+            'color':           'true' if color else 'false',
+            'double_sided':    'false',
+            'address_placement': 'insert_blank_page',
+            'mail_type':       mail_type,
+            'file':            f'<html><head></head><body><pdf src="data:application/pdf;base64,{pdf_b64}"/></body></html>'
+        }
+
+        # Use multipart form for Lob (it prefers it for file uploads)
+        # Actually Lob accepts JSON with hosted_url or HTML; we'll send as HTML wrapping the PDF
+        lob_json_body = {
+            'description':    f'{doc_title} — {client_name or to_name}',
+            'to': {
+                'name':             to_name,
+                'address_line1':    to_street,
+                'address_city':     to_city.strip(),
+                'address_state':    to_state,
+                'address_zip':      to_zip,
+                'address_country':  'US'
+            },
+            'from': {
+                'name':             f'Tomas K. Butcher, {FIRM_NAME}',
+                'address_line1':    FIRM_ADDRESS1,
+                'address_city':     FIRM_CITY,
+                'address_state':    FIRM_STATE,
+                'address_zip':      FIRM_ZIP,
+                'address_country':  'US'
+            },
+            'file':          f'<html><head></head><body style="margin:0;padding:0"><pdf pages="all" src="data:application/pdf;base64,{pdf_b64}"/></body></html>',
+            'color':         color,
+            'double_sided':  False,
+            'address_placement': 'insert_blank_page',
+            'mail_type':     mail_type
+        }
+
+        import base64 as _b64
+        auth_str = _b64.b64encode(f'{LOB_API_KEY}:'.encode()).decode()
+        req = _ur.Request(
+            'https://api.lob.com/v1/letters',
+            data=_json.dumps(lob_json_body).encode(),
+            headers={
+                'Authorization': f'Basic {auth_str}',
+                'Content-Type':  'application/json'
+            },
+            method='POST'
+        )
+        with _ur.urlopen(req) as resp:
+            result = _json.loads(resp.read())
+
+        logger.info(f'Mail queued via Lob: {doc_title} → {to_name}, {to_city}, {to_state}')
+        return jsonify({
+            'status':       'success',
+            'lob_id':       result.get('id'),
+            'expected_delivery': result.get('expected_delivery_date'),
+            'mail_to':      f'{to_name}, {to_street}, {to_city}, {to_state} {to_zip}',
+            'mail_type':    mail_type
+        }), 200
+
+    except Exception as e:
+        logger.error(f'Mail error: {e}', exc_info=True)
+        return jsonify({'error': str(e)}), 500
+
+
 @app.route('/health', methods=['GET'])
 def health():
     return jsonify({'status': 'ok', 'documents': len(DOCS), 'routes': list(DOCS.keys())}), 200
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    logger.info(f'Starting on port {port} — {len(DOCS)} documents registered')
+    logger.info(f'Starting on port {port} â {len(DOCS)} documents registered')
     app.run(host='0.0.0.0', port=port, debug=False)
