@@ -2147,26 +2147,28 @@ function injectSendDestUI(doc){
   doc=doc||window._activeDoc||{};
   if(doc.category!=='letters') return;
   _sendDests=new Set(['email']);
-  const form=document.getElementById('docForm');
-  const old=document.getElementById('sendDestRow');if(old) old.remove();
+  var form=document.getElementById('docForm');
+  var old=document.getElementById('sendDestRow');if(old) old.remove();
   if(!form) return;
-  const wrap=document.createElement('div');
+  var wrap=document.createElement('div');
   wrap.id='sendDestRow';
-  wrap.innerHTML='<div class="send-dest-label" style="margin-top:20px;border-top:1px solid var(--rule);padding-top:16px">Send To — select all that apply</div><div class="send-dest-checks"><label class="send-dest-check active" id="sdChk_email" onclick="toggleSendDest('email')"><input type="checkbox" checked>✉ Email Me</label><label class="send-dest-check" id="sdChk_fax" onclick="toggleSendDest('fax')"><input type="checkbox">📠 Fax</label><label class="send-dest-check" id="sdChk_mail" onclick="toggleSendDest('mail')"><input type="checkbox">📬 Physical Mail</label><label class="send-dest-check" id="sdChk_download" onclick="toggleSendDest('download')"><input type="checkbox">↓ Download PDF</label></div><div class="send-dest-fields open" id="sdFields_email"><div class="send-extra-row"><label>Send to Email — leave blank to send to yourself</label><input id="sendEmailAddr" placeholder="tom@butcherlawoffice.com"></div></div><div class="send-dest-fields" id="sdFields_fax"><div class="send-extra-row"><label>Fax Number</label><input id="sendFaxNum" placeholder="(503) 555-1234"></div></div><div class="send-dest-fields" id="sdFields_mail"><div class="send-extra-row"><label>Recipient Name</label><input id="sendMailName" placeholder="ABC Collections, LLC"><label>Street Address</label><input id="sendMailStreet" placeholder="1234 Commerce Drive, Suite 100"><label>City, State ZIP</label><input id="sendMailCityStateZip" placeholder="Portland, OR 97201"><label>Mail Class</label><select id="sendMailType"><option value="usps_first_class">USPS First Class</option><option value="certified">Certified Mail</option><option value="certified_return_receipt">Certified + Return Receipt</option></select></div></div>';
+  var emailFields='<div class="send-dest-fields open" id="sdFields_email"><div class="send-extra-row"><label>Send to Email &mdash; leave blank to send to yourself</label><input id="sendEmailAddr" placeholder="tom@butcherlawoffice.com"></div></div>';
+  var faxFields='<div class="send-dest-fields" id="sdFields_fax"><div class="send-extra-row"><label>Fax Number</label><input id="sendFaxNum" placeholder="(503) 555-1234"></div></div>';
+  var mailFields='<div class="send-dest-fields" id="sdFields_mail"><div class="send-extra-row"><label>Recipient Name</label><input id="sendMailName" placeholder="ABC Collections, LLC"><label>Street Address</label><input id="sendMailStreet" placeholder="1234 Commerce Drive, Suite 100"><label>City, State ZIP</label><input id="sendMailCityStateZip" placeholder="Portland, OR 97201"><label>Mail Class</label><select id="sendMailType"><option value="usps_first_class">USPS First Class</option><option value="certified">Certified Mail</option><option value="certified_return_receipt">Certified + Return Receipt</option></select></div></div>';
+  var html=['<div class="send-dest-label" style="margin-top:20px;border-top:1px solid var(--rule);padding-top:16px">Send To &mdash; select all that apply</div>','<div class="send-dest-checks">','<label class="send-dest-check active" id="sdChk_email" onclick="toggleSendDest(this)">&#9993; Email Me</label>','<label class="send-dest-check" id="sdChk_fax" onclick="toggleSendDest(this)">&#128224; Fax</label>','<label class="send-dest-check" id="sdChk_mail" onclick="toggleSendDest(this)">&#128236; Physical Mail</label>','<label class="send-dest-check" id="sdChk_download" onclick="toggleSendDest(this)">&#8595; Download PDF</label>','</div>',emailFields,faxFields,mailFields].join('');
+  wrap.innerHTML=html;
   form.appendChild(wrap);
 }
 
-function toggleSendDest(dest){
-  const chk=document.getElementById('sdChk_'+dest);
-  const fields=document.getElementById('sdFields_'+dest);
+function toggleSendDest(el){
+  var dest=el.id.replace('sdChk_','');
+  var fields=document.getElementById('sdFields_'+dest);
   if(_sendDests.has(dest)){
-    _sendDests.delete(dest);
-    if(chk){chk.classList.remove('active');chk.querySelector('input').checked=false;}
-    if(fields) fields.classList.remove('open');
+    _sendDests.delete(dest);el.classList.remove('active');
+    if(fields)fields.classList.remove('open');
   } else {
-    _sendDests.add(dest);
-    if(chk){chk.classList.add('active');chk.querySelector('input').checked=true;}
-    if(fields) fields.classList.add('open');
+    _sendDests.add(dest);el.classList.add('active');
+    if(fields)fields.classList.add('open');
   }
 }
 
