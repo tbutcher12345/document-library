@@ -1,16 +1,12 @@
 """
-Butcher Law Office Ã¢ÂÂ Document Generator Server
+Butcher Law Office ÃÂ¢ÃÂÃÂ Document Generator Server
 Serves the Document Library web app and handles all document generation webhooks.
 
 ENV VARIABLES (set in Railway):
     GMAIL_USER, GMAIL_APP_PASSWORD, ATTORNEY_EMAIL, VA_EMAIL
 """
 
-import os, json, subprocess, tempfile, smtplib, logging, hmac, hashlib, base64
-from email.mime.multipart import MIMEMultipart
-from email.mime.base import MIMEBase
-from email.mime.text import MIMEText
-from email import encoders
+import os, json, subprocess, tempfile, logging, hmac, hashlib, base64
 from datetime import date
 from flask import Flask, request, jsonify, send_from_directory
 import urllib.request
@@ -19,8 +15,6 @@ app = Flask(__name__)
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-GMAIL_USER         = os.environ.get('GMAIL_USER', 'your.gmail@gmail.com')
-GMAIL_APP_PASSWORD = os.environ.get('GMAIL_APP_PASSWORD', '')
 ATTORNEY_EMAIL     = os.environ.get('ATTORNEY_EMAIL', 'tom@butcherlawoffice.com')
 VA_EMAIL           = os.environ.get('VA_EMAIL', 'va@butcherlawoffice.com')
 BASE_DIR           = os.path.dirname(os.path.abspath(__file__))
@@ -49,7 +43,7 @@ DSIGN_API_KEY = os.environ.get('DSIGN_API_KEY', '4270ba333e457cc394bd924de0bdebd
 # Populated by the library when sending for signature
 pending_payments = {}
 
-# Ã¢ÂÂÃ¢ÂÂ LawPay helpers Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ LawPay helpers ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 def lawpay_create_payment_request(client_email, amount_cents, description, account_type='operating'):
     """Create a LawPay payment request. Returns (payment_link, request_id) or raises."""
@@ -120,7 +114,7 @@ p{{margin:0 0 12pt;line-height:1.65}}
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read())
 
-# Ã¢ÂÂÃ¢ÂÂ Dropbox Sign webhook Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Dropbox Sign webhook ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 @app.route('/webhook/dropbox-sign', methods=['POST'])
 def dropbox_sign_webhook():
@@ -155,14 +149,14 @@ def dropbox_sign_webhook():
     # Look up pending payment
     payment = pending_payments.pop(sig_req_id, None)
     if not payment:
-        logger.info(f'No pending payment for {sig_req_id} Ã¢ÂÂ nothing to do')
+        logger.info(f'No pending payment for {sig_req_id} ÃÂ¢ÃÂÃÂ nothing to do')
         return 'Hello API Event Received', 200
 
     client_name  = payment.get('client_name', '')
     client_email = payment.get('client_email', '')
     amount_str   = payment.get('amount', '0')
     account_type = payment.get('account_type', 'operating')
-    description  = payment.get('description', 'Legal Services Ã¢ÂÂ Fee Agreement')
+    description  = payment.get('description', 'Legal Services ÃÂ¢ÃÂÃÂ Fee Agreement')
 
     try:
         amount_cents = round(float(amount_str) * 100)
@@ -180,7 +174,7 @@ def dropbox_sign_webhook():
 
     return 'Hello API Event Received', 200
 
-# Ã¢ÂÂÃ¢ÂÂ Pending payment registration (called by the browser app) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Pending payment registration (called by the browser app) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 
 @app.route('/webhook/register-payment', methods=['POST'])
 def register_payment():
@@ -221,23 +215,23 @@ ATTORNEY_DEFAULTS = {
 
 DOCS = {
     'extend_time':               {'script': 'generate_motion_extend_time.js',                'label': 'Motion for Extension of Time to File Deficient Documents'},
-    'extend_time_pre341_pancic': {'script': 'generate_motion_extend_time_pre341_pancic.js',  'label': 'Motion for Extension of Time Ã¢ÂÂ Deficient Documents (Pre-341, Trustee Pancic)'},
-    'extend_time_pre341_other':  {'script': 'generate_motion_extend_time_pre341_other.js',   'label': 'Motion for Extension of Time Ã¢ÂÂ Deficient Documents (Pre-341)'},
+    'extend_time_pre341_pancic': {'script': 'generate_motion_extend_time_pre341_pancic.js',  'label': 'Motion for Extension of Time ÃÂ¢ÃÂÃÂ Deficient Documents (Pre-341, Trustee Pancic)'},
+    'extend_time_pre341_other':  {'script': 'generate_motion_extend_time_pre341_other.js',   'label': 'Motion for Extension of Time ÃÂ¢ÃÂÃÂ Deficient Documents (Pre-341)'},
     'extend_plan':               {'script': 'generate_motion_extend_plan.js',                'label': 'Motion for Extension of Time to File Chapter 13 Plan'},
     'extend_financial_mgmt':     {'script': 'generate_motion_extend_financial_mgmt.js',      'label': 'Motion for Extension of Time to File Financial Management Course Certificate'},
     'extend_filing_fee':         {'script': 'generate_motion_extend_filing_fee.js',          'label': 'Motion for Extension of Time to Pay Filing Fee'},
     'dismiss_vol':               {'script': 'generate_motion_dismiss.js',                    'label': 'Motion to Voluntarily Dismiss Case'},
     'convert_13_to_7':           {'script': 'generate_motion_convert_13_to_7.js',            'label': 'Motion to Convert Case from Chapter 13 to Chapter 7'},
     'convert_7_to_13':           {'script': 'generate_motion_convert_7_to_13.js',            'label': 'Motion to Convert Case from Chapter 7 to Chapter 13'},
-    'redeem':                    {'script': 'generate_motion_redeem.js',                     'label': 'Motion to Redeem Property Ã¢ÂÂ 11 U.S.C. ÃÂ§ 722'},
-    'extend_stay':               {'script': 'generate_motion_extend_stay.js',                'label': 'Motion to Extend Automatic Stay Ã¢ÂÂ 11 U.S.C. ÃÂ§ 362(c)(3)'},
-    'declaration_extend_stay':   {'script': 'generate_declaration_extend_stay.js',           'label': 'Debtor Declaration Ã¢ÂÂ Motion to Extend Stay'},
+    'redeem':                    {'script': 'generate_motion_redeem.js',                     'label': 'Motion to Redeem Property ÃÂ¢ÃÂÃÂ 11 U.S.C. ÃÂÃÂ§ 722'},
+    'extend_stay':               {'script': 'generate_motion_extend_stay.js',                'label': 'Motion to Extend Automatic Stay ÃÂ¢ÃÂÃÂ 11 U.S.C. ÃÂÃÂ§ 362(c)(3)'},
+    'declaration_extend_stay':   {'script': 'generate_declaration_extend_stay.js',           'label': 'Debtor Declaration ÃÂ¢ÃÂÃÂ Motion to Extend Stay'},
     'delay_discharge':           {'script': 'generate_motion_delay_discharge.js',            'label': 'Motion to Delay Entry of Discharge'},
     'substitution':              {'script': 'generate_motion_substitution.js',               'label': 'Stipulation for Substitution of Attorney'},
     'withdraw':                  {'script': 'generate_motion_withdraw.js',                   'label': 'Motion to Withdraw as Counsel'},
     'objection_trustee_dismiss': {'script': 'generate_objection_trustee_dismiss.js',         'label': "Objection to Trustee's Motion to Dismiss"},
     'objection_trustee_convert': {'script': 'generate_objection_trustee_convert.js',         'label': "Objection to Trustee's Motion to Convert"},
-    'letter_mortgage_auth':      {'script': 'generate_letter_mortgage_auth.js',              'label': 'Authorization Letter Ã¢ÂÂ Mortgage Servicer'},
+    'letter_mortgage_auth':      {'script': 'generate_letter_mortgage_auth.js',              'label': 'Authorization Letter ÃÂ¢ÃÂÃÂ Mortgage Servicer'},
     'certificate_of_service':    {'script': 'generate_certificate_of_service.js',            'label': 'Certificate of Service'},
 }
 
@@ -274,31 +268,24 @@ def generate_documents(motion_type, data):
         return docx_bytes, pdf_bytes, base
 
 def send_email(motion_type, data, docx_bytes, pdf_bytes, base):
-    label   = DOCS[motion_type]['label']
-    case_no = data.get('case_number', 'Unknown')
-    debtor  = data.get('debtor_name') or data.get('client_name', 'Unknown')
-    today   = date.today().strftime('%B %d, %Y')
-    subject = f'{label} Ã¢ÂÂ {debtor} Ã¢ÂÂ Case {case_no}'
-    body    = f'{label}\n\nCase: {debtor}\nCase No.: {case_no}\nGenerated: {today}\n\nAttachments:\n  Ã¢ÂÂ¢ {base}.docx\n  Ã¢ÂÂ¢ {base}.pdf\n'
-    recipients = [ATTORNEY_EMAIL, VA_EMAIL]
-    msg = MIMEMultipart()
-    msg['From'] = GMAIL_USER; msg['To'] = ', '.join(recipients); msg['Subject'] = subject
-    msg.attach(MIMEText(body, 'plain'))
-    p = MIMEBase('application', 'vnd.openxmlformats-officedocument.wordprocessingml.document')
-    p.set_payload(docx_bytes); encoders.encode_base64(p)
-    p.add_header('Content-Disposition', f'attachment; filename="{base}.docx"')
-    msg.attach(p)
-    if pdf_bytes:
-        p2 = MIMEBase('application', 'pdf'); p2.set_payload(pdf_bytes); encoders.encode_base64(p2)
-        p2.add_header('Content-Disposition', f'attachment; filename="{base}.pdf"')
-        msg.attach(p2)
-    with smtplib.SMTP_SSL('smtp.gmail.com', 465) as s:
-        s.login(GMAIL_USER, GMAIL_APP_PASSWORD)
-        s.sendmail(GMAIL_USER, recipients, msg.as_string())
-    logger.info(f'Emailed: {label} Ã¢ÂÂ {debtor} ({case_no})')
+    """Send document email via Resend API (replaces Gmail SMTP)."""
+    to_email   = data.get('send_email') or ATTORNEY_EMAIL
+    doc_title  = DOCS.get(motion_type, {}).get('label', motion_type)
+    debtor     = data.get('debtor_name', '')
+    case_no    = data.get('case_number', '')
+    result = _send_resend_doc(
+        to_email   = to_email,
+        doc_title  = doc_title,
+        debtor     = debtor,
+        case_no    = case_no,
+        pdf_bytes  = pdf_bytes,
+        docx_bytes = docx_bytes,
+        base       = base,
+    )
+    if not result.get('ok'):
+        raise Exception(result.get('error', 'Resend email failed'))
+    logger.info(f'Email sent via Resend to {to_email} for {doc_title}')
 
-
-# ââ Internal send helpers ââââââââââââââââââââââââââââââââââââââââââââââââââââ
 def _send_fax_internal(fax_number, pdf_b64, doc_title, client_name='', case_no=''):
     """Send a fax via RedFax email-to-fax gateway using Resend."""
     if not RESEND_API_KEY:
@@ -308,7 +295,7 @@ def _send_fax_internal(fax_number, pdf_b64, doc_title, client_name='', case_no='
         digits = '1' + digits
     fax_email = f'{digits}@{REDFAX_DOMAIN}'
     subject = doc_title
-    if client_name: subject += f' â {client_name}'
+    if client_name: subject += f' Ã¢ÂÂ {client_name}'
     if case_no:     subject += f' (Case {case_no})'
     import urllib.request as _ur, json as _json
     body = {
@@ -330,7 +317,7 @@ def _send_fax_internal(fax_number, pdf_b64, doc_title, client_name='', case_no='
     try:
         with _ur.urlopen(req) as resp:
             result = _json.loads(resp.read())
-        logger.info(f'Fax queued: {doc_title} â {fax_email}')
+        logger.info(f'Fax queued: {doc_title} Ã¢ÂÂ {fax_email}')
         return {'status': 'success', 'fax_to': fax_number, 'fax_email': fax_email, 'resend_id': result.get('id')}
     except Exception as e:
         logger.error(f'Fax send error: {e}')
@@ -350,7 +337,7 @@ def _send_mail_internal(pdf_b64, doc_title, client_name='', case_no='',
         return {'error': f'Cannot parse city/state/zip from: {to_csz}'}
     to_city, to_state, to_zip = csz_match.groups()
     lob_body = {
-        'description': f'{doc_title} â {client_name or to_name}',
+        'description': f'{doc_title} Ã¢ÂÂ {client_name or to_name}',
         'to': {
             'name':            to_name,
             'address_line1':   to_street,
@@ -383,7 +370,7 @@ def _send_mail_internal(pdf_b64, doc_title, client_name='', case_no='',
     try:
         with _ur.urlopen(req) as resp:
             result = _json.loads(resp.read())
-        logger.info(f'Mail queued via Lob: {doc_title} â {to_name}, {to_city} {to_state}')
+        logger.info(f'Mail queued via Lob: {doc_title} Ã¢ÂÂ {to_name}, {to_city} {to_state}')
         return {
             'status': 'success',
             'lob_id': result.get('id'),
@@ -408,7 +395,7 @@ def _send_resend_doc(to_email, doc_title, debtor, case_no, pdf_bytes, docx_bytes
     body = {
         'from':        f'{FIRM_NAME} <{ATTORNEY_EMAIL}>',
         'to':          [to_email],
-        'subject':     f'{doc_title} â {debtor} â Case {case_no}',
+        'subject':     f'{doc_title} Ã¢ÂÂ {debtor} Ã¢ÂÂ Case {case_no}',
         'text':        f'{doc_title}\nCase: {debtor}\nCase No.: {case_no}',
         'attachments': attachments
     }
@@ -434,7 +421,7 @@ def handle_request(motion_type):
             if f in data:
                 try: data[f] = int(data[f])
                 except: pass
-        logger.info(f'Generating: {DOCS[motion_type]["label"]} Ã¢ÂÂ {data.get("debtor_name") or data.get("client_name")} {data.get("case_number")}')
+        logger.info(f'Generating: {DOCS[motion_type]["label"]} ÃÂ¢ÃÂÃÂ {data.get("debtor_name") or data.get("client_name")} {data.get("case_number")}')
         docx_bytes, pdf_bytes, base = generate_documents(motion_type, data)
         # Support both legacy send_dest (string) and new send_dests (array)
         raw_dests = entry.get('send_dests') or entry.get('send_dest', 'email')
@@ -523,10 +510,10 @@ def handle_request(motion_type):
 
         return jsonify(resp_data), 200
     except Exception as e:
-        logger.error(f'Error Ã¢ÂÂ {motion_type}: {e}', exc_info=True)
+        logger.error(f'Error ÃÂ¢ÃÂÃÂ {motion_type}: {e}', exc_info=True)
         return jsonify({'error': str(e)}), 500
 
-# Ã¢ÂÂÃ¢ÂÂ ROUTES Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
+# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ ROUTES ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
 @app.route('/webhook/motion-extend-time',               methods=['POST'])
 def r01(): return handle_request('extend_time')
 @app.route('/webhook/motion-extend-time-pre341-pancic', methods=['POST'])
@@ -567,7 +554,7 @@ def r18(): return handle_request('letter_mortgage_auth')
 def r19(): return handle_request('certificate_of_service')
 
 
-# ââ Send via Fax (RedFax email-to-fax) ââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂ Send via Fax (RedFax email-to-fax) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 @app.route('/send/fax', methods=['POST'])
 def send_fax():
     try:
@@ -593,7 +580,7 @@ def send_fax():
 
         pdf_bytes = base64.b64decode(pdf_b64)
         subject   = f'{doc_title}'
-        if client_name: subject += f' â {client_name}'
+        if client_name: subject += f' Ã¢ÂÂ {client_name}'
         if case_no:     subject += f' (Case {case_no})'
 
         # Send via Resend with PDF attachment to fax gateway
@@ -620,7 +607,7 @@ def send_fax():
         with _ur.urlopen(req) as resp:
             result = _json.loads(resp.read())
 
-        logger.info(f'Fax queued: {doc_title} â {fax_email}')
+        logger.info(f'Fax queued: {doc_title} Ã¢ÂÂ {fax_email}')
         return jsonify({'status': 'success', 'fax_to': fax_number, 'fax_email': fax_email, 'resend_id': result.get('id')}), 200
 
     except Exception as e:
@@ -628,7 +615,7 @@ def send_fax():
         return jsonify({'error': str(e)}), 500
 
 
-# ââ Send via Physical Mail (Lob) âââââââââââââââââââââââââââââââââââââââââââââ
+# Ã¢ÂÂÃ¢ÂÂ Send via Physical Mail (Lob) Ã¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂÃ¢ÂÂ
 @app.route('/send/mail', methods=['POST'])
 def send_mail():
     try:
@@ -676,7 +663,7 @@ def send_mail():
 
         # Lob create letter endpoint
         lob_body = {
-            'description':     f'{doc_title} â {client_name or to_name}',
+            'description':     f'{doc_title} Ã¢ÂÂ {client_name or to_name}',
             'to[name]':        to_name,
             'to[address_line1]': to_street,
             'to[address_city]':  to_city.strip(),
@@ -699,7 +686,7 @@ def send_mail():
         # Use multipart form for Lob (it prefers it for file uploads)
         # Actually Lob accepts JSON with hosted_url or HTML; we'll send as HTML wrapping the PDF
         lob_json_body = {
-            'description':    f'{doc_title} â {client_name or to_name}',
+            'description':    f'{doc_title} Ã¢ÂÂ {client_name or to_name}',
             'to': {
                 'name':             to_name,
                 'address_line1':    to_street,
@@ -737,7 +724,7 @@ def send_mail():
         with _ur.urlopen(req) as resp:
             result = _json.loads(resp.read())
 
-        logger.info(f'Mail queued via Lob: {doc_title} â {to_name}, {to_city}, {to_state}')
+        logger.info(f'Mail queued via Lob: {doc_title} Ã¢ÂÂ {to_name}, {to_city}, {to_state}')
         return jsonify({
             'status':       'success',
             'lob_id':       result.get('id'),
@@ -757,5 +744,5 @@ def health():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    logger.info(f'Starting on port {port} Ã¢ÂÂ {len(DOCS)} documents registered')
+    logger.info(f'Starting on port {port} ÃÂ¢ÃÂÃÂ {len(DOCS)} documents registered')
     app.run(host='0.0.0.0', port=port, debug=False)
