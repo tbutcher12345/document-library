@@ -430,7 +430,10 @@ def _send_resend_doc(to_email, pdf_b64, doc_title, debtor=''):
     import json as _json
     import urllib.request as _ur
     import urllib.error as _ue
-    subject = doc_title + (f' - {debtor}' if debtor else '')
+    # Sanitize subject: strip non-ASCII (mojibake from em-dashes etc.) and truncate to 200 chars
+    _clean = lambda s: s.encode('ascii', errors='replace').decode('ascii').replace('?','').strip()
+    subject = _clean(doc_title) + (f' - {_clean(debtor)}' if debtor else '')
+    subject = (subject or 'Document')[:200]
     body_html = f'<html><body><p>Please find attached: <strong>{doc_title}</strong></p><p>Debtor: {debtor}</p><p>Sincerely,<br><strong>{ATTORNEY_NAME}</strong></p></body></html>'
     from_addr = f'{ATTORNEY_NAME} <{ATTORNEY_EMAIL}>'
     payload = _json.dumps({
