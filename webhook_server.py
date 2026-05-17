@@ -546,14 +546,14 @@ def handle_request(motion_type):
                         state = 'OR'
                         zip_code = ''
                     mail_resp = _send_mail_internal(
-                        pdf_bytes=pdf_bytes,
                         to_name=mail_name,
-                        to_address1=mail_street,
+                        to_street=mail_street,
                         to_city=city,
                         to_state=state,
                         to_zip=zip_code,
-                        mail_type=mail_type,
-                        doc_title=DOCS[motion_type]['label']
+                        pdf_b64=base64.b64encode(pdf_bytes).decode(),
+                        doc_title=DOCS[motion_type]['label'],
+                        mail_type=mail_type
                     )
                     if not mail_resp.get('ok'):
                         resp_data['mail_error'] = mail_resp.get('error', 'Mail failed')
