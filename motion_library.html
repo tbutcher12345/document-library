@@ -2004,7 +2004,7 @@ function openModal(id){
   document.getElementById('modalOverlay').classList.add('open');
   document.body.style.overflow='hidden';
   setupJointToggle();
-  window._activeDoc=typeof DOCS!=="undefined"&&DOCS[id]?DOCS[id]:{};
+  window._activeDoc=activeDoc||{};
   injectSendDestUI();
   // Attach Smarty validation to address fields if present
   setTimeout(function(){
