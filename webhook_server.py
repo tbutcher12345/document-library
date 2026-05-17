@@ -482,8 +482,12 @@ def _send_mail_internal(to_name, to_street, to_city, to_state, to_zip, pdf_b64, 
         with _ur.urlopen(req, timeout=30) as resp:
             result = _j.loads(resp.read())
             return {'ok': True, 'id': result.get('id'), 'expected_delivery': result.get('expected_delivery_date')}
+    except _ur.error.HTTPError as e:
+        body = e.read().decode('utf-8', errors='replace')
+        logger.error(f'Lob mail HTTP error {e.code}: {body[:500]}')
+        return {'ok': False, 'error': f'HTTP {e.code}: {body[:200]}'}
     except Exception as e:
-        logger.error(f'Lob mail error: {e}')
+        logger.error(f'Lob mail error: {e}', exc_info=True)
         return {'ok': False, 'error': str(e)}
 
 def handle_request(motion_type):
