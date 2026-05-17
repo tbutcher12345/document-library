@@ -2218,7 +2218,7 @@ function showSuccess(data,result){
   var isAgree=activeDoc&&activeDoc.category==='agreements';
   var docTitle=activeDoc?activeDoc.title:'Document';
   document.getElementById('okTitle').textContent=isAgree?'Sent for Signature':'Documents Generated';
-  var rec=result.emailed_to?result.emailed_to.join(' and '):'attorney and VA';
+  var rec=result.emailed_to?[].concat(result.emailed_to).join(' and '):'attorney and VA';
   var name=data.debtor_name||data.client_name||'';
   if((data.joint_filing==='Joint debtors'||data.joint_filing==='Yes - joint clients')&&(data.debtor2_name||data.client2_name)){
     name+=' and '+(data.debtor2_name||data.client2_name||'');
