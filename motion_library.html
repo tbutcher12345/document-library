@@ -2368,59 +2368,6 @@ function applySettingsToPage(s){
   if(s&&s.firmName) applySettingsToPage(s);
 })();
 
-/* -- SETTINGS FUNCTIONS -- */
-var _settingsKey='dee_firm_settings';
-function openSettings(){
-  loadSettingsToForm();
-  document.getElementById('settingsOverlay').classList.add('open');
-  document.body.style.overflow='hidden';
-}
-function closeSettings(){
-  document.getElementById('settingsOverlay').classList.remove('open');
-  document.body.style.overflow='';
-}
-function getSettings(){
-  try{return JSON.parse(localStorage.getItem(_settingsKey)||'{}');}catch(e){return {};}
-}
-function saveSettings(){
-  var s=_collectSettingsForm();
-  localStorage.setItem(_settingsKey,JSON.stringify(s));
-  applySettingsToPage(s);
-  var msg=document.getElementById('settingsSavedMsg');
-  if(msg){msg.classList.add('show');setTimeout(function(){msg.classList.remove('show');},2000);}
-}
-function autoSaveSettings(){
-  var s=_collectSettingsForm();
-  localStorage.setItem(_settingsKey,JSON.stringify(s));
-  applySettingsToPage(s);
-  var msg=document.getElementById('settingsSavedMsg');
-  if(msg){msg.classList.add('show');setTimeout(function(){msg.classList.remove('show');},1200);}
-}
-function _collectSettingsForm(){
-  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip','railwayUrl'];
-  var s={};
-  ids.forEach(function(k){
-    var el=document.getElementById('set_'+k);
-    s[k]=el?el.value.trim():'';
-  });
-  return s;
-}
-function loadSettingsToForm(){
-  var s=getSettings();
-  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip','railwayUrl'];
-  ids.forEach(function(k){
-    var el=document.getElementById('set_'+k);
-    if(el) el.value=s[k]||'';
-  });
-}
-function applySettingsToPage(s){
-  var fn=document.querySelector('.firm-name');
-  if(fn&&s.firmName) fn.textContent=s.firmName;
-}
-(function(){
-  var s=getSettings();
-  if(s&&s.firmName) applySettingsToPage(s);
-})();
 </script>
 
 <!-- Lob Settings Modal -->
