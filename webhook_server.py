@@ -435,20 +435,24 @@ def handle_request(motion_type):
                 except: pass
         logger.info(f'Generating: {DOCS[motion_type]["label"]} â {data.get("debtor_name") or data.get("client_name")} {data.get("case_number")}')
         docx_bytes, pdf_bytes, base = generate_documents(motion_type, data)
-        send_email(motion_type, data, docx_bytes, pdf_bytes, base)
         # Support both legacy send_dest (string) and new send_dests (array)
         raw_dests = entry.get('send_dests') or entry.get('send_dest', 'email')
         if isinstance(raw_dests, str):
             send_dests = [raw_dests]
         else:
             send_dests = list(raw_dests) if raw_dests else ['email']
+        if 'email' in send_dests:
+            send_email(motion_type, data, docx_bytes, pdf_bytes, base)
 
+        send_email_addr = entry.get('send_email','') or ''
         resp_data = {
+            'success': True,
             'status': 'success',
             'document': DOCS[motion_type]['label'],
             'case': data.get('case_number'),
             'debtor': data.get('debtor_name') or data.get('client_name'),
-            'send_dests': send_dests
+            'send_dests': send_dests,
+            'emailed_to': [send_email_addr] if 'email' in send_dests and send_email_addr else []
         }
 
         for dest in send_dests:
