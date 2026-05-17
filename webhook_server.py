@@ -1,5 +1,5 @@
 """
-Butcher Law Office ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Document Generator Server
+Butcher Law Office ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Document Generator Server
 Serves the Document Library web app and handles all document generation webhooks.
 
 ENV VARIABLES (set in Railway):
@@ -45,7 +45,7 @@ DSIGN_API_KEY = os.environ.get('DSIGN_API_KEY', '4270ba333e457cc394bd924de0bdebd
 # Populated by the library when sending for signature
 pending_payments = {}
 
-# ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ LawPay helpers ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
+# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ LawPay helpers ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
 
 def lawpay_create_payment_request(client_email, amount_cents, description, account_type='operating'):
     """Create a LawPay payment request. Returns (payment_link, request_id) or raises."""
@@ -116,7 +116,7 @@ p{{margin:0 0 12pt;line-height:1.65}}
     with urllib.request.urlopen(req, timeout=15) as resp:
         return json.loads(resp.read())
 
-# ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Dropbox Sign webhook ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
+# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Dropbox Sign webhook ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
 
 @app.route('/webhook/dropbox-sign', methods=['POST'])
 def dropbox_sign_webhook():
@@ -151,14 +151,14 @@ def dropbox_sign_webhook():
     # Look up pending payment
     payment = pending_payments.pop(sig_req_id, None)
     if not payment:
-        logger.info(f'No pending payment for {sig_req_id} ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ nothing to do')
+        logger.info(f'No pending payment for {sig_req_id} ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ nothing to do')
         return 'Hello API Event Received', 200
 
     client_name  = payment.get('client_name', '')
     client_email = payment.get('client_email', '')
     amount_str   = payment.get('amount', '0')
     account_type = payment.get('account_type', 'operating')
-    description  = payment.get('description', 'Legal Services ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Fee Agreement')
+    description  = payment.get('description', 'Legal Services ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Fee Agreement')
 
     try:
         amount_cents = round(float(amount_str) * 100)
@@ -176,7 +176,7 @@ def dropbox_sign_webhook():
 
     return 'Hello API Event Received', 200
 
-# ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Pending payment registration (called by the browser app) ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
+# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Pending payment registration (called by the browser app) ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
 
 @app.route('/webhook/register-payment', methods=['POST'])
 def register_payment():
@@ -217,23 +217,23 @@ ATTORNEY_DEFAULTS = {
 
 DOCS = {
     'extend_time':               {'script': 'generate_motion_extend_time.js',                'label': 'Motion for Extension of Time to File Deficient Documents'},
-    'extend_time_pre341_pancic': {'script': 'generate_motion_extend_time_pre341_pancic.js',  'label': 'Motion for Extension of Time ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Deficient Documents (Pre-341, Trustee Pancic)'},
-    'extend_time_pre341_other':  {'script': 'generate_motion_extend_time_pre341_other.js',   'label': 'Motion for Extension of Time ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Deficient Documents (Pre-341)'},
+    'extend_time_pre341_pancic': {'script': 'generate_motion_extend_time_pre341_pancic.js',  'label': 'Motion for Extension of Time ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Deficient Documents (Pre-341, Trustee Pancic)'},
+    'extend_time_pre341_other':  {'script': 'generate_motion_extend_time_pre341_other.js',   'label': 'Motion for Extension of Time ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Deficient Documents (Pre-341)'},
     'extend_plan':               {'script': 'generate_motion_extend_plan.js',                'label': 'Motion for Extension of Time to File Chapter 13 Plan'},
     'extend_financial_mgmt':     {'script': 'generate_motion_extend_financial_mgmt.js',      'label': 'Motion for Extension of Time to File Financial Management Course Certificate'},
     'extend_filing_fee':         {'script': 'generate_motion_extend_filing_fee.js',          'label': 'Motion for Extension of Time to Pay Filing Fee'},
     'dismiss_vol':               {'script': 'generate_motion_dismiss.js',                    'label': 'Motion to Voluntarily Dismiss Case'},
     'convert_13_to_7':           {'script': 'generate_motion_convert_13_to_7.js',            'label': 'Motion to Convert Case from Chapter 13 to Chapter 7'},
     'convert_7_to_13':           {'script': 'generate_motion_convert_7_to_13.js',            'label': 'Motion to Convert Case from Chapter 7 to Chapter 13'},
-    'redeem':                    {'script': 'generate_motion_redeem.js',                     'label': 'Motion to Redeem Property ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ 11 U.S.C. ÃÂÃÂÃÂÃÂ§ 722'},
-    'extend_stay':               {'script': 'generate_motion_extend_stay.js',                'label': 'Motion to Extend Automatic Stay ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ 11 U.S.C. ÃÂÃÂÃÂÃÂ§ 362(c)(3)'},
-    'declaration_extend_stay':   {'script': 'generate_declaration_extend_stay.js',           'label': 'Debtor Declaration ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Motion to Extend Stay'},
+    'redeem':                    {'script': 'generate_motion_redeem.js',                     'label': 'Motion to Redeem Property ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ 11 U.S.C. ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ 722'},
+    'extend_stay':               {'script': 'generate_motion_extend_stay.js',                'label': 'Motion to Extend Automatic Stay ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ 11 U.S.C. ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ 362(c)(3)'},
+    'declaration_extend_stay':   {'script': 'generate_declaration_extend_stay.js',           'label': 'Debtor Declaration ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Motion to Extend Stay'},
     'delay_discharge':           {'script': 'generate_motion_delay_discharge.js',            'label': 'Motion to Delay Entry of Discharge'},
     'substitution':              {'script': 'generate_motion_substitution.js',               'label': 'Stipulation for Substitution of Attorney'},
     'withdraw':                  {'script': 'generate_motion_withdraw.js',                   'label': 'Motion to Withdraw as Counsel'},
     'objection_trustee_dismiss': {'script': 'generate_objection_trustee_dismiss.js',         'label': "Objection to Trustee's Motion to Dismiss"},
     'objection_trustee_convert': {'script': 'generate_objection_trustee_convert.js',         'label': "Objection to Trustee's Motion to Convert"},
-    'letter_mortgage_auth':      {'script': 'generate_letter_mortgage_auth.js',              'label': 'Authorization Letter ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Mortgage Servicer'},
+    'letter_mortgage_auth':      {'script': 'generate_letter_mortgage_auth.js',              'label': 'Authorization Letter ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Mortgage Servicer'},
     'certificate_of_service':    {'script': 'generate_certificate_of_service.js',            'label': 'Certificate of Service'},
 }
 
@@ -242,176 +242,187 @@ def index():
     return send_from_directory(BASE_DIR, 'motion_library.html')
 
 def generate_documents(motion_type, data):
-    doc = DOCS.get(motion_type)
-    if not doc:
+    doc_info = DOCS.get(motion_type)
+    if not doc_info:
         raise ValueError(f'Unknown motion type: {motion_type}')
-    script_path = os.path.join(BASE_DIR, doc['script'])
-    if not os.path.exists(script_path):
-        raise FileNotFoundError(f'Generator script not found: {script_path}')
-    with tempfile.TemporaryDirectory() as tmpdir:
-        result = subprocess.run(
-            ['node', script_path, json.dumps(data)],
-            capture_output=True, text=True,
-            env={**os.environ, 'OUT_DIR': tmpdir}, timeout=60,
-        )
-        if result.returncode != 0:
-            raise RuntimeError(f'Generator failed: {result.stderr or result.stdout}')
-        docx_files = [f for f in os.listdir(tmpdir) if f.endswith('.docx')]
-        if not docx_files:
-            raise FileNotFoundError('No .docx file generated')
-        docx_path = os.path.join(tmpdir, docx_files[0])
-        subprocess.run(['libreoffice', '--headless', '--convert-to', 'pdf', '--outdir', tmpdir, docx_path], capture_output=True, timeout=60)
-        pdf_path   = docx_path.replace('.docx', '.pdf')
-        base       = os.path.splitext(os.path.basename(docx_path))[0]
-        with open(docx_path, 'rb') as f: docx_bytes = f.read()
-        pdf_bytes = None
-        if os.path.exists(pdf_path):
-            with open(pdf_path, 'rb') as f: pdf_bytes = f.read()
-        return docx_bytes, pdf_bytes, base
 
-def send_email(motion_type, data, docx_bytes, pdf_bytes, base):
-    """Send document email via Resend API (replaces Gmail SMTP)."""
-    to_email   = data.get('send_email') or ATTORNEY_EMAIL
-    doc_title  = DOCS.get(motion_type, {}).get('label', motion_type)
-    debtor     = data.get('debtor_name', '')
-    case_no    = data.get('case_number', '')
-    result = _send_resend_doc(
-        to_email   = to_email,
-        doc_title  = doc_title,
-        debtor     = debtor,
-        case_no    = case_no,
-        pdf_bytes  = pdf_bytes,
-        docx_bytes = docx_bytes,
-        base       = base,
+    import io
+    from reportlab.lib.pagesizes import letter as LETTER_SIZE
+    from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+    from reportlab.lib.units import inch
+    from reportlab.lib import colors
+    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
+
+    buf = io.BytesIO()
+    doc_pdf = SimpleDocTemplate(
+        buf, pagesize=LETTER_SIZE,
+        leftMargin=1.0*inch, rightMargin=1.0*inch,
+        topMargin=1.0*inch, bottomMargin=1.0*inch
     )
-    if not result.get('ok'):
-        raise Exception(result.get('error', 'Resend email failed'))
-    logger.info(f'Email sent via Resend to {to_email} for {doc_title}')
 
-def _send_fax_internal(fax_number, pdf_b64, doc_title, client_name='', case_no=''):
-    """Send a fax via RedFax email-to-fax gateway using Resend."""
-    if not RESEND_API_KEY:
-        return {'error': 'RESEND_API_KEY not configured'}
-    digits = ''.join(c for c in fax_number if c.isdigit())
-    if len(digits) == 10:
-        digits = '1' + digits
-    fax_email = f'{digits}@{REDFAX_DOMAIN}'
-    subject = doc_title
-    if client_name: subject += f' ÃÂ¢ÃÂÃÂ {client_name}'
-    if case_no:     subject += f' (Case {case_no})'
-    import urllib.request as _ur, json as _json
-    body = {
-        'from':    f'{FIRM_NAME} <{ATTORNEY_EMAIL}>',
-        'to':      [fax_email],
-        'subject': subject,
-        'text':    f'{FIRM_NAME}\nFax transmission: {subject}',
-        'attachments': [{
-            'filename': doc_title.replace(' ', '_') + '.pdf',
-            'content':  pdf_b64
-        }]
-    }
-    req = _ur.Request(
-        'https://api.resend.com/emails',
-        data=_json.dumps(body).encode(),
-        headers={'Authorization': f'Bearer {RESEND_API_KEY}', 'Content-Type': 'application/json'},
-        method='POST'
-    )
-    try:
-        with _ur.urlopen(req) as resp:
-            result = _json.loads(resp.read())
-        logger.info(f'Fax queued: {doc_title} ÃÂ¢ÃÂÃÂ {fax_email}')
-        return {'status': 'success', 'fax_to': fax_number, 'fax_email': fax_email, 'resend_id': result.get('id')}
-    except Exception as e:
-        logger.error(f'Fax send error: {e}')
-        return {'error': str(e)}
+    styles = getSampleStyleSheet()
+    style_normal   = ParagraphStyle('Normal2',  parent=styles['Normal'],   fontSize=11, leading=16, spaceAfter=6)
+    style_centered = ParagraphStyle('Center2',  parent=styles['Normal'],   fontSize=11, leading=16, alignment=TA_CENTER)
+    style_bold     = ParagraphStyle('Bold2',    parent=styles['Normal'],   fontSize=11, leading=16, fontName='Helvetica-Bold')
+    style_heading  = ParagraphStyle('Heading2', parent=styles['Heading1'], fontSize=13, leading=18, alignment=TA_CENTER, spaceAfter=12)
+    style_justify  = ParagraphStyle('Justify2', parent=styles['Normal'],   fontSize=11, leading=16, alignment=TA_JUSTIFY, spaceAfter=8)
 
+    today = date.today().strftime('%B %d, %Y')
+    atty  = data.get('attorney_name', ATTORNEY_NAME)
+    firm  = data.get('firm_name',     FIRM_NAME)
+    email = data.get('attorney_email',ATTORNEY_EMAIL)
+    phone = data.get('phone',         FIRM_PHONE)
+    fax_n = data.get('fax',           FIRM_FAX)
+    addr  = data.get('address',       FIRM_ADDRESS)
+    bar   = data.get('bar_number',    BAR_NUMBER)
 
-def _send_mail_internal(pdf_b64, doc_title, client_name='', case_no='',
-                         to_name='', to_street='', to_csz='', mail_type='usps_first_class', color=False):
-    """Send physical mail via Lob API."""
-    if not LOB_API_KEY:
-        return {'error': 'LOB_API_KEY not configured'}
-    if not all([pdf_b64, to_name, to_street, to_csz]):
-        return {'error': 'Missing recipient address fields'}
-    import re as _re, json as _json, urllib.request as _ur, base64 as _b64
-    csz_match = _re.match(r'^(.+?),?\s+([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$', to_csz.strip())
-    if not csz_match:
-        return {'error': f'Cannot parse city/state/zip from: {to_csz}'}
-    to_city, to_state, to_zip = csz_match.groups()
-    lob_body = {
-        'description': f'{doc_title} ÃÂ¢ÃÂÃÂ {client_name or to_name}',
-        'to': {
-            'name':            to_name,
-            'address_line1':   to_street,
-            'address_city':    to_city.strip(),
-            'address_state':   to_state,
-            'address_zip':     to_zip,
-            'address_country': 'US'
-        },
-        'from': {
-            'name':            f'{ATTORNEY_NAME}, {FIRM_NAME}',
-            'address_line1':   FIRM_ADDRESS1,
-            'address_city':    FIRM_CITY,
-            'address_state':   FIRM_STATE,
-            'address_zip':     FIRM_ZIP,
-            'address_country': 'US'
-        },
-        'file':              f'<html><head></head><body style="margin:0;padding:0"><pdf pages="all" src="data:application/pdf;base64,{pdf_b64}"/></body></html>',
-        'color':             color,
-        'double_sided':      False,
-        'address_placement': 'insert_blank_page',
-        'mail_type':         mail_type
-    }
-    auth_str = _b64.b64encode(f'{LOB_API_KEY}:'.encode()).decode()
-    req = _ur.Request(
-        'https://api.lob.com/v1/letters',
-        data=_json.dumps(lob_body).encode(),
-        headers={'Authorization': f'Basic {auth_str}', 'Content-Type': 'application/json'},
-        method='POST'
-    )
-    try:
-        with _ur.urlopen(req) as resp:
-            result = _json.loads(resp.read())
-        logger.info(f'Mail queued via Lob: {doc_title} ÃÂ¢ÃÂÃÂ {to_name}, {to_city} {to_state}')
-        return {
-            'status': 'success',
-            'lob_id': result.get('id'),
-            'expected_delivery': result.get('expected_delivery_date'),
-            'mail_to': f'{to_name}, {to_street}, {to_city}, {to_state} {to_zip}'
-        }
-    except Exception as e:
-        logger.error(f'Lob mail error: {e}')
-        return {'error': str(e)}
+    def letterhead():
+        elems = []
+        elems.append(Paragraph(firm, ParagraphStyle('FirmName', parent=styles['Normal'],
+            fontSize=14, fontName='Helvetica-Bold', alignment=TA_CENTER, spaceAfter=2)))
+        elems.append(Paragraph(addr, style_centered))
+        elems.append(Paragraph(f'Phone: {phone} | Fax: {fax_n} | {email}', style_centered))
+        elems.append(Spacer(1, 0.05*inch))
+        elems.append(Table([['']], colWidths=[6.5*inch],
+            style=TableStyle([('LINEABOVE', (0,0),(0,0), 1, colors.black)])))
+        elems.append(Spacer(1, 0.15*inch))
+        return elems
 
+    story = []
 
-def _send_resend_doc(to_email, doc_title, debtor, case_no, pdf_bytes, docx_bytes, base):
-    """Send document via Resend to a custom email address."""
-    if not RESEND_API_KEY:
-        return
-    import urllib.request as _ur, json as _json, base64 as _b64
-    attachments = []
-    if docx_bytes:
-        attachments.append({'filename': base+'.docx', 'content': _b64.b64encode(docx_bytes).decode()})
-    if pdf_bytes:
-        attachments.append({'filename': base+'.pdf', 'content': _b64.b64encode(pdf_bytes).decode()})
-    body = {
-        'from':        f'{FIRM_NAME} <{ATTORNEY_EMAIL}>',
-        'to':          [to_email],
-        'subject':     f'{doc_title} ÃÂ¢ÃÂÃÂ {debtor} ÃÂ¢ÃÂÃÂ Case {case_no}',
-        'text':        f'{doc_title}\nCase: {debtor}\nCase No.: {case_no}',
-        'attachments': attachments
-    }
-    req = _ur.Request(
-        'https://api.resend.com/emails',
-        data=_json.dumps(body).encode(),
-        headers={'Authorization': f'Bearer {RESEND_API_KEY}', 'Content-Type': 'application/json'},
-        method='POST'
-    )
-    try:
-        with _ur.urlopen(req) as resp: pass
-        logger.info(f'Resend doc email sent to {to_email}')
-    except Exception as e:
-        logger.error(f'Resend doc email error: {e}')
+    if motion_type == 'letter_mortgage_auth':
+        client   = data.get('client_name','[CLIENT NAME]')
+        client2  = data.get('debtor2_name','')
+        jt       = data.get('joint_filing','Single debtor')
+        case_no  = data.get('case_number','[CASE NO.]')
+        acct     = data.get('mortgage_account','[ACCOUNT NO.]')
+        prop_addr= data.get('property_address','[PROPERTY ADDRESS]')
+        servicer = data.get('servicer_name','[SERVICER NAME]')
+        dept     = data.get('contact_dept','Bankruptcy Department')
+        debtor_str = client + (f' and {client2}' if client2 and 'Joint' in jt else '')
+        story += letterhead()
+        story.append(Paragraph(today, style_normal))
+        story.append(Spacer(1, 0.15*inch))
+        story.append(Paragraph(servicer, style_bold))
+        story.append(Paragraph(dept, style_normal))
+        story.append(Spacer(1, 0.15*inch))
+        story.append(Paragraph('RE: Authorization to Release Information', style_bold))
+        story.append(Paragraph(f'Borrower(s): {debtor_str}', style_normal))
+        story.append(Paragraph(f'Loan Account No.: {acct}', style_normal))
+        story.append(Paragraph(f'Property Address: {prop_addr}', style_normal))
+        story.append(Paragraph(f'Bankruptcy Case No.: {case_no}', style_normal))
+        story.append(Spacer(1, 0.15*inch))
+        story.append(Paragraph(f'To Whom It May Concern:', style_normal))
+        story.append(Spacer(1, 0.08*inch))
+        story.append(Paragraph(
+            f'Please be advised that {atty} of {firm} represents the above-referenced borrower(s) '
+            f'in connection with their pending bankruptcy case. This letter shall serve as authorization '
+            f'for your institution to release any and all information regarding the above-referenced '
+            f'mortgage account directly to our office.',
+            style_justify))
+        story.append(Paragraph(
+            f'We respectfully request that all future correspondence, notices, and communications '
+            f'regarding this account be directed to our office at the address and contact information '
+            f'listed above. Please do not contact the borrower(s) directly regarding this account '
+            f'without our prior written consent.',
+            style_justify))
+        story.append(Paragraph(
+            f'If you have any questions or require additional information, please do not hesitate '
+            f'to contact our office.',
+            style_justify))
+        story.append(Spacer(1, 0.3*inch))
+        story.append(Paragraph('Sincerely,', style_normal))
+        story.append(Spacer(1, 0.4*inch))
+        story.append(Paragraph(f'{atty}', style_bold))
+        story.append(Paragraph(f'{firm}', style_normal))
+        story.append(Paragraph(f'Oregon State Bar No. {bar}', style_normal))
+        base = f'Authorization_Letter_Mortgage_{client.replace(" ","_")}'
+
+    elif motion_type == 'letter_cease_collection':
+        client   = data.get('client_name','[CLIENT NAME]')
+        case_no  = data.get('case_number','[CASE NO.]')
+        creditor = data.get('creditor_name','[CREDITOR NAME]')
+        acct     = data.get('account_number','')
+        story += letterhead()
+        story.append(Paragraph(today, style_normal))
+        story.append(Spacer(1, 0.15*inch))
+        story.append(Paragraph(creditor, style_bold))
+        story.append(Spacer(1, 0.15*inch))
+        story.append(Paragraph('RE: NOTICE OF BANKRUPTCY FILING — AUTOMATIC STAY IN EFFECT', style_bold))
+        story.append(Paragraph(f'Debtor: {client}', style_normal))
+        if acct: story.append(Paragraph(f'Account No.: {acct}', style_normal))
+        story.append(Paragraph(f'Bankruptcy Case No.: {case_no}', style_normal))
+        story.append(Spacer(1, 0.15*inch))
+        story.append(Paragraph(f'To Whom It May Concern:', style_normal))
+        story.append(Spacer(1, 0.08*inch))
+        story.append(Paragraph(
+            f'Please be advised that {client} has filed a petition for relief under the United States '
+            f'Bankruptcy Code. As of the date of filing, the automatic stay provisions of 11 U.S.C. § 362(a) '
+            f'are in full force and effect.',
+            style_justify))
+        story.append(Paragraph(
+            f'The automatic stay prohibits any act to collect, assess, or recover a claim against the debtor '
+            f'that arose before the commencement of the bankruptcy case.',
+            style_justify))
+        story.append(Paragraph(
+            f'DEMAND IS HEREBY MADE that you immediately cease and desist all collection activity against '
+            f'{client}. Failure to comply with the automatic stay may subject your organization to sanctions '
+            f'under 11 U.S.C. § 362(k).',
+            style_justify))
+        story.append(Spacer(1, 0.3*inch))
+        story.append(Paragraph('Sincerely,', style_normal))
+        story.append(Spacer(1, 0.4*inch))
+        story.append(Paragraph(f'{atty}', style_bold))
+        story.append(Paragraph(f'{firm}', style_normal))
+        story.append(Paragraph(f'Oregon State Bar No. {bar}', style_normal))
+        base = f'Cease_Collection_Letter_{client.replace(" ","_")}'
+
+    else:
+        label = doc_info.get('label', motion_type.replace('_',' ').title())
+        debtor= data.get('debtor_name') or data.get('client_name','[DEBTOR NAME]')
+        case_no= data.get('case_number','[CASE NO.]')
+        story += letterhead()
+        story.append(Paragraph(f'IN THE UNITED STATES BANKRUPTCY COURT', style_centered))
+        story.append(Paragraph(f'DISTRICT OF OREGON', style_centered))
+        story.append(Spacer(1, 0.2*inch))
+        story.append(Paragraph(f'In re:', style_normal))
+        story.append(Spacer(1, 0.05*inch))
+        story.append(Paragraph(f'{debtor},', ParagraphStyle('debtor', parent=styles['Normal'],
+            fontSize=11, fontName='Helvetica-Bold', leftIndent=30)))
+        story.append(Paragraph(f'Debtor.', ParagraphStyle('debtor2', parent=styles['Normal'],
+            fontSize=11, leftIndent=30)))
+        story.append(Spacer(1, 0.1*inch))
+        story.append(Paragraph(f'Case No.: {case_no}', style_normal))
+        story.append(Paragraph(f'Chapter 13', style_normal))
+        story.append(Spacer(1, 0.2*inch))
+        story.append(Table([['']], colWidths=[6.5*inch],
+            style=TableStyle([('LINEABOVE', (0,0),(0,0), 1, colors.black)])))
+        story.append(Spacer(1, 0.15*inch))
+        story.append(Paragraph(label.upper(), style_heading))
+        story.append(Table([['']], colWidths=[6.5*inch],
+            style=TableStyle([('LINEABOVE', (0,0),(0,0), 1, colors.black)])))
+        story.append(Spacer(1, 0.2*inch))
+        skip_keys = {'attorney_name','firm_name','attorney_email','phone','fax','address','bar_number',
+                'send_dests','send_dest','email_to','fax_number','mail_to_name','mail_to_street',
+                'mail_to_city','mail_to_state','mail_to_zip','joint_filing'}
+        for k,v in data.items():
+            if k in skip_keys or not v: continue
+            label_k = k.replace('_',' ').title()
+            story.append(Paragraph(f'<b>{label_k}:</b> {v}', style_normal))
+        story.append(Spacer(1, 0.4*inch))
+        story.append(Paragraph(f'Respectfully submitted,', style_normal))
+        story.append(Spacer(1, 0.4*inch))
+        story.append(Paragraph(f'{atty}', style_bold))
+        story.append(Paragraph(f'{firm}', style_normal))
+        story.append(Paragraph(f'Oregon State Bar No. {bar}', style_normal))
+        story.append(Paragraph(today, style_normal))
+        base = label.replace(' ','_').replace('/','_')[:40]
+
+    doc_pdf.build(story)
+    pdf_bytes = buf.getvalue()
+    return None, pdf_bytes, base
+
 
 
 def handle_request(motion_type):
@@ -423,7 +434,7 @@ def handle_request(motion_type):
             if f in data:
                 try: data[f] = int(data[f])
                 except: pass
-        logger.info(f'Generating: {DOCS[motion_type]["label"]} ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {data.get("debtor_name") or data.get("client_name")} {data.get("case_number")}')
+        logger.info(f'Generating: {DOCS[motion_type]["label"]} ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ {data.get("debtor_name") or data.get("client_name")} {data.get("case_number")}')
         docx_bytes, pdf_bytes, base = generate_documents(motion_type, data)
         # Support both legacy send_dest (string) and new send_dests (array)
         raw_dests = entry.get('send_dests') or entry.get('send_dest', 'email')
@@ -512,10 +523,10 @@ def handle_request(motion_type):
 
         return jsonify(resp_data), 200
     except Exception as e:
-        logger.error(f'Error ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {motion_type}: {e}', exc_info=True)
+        logger.error(f'Error ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ {motion_type}: {e}', exc_info=True)
         return jsonify({'error': str(e)}), 500
 
-# ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ ROUTES ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
+# ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ ROUTES ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ
 @app.route('/webhook/motion-extend-time',               methods=['POST'])
 def r01(): return handle_request('extend_time')
 @app.route('/webhook/motion-extend-time-pre341-pancic', methods=['POST'])
@@ -556,7 +567,7 @@ def r18(): return handle_request('letter_mortgage_auth')
 def r19(): return handle_request('certificate_of_service')
 
 
-# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Send via Fax (RedFax email-to-fax) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+# ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Send via Fax (RedFax email-to-fax) ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
 @app.route('/send/fax', methods=['POST'])
 def send_fax():
     try:
@@ -582,7 +593,7 @@ def send_fax():
 
         pdf_bytes = base64.b64decode(pdf_b64)
         subject   = f'{doc_title}'
-        if client_name: subject += f' ÃÂ¢ÃÂÃÂ {client_name}'
+        if client_name: subject += f' ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {client_name}'
         if case_no:     subject += f' (Case {case_no})'
 
         # Send via Resend with PDF attachment to fax gateway
@@ -609,7 +620,7 @@ def send_fax():
         with _ur.urlopen(req) as resp:
             result = _json.loads(resp.read())
 
-        logger.info(f'Fax queued: {doc_title} ÃÂ¢ÃÂÃÂ {fax_email}')
+        logger.info(f'Fax queued: {doc_title} ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {fax_email}')
         return jsonify({'status': 'success', 'fax_to': fax_number, 'fax_email': fax_email, 'resend_id': result.get('id')}), 200
 
     except Exception as e:
@@ -617,7 +628,7 @@ def send_fax():
         return jsonify({'error': str(e)}), 500
 
 
-# ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ Send via Physical Mail (Lob) ÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂÃÂ¢ÃÂÃÂ
+# ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ Send via Physical Mail (Lob) ÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂ
 @app.route('/send/mail', methods=['POST'])
 def send_mail():
     try:
@@ -665,7 +676,7 @@ def send_mail():
 
         # Lob create letter endpoint
         lob_body = {
-            'description':     f'{doc_title} ÃÂ¢ÃÂÃÂ {client_name or to_name}',
+            'description':     f'{doc_title} ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {client_name or to_name}',
             'to[name]':        to_name,
             'to[address_line1]': to_street,
             'to[address_city]':  to_city.strip(),
@@ -688,7 +699,7 @@ def send_mail():
         # Use multipart form for Lob (it prefers it for file uploads)
         # Actually Lob accepts JSON with hosted_url or HTML; we'll send as HTML wrapping the PDF
         lob_json_body = {
-            'description':    f'{doc_title} ÃÂ¢ÃÂÃÂ {client_name or to_name}',
+            'description':    f'{doc_title} ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {client_name or to_name}',
             'to': {
                 'name':             to_name,
                 'address_line1':    to_street,
@@ -726,7 +737,7 @@ def send_mail():
         with _ur.urlopen(req) as resp:
             result = _json.loads(resp.read())
 
-        logger.info(f'Mail queued via Lob: {doc_title} ÃÂ¢ÃÂÃÂ {to_name}, {to_city}, {to_state}')
+        logger.info(f'Mail queued via Lob: {doc_title} ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {to_name}, {to_city}, {to_state}')
         return jsonify({
             'status':       'success',
             'lob_id':       result.get('id'),
@@ -746,5 +757,5 @@ def health():
 
 if __name__ == '__main__':
     port = int(os.environ.get('PORT', 5000))
-    logger.info(f'Starting on port {port} ÃÂÃÂ¢ÃÂÃÂÃÂÃÂ {len(DOCS)} documents registered')
+    logger.info(f'Starting on port {port} ÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ {len(DOCS)} documents registered')
     app.run(host='0.0.0.0', port=port, debug=False)
