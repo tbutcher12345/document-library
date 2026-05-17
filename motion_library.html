@@ -2181,12 +2181,12 @@ async function handleSubmit(e){
   if(mailCSZ) body.mail_csz=mailCSZ;
   if(mailType) body.mail_type=mailType;
   try{
-    var resp=await fetch(svc+'/generate',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
+    var docWebhook=svc+'/webhook/'+(activeDoc.id||'').replace(/_/g,'-');var resp=await fetch(docWebhook,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(body)});
     var result=await resp.json();
     if(result.success){
       var labels={'email':'Email','fax':'Fax','mail':'Physical Mail','download':'Download'};
       var channelList=sendDests.map(function(d){return labels[d]||d;}).join(', ');
-      showSuccess('Sent via: '+channelList,result);
+      showSuccess(body,result);
       if(sendDests.indexOf('download')>=0&&result.pdf_url){window.open(result.pdf_url,'_blank');}
     } else {
       showError(result.error||'Generation failed');
@@ -2196,6 +2196,21 @@ async function handleSubmit(e){
   } finally {
     if(btn){btn.disabled=false;btn.textContent='Generate Documents';}
   }
+}
+
+function showError(msg){
+  var btn=document.getElementById('generateBtn');
+  if(btn){btn.disabled=false;btn.textContent='Generate Documents';}
+  var errDiv=document.getElementById('modalError');
+  if(!errDiv){
+    errDiv=document.createElement('div');
+    errDiv.id='modalError';
+    errDiv.style.cssText='background:#fef2f2;border:1px solid #fca5a5;color:#991b1b;padding:12px 16px;border-radius:3px;margin:12px 0;font-size:13px;';
+    var footer=document.getElementById('modalFooter');
+    if(footer) footer.parentNode.insertBefore(errDiv,footer);
+  }
+  errDiv.textContent=msg;
+  errDiv.style.display='block';
 }
 function showSuccess(data,result){
   document.getElementById('modalBody').style.display='none';
@@ -2326,7 +2341,7 @@ function autoSaveSettings(){
   if(msg){msg.classList.add('show');setTimeout(function(){msg.classList.remove('show');},1200);}
 }
 function _collectSettingsForm(){
-  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip'];
+  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip','railwayUrl'];
   var s={};
   ids.forEach(function(k){
     var el=document.getElementById('set_'+k);
@@ -2336,7 +2351,7 @@ function _collectSettingsForm(){
 }
 function loadSettingsToForm(){
   var s=getSettings();
-  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip'];
+  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip','railwayUrl'];
   ids.forEach(function(k){
     var el=document.getElementById('set_'+k);
     if(el) el.value=s[k]||'';
@@ -2345,6 +2360,7 @@ function loadSettingsToForm(){
 function applySettingsToPage(s){
   var fn=document.querySelector('.firm-name');
   if(fn&&s.firmName) fn.textContent=s.firmName;
+  if(s.railwayUrl!==undefined) localStorage.setItem('pdf_service_url',s.railwayUrl||'');
 }
 // Auto-load settings on page start
 (function(){
@@ -2381,7 +2397,7 @@ function autoSaveSettings(){
   if(msg){msg.classList.add('show');setTimeout(function(){msg.classList.remove('show');},1200);}
 }
 function _collectSettingsForm(){
-  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip'];
+  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip','railwayUrl'];
   var s={};
   ids.forEach(function(k){
     var el=document.getElementById('set_'+k);
@@ -2391,7 +2407,7 @@ function _collectSettingsForm(){
 }
 function loadSettingsToForm(){
   var s=getSettings();
-  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip'];
+  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip','railwayUrl'];
   ids.forEach(function(k){
     var el=document.getElementById('set_'+k);
     if(el) el.value=s[k]||'';
@@ -2813,6 +2829,7 @@ Tel: (541) 762-1967  Fax: (541) 762-1968</textarea>
     <div class="settings-field"><label>Fax</label><input id="set_fax" placeholder="(541) 555-5678" oninput="autoSaveSettings()"></div>
     <div class="settings-field full"><label>Street Address</label><input id="set_street" placeholder="123 Main St, Suite 100" oninput="autoSaveSettings()"></div>
     <div class="settings-field full"><label>City, State ZIP</label><input id="set_cityStateZip" placeholder="Eugene, OR 97401" oninput="autoSaveSettings()"></div>
+    <div class="settings-field full" style="border-top:1px solid #ddd;padding-top:14px;margin-top:4px"><label>Railway Backend URL</label><input id="set_railwayUrl" placeholder="https://your-app.railway.app" oninput="autoSaveSettings()"></div>
   </div>
   <div class="settings-actions">
     <span class="settings-saved" id="settingsSavedMsg">Saved &#10003;</span>
