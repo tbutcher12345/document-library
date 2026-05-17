@@ -395,12 +395,32 @@ footer{margin-top:64px;padding:24px 32px;border-top:1px solid var(--rule);text-a
 .settings-cancel-btn{background:none;border:1px solid #ccc;padding:9px 18px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;color:var(--muted);}
 .settings-saved{font-family:'DM Mono',monospace;font-size:9px;color:#2a7a2a;letter-spacing:.08em;opacity:0;transition:opacity .3s;margin-right:auto;}
 .settings-saved.show{opacity:1;}
+
+/* -- SETTINGS PANEL -- */
+.settings-btn{font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--rule);background:none;border:1px solid #444;padding:4px 10px;border-radius:2px;cursor:pointer;transition:all .15s;}
+.settings-btn:hover{background:var(--rule);color:#fff;}
+#settingsOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:3000;align-items:center;justify-content:center;}
+#settingsOverlay.open{display:flex;}
+#settingsPanel{background:var(--paper);border:1px solid var(--rule);border-radius:4px;width:520px;max-width:95vw;max-height:90vh;overflow-y:auto;padding:32px 36px 28px;}
+.settings-title{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--rule);margin-bottom:20px;display:flex;align-items:center;gap:10px;}
+.settings-title svg{width:16px;height:16px;fill:var(--rule);}
+.settings-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px 18px;}
+.settings-grid .full{grid-column:1/-1;}
+.settings-field label{display:block;font-family:'DM Mono',monospace;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;}
+.settings-field input{width:100%;padding:8px 10px;border:1px solid #ccc;border-radius:2px;font-size:13px;font-family:'Instrument Sans',sans-serif;background:#fff;box-sizing:border-box;}
+.settings-field input:focus{outline:none;border-color:var(--rule);}
+.settings-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px;align-items:center;}
+.settings-save-btn{background:var(--rule);color:#fff;border:none;padding:9px 24px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;}
+.settings-save-btn:hover{opacity:.85;}
+.settings-cancel-btn{background:none;border:1px solid #ccc;padding:9px 18px;font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;border-radius:2px;color:var(--muted);}
+.settings-saved{font-family:'DM Mono',monospace;font-size:9px;color:#2a7a2a;letter-spacing:.08em;opacity:0;transition:opacity .3s;margin-right:auto;}
+.settings-saved.show{opacity:1;}
 </style>
 </head>
 <body>
 <div id="login-screen"><div class="login-box"><div class="login-logo">Butcher Law Office</div><div class="login-sub">Document Execution Engine &mdash; Staff Access</div><label for="pwd">Password</label><input type="password" id="pwd" placeholder="Enter password" onkeydown="if(event.key==='Enter')doLogin()"><button class="login-btn" onclick="doLogin()">Sign In</button><div class="login-error" id="login-error">Incorrect password.</div></div></div>
 <div id="app-screen">
-  <header><div class="header-left"><div class="firm-seal">BL</div><div><div class="firm-name">Butcher Law Office</div><div class="firm-tagline">Document Execution Engine</div></div></div><div class="header-right"><div class="header-badge">District of Oregon</div><button class="logout-btn" onclick="openPDFSettings()" title="Configure PDF Service">PDF</button><button class="logout-btn" onclick="openSmartySettings()" title="Configure Address Validation">ADDR</button><button class="settings-btn" onclick="openSettings()" title="Firm &amp; Attorney Settings">&#9881;</button><button class="logout-btn" onclick="doLogout()">Sign Out</button></div></header>
+  <header><div class="header-left"><div class="firm-seal">BL</div><div><div class="firm-name">Butcher Law Office</div><div class="firm-tagline">Document Execution Engine</div></div></div><div class="header-right"><div class="header-badge">District of Oregon</div><button class="logout-btn" onclick="openPDFSettings()" title="Configure PDF Service">PDF</button><button class="logout-btn" onclick="openSmartySettings()" title="Configure Address Validation">ADDR</button><button class="settings-btn" onclick="openSettings()" title="Firm &amp; Attorney Settings">&#9881;</button><button class="settings-btn" onclick="openSettings()" title="Firm &amp; Attorney Settings">&#9881;</button><button class="logout-btn" onclick="doLogout()">Sign Out</button></div></header>
   <div class="container">
     <div class="page-header"><div><div class="page-title">Document Execution Engine</div><div class="page-subtitle">Select a document type to generate</div></div><div class="district-badge">U.S. Bankruptcy Court<br>District of Oregon<br>LBR Effective 12/1/2024</div></div>
     <div class="search-wrap">
@@ -1073,88 +1093,9 @@ function lobBuildHtml(text){
     +'<div class="header"><div class="firm">Butcher Law Office, LLC</div>'
     +'<div class="firm-sub">116 Hwy 99 N #101 &bull; Eugene, OR 97402 &bull; (541) 762-1967</div></div>'
     +paras
-    +'</div>
-<!-- SETTINGS OVERLAY -->
-<div id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
-<div id="settingsPanel">
-  <div class="settings-title"><svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7.07-2.13a7.08 7.08 0 0 0 .06-.87c0-.3-.03-.6-.06-.87l1.88-1.47a.45.45 0 0 0 .11-.57l-1.78-3.08a.45.45 0 0 0-.55-.2l-2.22.89a6.53 6.53 0 0 0-1.5-.87l-.34-2.36A.44.44 0 0 0 12.23 2H7.77a.44.44 0 0 0-.44.38L7 4.74a6.53 6.53 0 0 0-1.5.87l-2.21-.89a.44.44 0 0 0-.56.2L1.01 7.99a.44.44 0 0 0 .1.57l1.88 1.47c-.04.27-.07.58-.07.87s.03.6.07.87L1.11 13.24a.44.44 0 0 0-.1.57l1.78 3.08c.11.2.35.27.55.2l2.22-.89c.46.34.97.62 1.5.87l.34 2.36c.05.22.25.38.44.38h4.46c.2 0 .39-.16.44-.38l.34-2.36a6.53 6.53 0 0 0 1.5-.87l2.22.89c.2.07.44 0 .55-.2l1.78-3.08a.44.44 0 0 0-.1-.57l-1.88-1.44z"/></svg> Firm &amp; Attorney Settings</div>
-  <div class="settings-grid">
-    <div class="settings-field full"><label>Law Firm Name</label><input id="set_firmName" placeholder="Butcher Law Office" oninput="autoSaveSettings()"></div>
-    <div class="settings-field full"><label>Attorney Name</label><input id="set_attorneyName" placeholder="Tom Butcher" oninput="autoSaveSettings()"></div>
-    <div class="settings-field"><label>Attorney Email</label><input id="set_email" type="email" placeholder="tom@butcherlawoffice.com" oninput="autoSaveSettings()"></div>
-    <div class="settings-field"><label>Bar Number</label><input id="set_barNumber" placeholder="OSB #123456" oninput="autoSaveSettings()"></div>
-    <div class="settings-field"><label>Phone</label><input id="set_phone" placeholder="(541) 555-1234" oninput="autoSaveSettings()"></div>
-    <div class="settings-field"><label>Fax</label><input id="set_fax" placeholder="(541) 555-5678" oninput="autoSaveSettings()"></div>
-    <div class="settings-field full"><label>Street Address</label><input id="set_street" placeholder="123 Main St, Suite 100" oninput="autoSaveSettings()"></div>
-    <div class="settings-field full"><label>City, State ZIP</label><input id="set_cityStateZip" placeholder="Eugene, OR 97401" oninput="autoSaveSettings()"></div>
-  </div>
-  <div class="settings-actions">
-    <span class="settings-saved" id="settingsSavedMsg">Saved &#10003;</span>
-    <button class="settings-cancel-btn" onclick="closeSettings()">Close</button>
-    <button class="settings-save-btn" onclick="saveSettings()">Save Settings</button>
-  </div>
-</div>
-</div>
-</body></html>';
+    +'</div>'</body></html>';
 }
 
-// ── Lob: send letter ───────────────────────────────────────────────────
-async function lobSendLetter(){
-  var k=getLobKey();
-  if(!k){alert('Please add your Lob API key first.');openLobSettings();return;}
-  var toName=document.getElementById('lobToName').value.trim();
-  var toAddr1=document.getElementById('lobToAddr1').value.trim();
-  var toCity=document.getElementById('lobToCity').value.trim();
-  var toState=document.getElementById('lobToState').value.trim();
-  var toZip=document.getElementById('lobToZip').value.trim();
-  var body=document.getElementById('lobLetterBody').value.trim();
-  if(!toName||!toAddr1||!toCity||!toState||!toZip){alert('Please fill in all recipient address fields.');return;}
-  if(!body){alert('Please enter letter content.');return;}
-  var btn=document.getElementById('lobSendBtn');
-  var spinner=document.getElementById('lobSendSpinner');
-  var btnTxt=document.getElementById('lobSendBtnText');
-  btn.disabled=true; spinner.style.display='block'; btnTxt.textContent='Sending...';
-  var isHtml=body.trim().startsWith('<');
-  var letterHtml=isHtml?body:lobBuildHtml(body);
-  var mailType=document.getElementById('lobMailType').value;
-  var addr2=document.getElementById('lobToAddr2').value;
-  var payload={
-    to:{name:toName,address_line1:toAddr1,address_city:toCity,address_state:toState,address_zip:toZip,address_country:'US'},
-    from:{name:document.getElementById('lobFromName').value,address_line1:document.getElementById('lobFromAddr1').value,address_city:document.getElementById('lobFromCity').value,address_state:document.getElementById('lobFromState').value,address_zip:document.getElementById('lobFromZip').value,address_country:'US'},
-    file:letterHtml,
-    color:document.getElementById('lobColor').value==='true',
-    double_sided:document.getElementById('lobDoubleSided').value==='true'
-  };
-  if(addr2) payload.to.address_line2=addr2;
-  if(mailType) payload.extra_service=mailType;
-  try{
-    var r=await fetch('https://api.lob.com/v1/letters',{
-      method:'POST',
-      headers:{'Content-Type':'application/json','Authorization':'Basic '+btoa(k+':')},
-      body:JSON.stringify(payload)
-    });
-    var data=await r.json();
-    if(r.ok&&data.id){
-      var isTest=k.startsWith('test_');
-      var mailTypeLabel=mailType==='certified_return_receipt'?'Certified Mail + Return Receipt':mailType==='certified'?'Certified Mail':'First Class Mail';
-      document.getElementById('lobForm').style.display='none';
-      document.getElementById('lobSuccess').style.display='block';
-      document.getElementById('lobSuccessMsg').innerHTML=
-        'Letter <strong>'+data.id+'</strong> queued for mailing to<br>'
-        +'<strong>'+toName+'</strong> — '+toAddr1+', '+toCity+', '+toState+' '+toZip
-        +'<br><em>'+mailTypeLabel+'</em>'
-        +(isTest?'<br><br><span style="color:var(--gold)">Test mode — no physical letter will be sent.</span>':'');
-    } else {
-      throw new Error((data.error&&data.error.message)||'Send failed ('+r.status+')');
-    }
-  } catch(e){
-    alert('Error sending letter: '+e.message);
-  } finally {
-    btn.disabled=false; spinner.style.display='none'; btnTxt.textContent='â Send Letter via Lob';
-  }
-}
-
-var dsignDoc=null;
 function openDsign(docId,e){
   if(e)e.stopPropagation();
   dsignDoc=DOCS.find(function(d){return d.id===docId;});
@@ -2410,6 +2351,60 @@ function applySettingsToPage(s){
   var s=getSettings();
   if(s&&s.firmName) applySettingsToPage(s);
 })();
+
+/* -- SETTINGS FUNCTIONS -- */
+var _settingsKey='dee_firm_settings';
+function openSettings(){
+  loadSettingsToForm();
+  document.getElementById('settingsOverlay').classList.add('open');
+  document.body.style.overflow='hidden';
+}
+function closeSettings(){
+  document.getElementById('settingsOverlay').classList.remove('open');
+  document.body.style.overflow='';
+}
+function getSettings(){
+  try{return JSON.parse(localStorage.getItem(_settingsKey)||'{}');}catch(e){return {};}
+}
+function saveSettings(){
+  var s=_collectSettingsForm();
+  localStorage.setItem(_settingsKey,JSON.stringify(s));
+  applySettingsToPage(s);
+  var msg=document.getElementById('settingsSavedMsg');
+  if(msg){msg.classList.add('show');setTimeout(function(){msg.classList.remove('show');},2000);}
+}
+function autoSaveSettings(){
+  var s=_collectSettingsForm();
+  localStorage.setItem(_settingsKey,JSON.stringify(s));
+  applySettingsToPage(s);
+  var msg=document.getElementById('settingsSavedMsg');
+  if(msg){msg.classList.add('show');setTimeout(function(){msg.classList.remove('show');},1200);}
+}
+function _collectSettingsForm(){
+  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip'];
+  var s={};
+  ids.forEach(function(k){
+    var el=document.getElementById('set_'+k);
+    s[k]=el?el.value.trim():'';
+  });
+  return s;
+}
+function loadSettingsToForm(){
+  var s=getSettings();
+  var ids=['firmName','attorneyName','email','barNumber','phone','fax','street','cityStateZip'];
+  ids.forEach(function(k){
+    var el=document.getElementById('set_'+k);
+    if(el) el.value=s[k]||'';
+  });
+}
+function applySettingsToPage(s){
+  var fn=document.querySelector('.firm-name');
+  if(fn&&s.firmName) fn.textContent=s.firmName;
+}
+(function(){
+  var s=getSettings();
+  if(s&&s.firmName) applySettingsToPage(s);
+})();
 </script>
 
 <!-- Lob Settings Modal -->
@@ -2805,5 +2800,26 @@ Tel: (541) 762-1967  Fax: (541) 762-1968</textarea>
 </div>
 </div>
 
+
+<div id="settingsOverlay" onclick="if(event.target===this)closeSettings()">
+<div id="settingsPanel">
+  <div class="settings-title"><svg viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path d="M10 13a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm7.07-2.13a7.08 7.08 0 0 0 .06-.87c0-.3-.03-.6-.06-.87l1.88-1.47a.45.45 0 0 0 .11-.57l-1.78-3.08a.45.45 0 0 0-.55-.2l-2.22.89a6.53 6.53 0 0 0-1.5-.87l-.34-2.36A.44.44 0 0 0 12.23 2H7.77a.44.44 0 0 0-.44.38L7 4.74a6.53 6.53 0 0 0-1.5.87l-2.21-.89a.44.44 0 0 0-.56.2L1.01 7.99a.44.44 0 0 0 .1.57l1.88 1.47c-.04.27-.07.58-.07.87s.03.6.07.87L1.11 13.24a.44.44 0 0 0-.1.57l1.78 3.08c.11.2.35.27.55.2l2.22-.89c.46.34.97.62 1.5.87l.34 2.36c.05.22.25.38.44.38h4.46c.2 0 .39-.16.44-.38l.34-2.36a6.53 6.53 0 0 0 1.5-.87l2.22.89c.2.07.44 0 .55-.2l1.78-3.08a.44.44 0 0 0-.1-.57l-1.88-1.44z"/></svg> Firm &amp; Attorney Settings</div>
+  <div class="settings-grid">
+    <div class="settings-field full"><label>Law Firm Name</label><input id="set_firmName" placeholder="Butcher Law Office" oninput="autoSaveSettings()"></div>
+    <div class="settings-field full"><label>Attorney Name</label><input id="set_attorneyName" placeholder="Tom Butcher" oninput="autoSaveSettings()"></div>
+    <div class="settings-field"><label>Attorney Email</label><input id="set_email" type="email" placeholder="tom@butcherlawoffice.com" oninput="autoSaveSettings()"></div>
+    <div class="settings-field"><label>Bar Number</label><input id="set_barNumber" placeholder="OSB #123456" oninput="autoSaveSettings()"></div>
+    <div class="settings-field"><label>Phone</label><input id="set_phone" placeholder="(541) 555-1234" oninput="autoSaveSettings()"></div>
+    <div class="settings-field"><label>Fax</label><input id="set_fax" placeholder="(541) 555-5678" oninput="autoSaveSettings()"></div>
+    <div class="settings-field full"><label>Street Address</label><input id="set_street" placeholder="123 Main St, Suite 100" oninput="autoSaveSettings()"></div>
+    <div class="settings-field full"><label>City, State ZIP</label><input id="set_cityStateZip" placeholder="Eugene, OR 97401" oninput="autoSaveSettings()"></div>
+  </div>
+  <div class="settings-actions">
+    <span class="settings-saved" id="settingsSavedMsg">Saved &#10003;</span>
+    <button class="settings-cancel-btn" onclick="closeSettings()">Close</button>
+    <button class="settings-save-btn" onclick="saveSettings()">Save Settings</button>
+  </div>
+</div>
+</div>
 </body>
   </html>
