@@ -2787,5 +2787,535 @@ Tel: (541) 762-1967  Fax: (541) 762-1968</textarea>
 </div>
 </div>
   <script src="ecf-integration.js"></script>
+
+
+<script>
+/* ============================================================
+   BUTCHER LAW — DOCUMENT ENGINE ENHANCEMENTS  v1.0
+   Features: Case Context · Saved Service Lists · Activity Log
+             · Send-Panel Pre-fill · Settings FAQ
+   ============================================================ */
+(function () {
+'use strict';
+
+const CC_KEY    = 'bl_case_contexts';
+const CC_ACTIVE = 'bl_active_case';
+const SL_KEY    = 'bl_service_lists';
+const AL_KEY    = 'bl_activity_log';
+const AL_MAX    = 500;
+
+/* ── CSS ── */
+const ccStyle = document.createElement('style');
+ccStyle.id = 'cc-styles';
+ccStyle.textContent = `
+#cc-bar{display:flex;align-items:center;gap:10px;padding:7px 20px;background:#1a160f;border-bottom:1px solid #3a2e1f;font-family:inherit;font-size:12px;position:sticky;top:0;z-index:900;flex-wrap:wrap;}
+#cc-bar .cc-label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#7a6a4f;white-space:nowrap;flex-shrink:0;}
+#cc-active-pill{display:flex;align-items:center;gap:8px;background:#2d2416;border:1px solid #c9a84c;border-radius:20px;padding:3px 10px 3px 12px;cursor:pointer;transition:background .15s;}
+#cc-active-pill:hover{background:#3d3020;}
+#cc-active-pill .cc-pill-name{font-size:12px;font-weight:600;color:#e8d5a0;}
+#cc-active-pill .cc-pill-case{font-size:11px;color:#9a8a60;font-family:monospace;}
+#cc-active-pill .cc-pill-chapter{font-size:10px;background:#c9a84c22;color:#c9a84c;border-radius:10px;padding:1px 6px;border:1px solid #c9a84c44;}
+#cc-no-case{font-size:12px;color:#5a4a30;font-style:italic;}
+#cc-new-btn,#cc-switch-btn{background:none;border:1px solid #3a2e1f44;border-radius:4px;padding:3px 10px;font-size:11px;letter-spacing:.05em;color:#9a8a60;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap;}
+#cc-new-btn:hover,#cc-switch-btn:hover{background:#2d2416;color:#e8d5a0;border-color:#c9a84c55;}
+#cc-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:flex-start;justify-content:center;padding-top:60px;}
+#cc-overlay.open{display:flex;}
+#cc-panel{background:#faf7f2;width:min(620px,95vw);max-height:85vh;border-radius:12px;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.35);overflow:hidden;}
+#cc-panel-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px 0;}
+#cc-panel-header h2{font-size:16px;font-weight:700;color:#1a160f;margin:0;}
+#cc-panel-header .cc-close{background:none;border:none;font-size:20px;color:#7a6a4f;cursor:pointer;padding:0 4px;line-height:1;}
+#cc-tabs{display:flex;gap:0;padding:12px 24px 0;border-bottom:1px solid #e0d8c8;}
+.cc-tab{font-size:13px;font-weight:600;color:#9a8a70;padding:6px 16px 10px;cursor:pointer;border-bottom:2px solid transparent;transition:all .15s;background:none;border-top:none;border-left:none;border-right:none;}
+.cc-tab.active{color:#3a2e1f;border-bottom-color:#c9a84c;}
+.cc-tab-panel{display:none;padding:20px 24px 24px;overflow-y:auto;}
+.cc-tab-panel.active{display:block;}
+.cc-form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.cc-form-grid .cc-full{grid-column:1/-1;}
+.cc-form-group{display:flex;flex-direction:column;gap:4px;}
+.cc-form-group label{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#7a6a4f;font-weight:600;}
+.cc-form-group input,.cc-form-group select{padding:8px 10px;border:1px solid #d4c9b0;border-radius:6px;font-size:13px;color:#3a2e1f;background:#fff;font-family:inherit;transition:border-color .15s;}
+.cc-form-group input:focus,.cc-form-group select:focus{outline:none;border-color:#c9a84c;}
+#cc-debtor2-row{display:none;}
+.cc-save-bar{display:flex;justify-content:flex-end;gap:10px;padding-top:16px;border-top:1px solid #e8e0d0;margin-top:16px;}
+.cc-btn-primary{background:#c9a84c;color:#1a160f;border:none;border-radius:6px;padding:9px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;}
+.cc-btn-primary:hover{background:#b8963e;}
+.cc-btn-ghost{background:none;color:#7a6a4f;border:1px solid #d4c9b0;border-radius:6px;padding:9px 16px;font-size:13px;cursor:pointer;font-family:inherit;}
+.cc-btn-ghost:hover{background:#f0ebe0;}
+.cc-case-card{display:flex;align-items:center;gap:12px;padding:12px 14px;border:1px solid #e0d8c8;border-radius:8px;margin-bottom:8px;background:#fff;transition:border-color .15s;}
+.cc-case-card:hover{border-color:#c9a84c55;}
+.cc-case-card.cc-active-card{border-color:#c9a84c;background:#fdf8ec;}
+.cc-case-card-body{flex:1;min-width:0;}
+.cc-case-card-name{font-size:13px;font-weight:600;color:#1a160f;}
+.cc-case-card-meta{font-size:11px;color:#7a6a4f;margin-top:2px;font-family:monospace;}
+.cc-case-actions{display:flex;gap:6px;}
+.cc-case-actions button{background:none;border:1px solid #e0d8c8;border-radius:4px;padding:3px 8px;font-size:11px;cursor:pointer;color:#7a6a4f;font-family:inherit;}
+.cc-case-actions button:hover{background:#f0ebe0;}
+.cc-empty-state{color:#9a8a70;font-style:italic;font-size:13px;text-align:center;padding:20px;}
+.cc-autofilled{background:#fdf4e3 !important;border-color:#c9a84c !important;}
+#cc-prefill-notice{display:flex;align-items:center;gap:8px;background:#fdf4e3;border:1px solid #c9a84c44;border-radius:6px;padding:8px 12px;margin-bottom:12px;font-size:12px;color:#8a6a20;}
+#cc-prefill-notice .cc-pn-icon{font-size:14px;}
+#sl-panel{margin-top:16px;border-top:1px solid #e0d8c8;padding-top:14px;}
+#sl-panel .sl-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+#sl-panel .sl-title{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#7a6a4f;font-weight:600;}
+.sl-list{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px;}
+.sl-tag{font-size:11px;background:#f0ebe0;color:#4a3f2f;border:1px solid #d4c9b0;border-radius:12px;padding:2px 10px;cursor:pointer;transition:all .15s;display:flex;align-items:center;gap:5px;}
+.sl-tag:hover{background:#c9a84c22;border-color:#c9a84c;}
+.sl-tag .sl-tag-del{font-size:10px;color:#9a8a70;cursor:pointer;padding:0 2px;border-radius:50%;}
+.sl-tag .sl-tag-del:hover{background:#e0d0b0;color:#6a3a20;}
+.sl-save-row{display:flex;gap:8px;align-items:center;}
+.sl-save-row input{flex:1;padding:6px 9px;border:1px solid #d4c9b0;border-radius:5px;font-size:12px;font-family:inherit;}
+.sl-save-row button{background:#c9a84c;color:#1a160f;border:none;border-radius:5px;padding:6px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;}
+`;
+document.head.appendChild(ccStyle);
+const alStyle = document.createElement('style');
+alStyle.id = 'al-styles';
+alStyle.textContent = `
+#al-btn{position:relative;background:none;border:1px solid #3a2e1f44;border-radius:4px;padding:3px 10px;font-size:11px;letter-spacing:.05em;color:#9a8a60;cursor:pointer;transition:all .15s;font-family:inherit;white-space:nowrap;}
+#al-btn:hover{background:#2d2416;color:#e8d5a0;border-color:#c9a84c55;}
+#al-badge{position:absolute;top:-5px;right:-5px;background:#c9a84c;color:#1a160f;font-size:9px;font-weight:700;border-radius:8px;padding:1px 5px;line-height:1.4;display:none;}
+#al-badge.visible{display:block;}
+#al-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:9999;align-items:flex-start;justify-content:flex-end;}
+#al-overlay.open{display:flex;}
+#al-panel{background:#faf7f2;width:min(680px,95vw);height:100vh;display:flex;flex-direction:column;box-shadow:-10px 0 40px rgba(0,0,0,.3);}
+#al-header{padding:20px 24px 14px;border-bottom:1px solid #e0d8c8;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+#al-header h2{margin:0;font-size:16px;font-weight:700;color:#1a160f;}
+#al-header-actions{display:flex;gap:8px;}
+#al-header-actions button{background:none;border:1px solid #d4c9b0;border-radius:5px;padding:5px 12px;font-size:12px;cursor:pointer;color:#4a3f2f;font-family:inherit;}
+#al-header-actions button:hover{background:#f0ebe0;}
+#al-close-btn{font-size:18px !important;padding:4px 10px !important;}
+#al-filters{padding:12px 24px;border-bottom:1px solid #e8e0d0;display:flex;gap:10px;flex-wrap:wrap;flex-shrink:0;}
+#al-filters select,#al-filters input{padding:6px 9px;border:1px solid #d4c9b0;border-radius:5px;font-size:12px;font-family:inherit;background:#fff;color:#3a2e1f;}
+#al-stat-bar{padding:6px 24px;font-size:11px;color:#9a8a70;border-bottom:1px solid #f0e8d8;flex-shrink:0;}
+#al-entries{flex:1;overflow-y:auto;padding:8px 24px 24px;}
+.al-day-group{margin-top:20px;}
+.al-day-label{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:#9a8a70;font-weight:600;padding:8px 0 6px;border-bottom:1px solid #e8e0d0;margin-bottom:8px;position:sticky;top:0;background:#faf7f2;z-index:1;}
+.al-entry{display:flex;gap:12px;align-items:flex-start;padding:10px 12px;border:1px solid #ece7da;border-radius:8px;margin-bottom:6px;background:#fff;transition:border-color .15s;}
+.al-entry:hover{border-color:#c9a84c55;background:#fdfaf4;}
+.al-entry-time{font-size:11px;color:#9a8a70;font-family:monospace;white-space:nowrap;padding-top:2px;min-width:42px;}
+.al-entry-body{flex:1;min-width:0;}
+.al-entry-title{font-size:13px;font-weight:600;color:#1a160f;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.al-entry-meta{font-size:11px;color:#7a6a4f;margin-top:3px;display:flex;gap:10px;flex-wrap:wrap;}
+.al-entry-case{font-family:monospace;}
+.al-entry-cat{background:#f0ebe0;border-radius:4px;padding:1px 6px;font-size:10px;letter-spacing:.05em;text-transform:uppercase;}
+.al-empty{text-align:center;padding:40px 20px;color:#9a8a70;}
+.al-empty-icon{font-size:32px;margin-bottom:8px;}
+.cc-send-notice{display:flex;align-items:center;gap:8px;background:#fdf4e3;border:1px solid #c9a84c55;border-radius:6px;padding:7px 12px;margin-bottom:12px;font-size:11px;color:#8a6a20;}
+`;
+document.head.appendChild(alStyle);
+
+/* ── Storage ── */
+window.ccGetAll=function(){try{return JSON.parse(localStorage.getItem('bl_case_contexts')||'{}');}catch{return{};}};
+window.ccSaveAll=function(o){localStorage.setItem('bl_case_contexts',JSON.stringify(o));};
+window.ccGetCase=function(n){return ccGetAll()[n]||null;};
+window.ccSaveCase=function(n,d){const a=ccGetAll();a[n]=d;ccSaveAll(a);};
+window.ccDeleteCase=function(n){const a=ccGetAll();delete a[n];ccSaveAll(a);if(ccGetActive()===n){localStorage.removeItem('bl_active_case');ccUpdateBar();}};
+window.ccGetActive=function(){return localStorage.getItem('bl_active_case')||null;};
+window.ccSetActive=function(n){localStorage.setItem('bl_active_case',n);};
+window.slGetAll=function(){try{return JSON.parse(localStorage.getItem('bl_service_lists')||'{}');}catch{return{};}};
+window.slSaveAll=function(o){localStorage.setItem('bl_service_lists',JSON.stringify(o));};
+window.slGetForCase=function(n){return slGetAll()[n]||[];};
+window.slSaveForCase=function(n,l){const a=slGetAll();a[n]=l;slSaveAll(a);};
+window.alGetLog=function(){try{return JSON.parse(localStorage.getItem('bl_activity_log')||'[]');}catch{return[];}};
+window.alSaveLog=function(e){localStorage.setItem('bl_activity_log',JSON.stringify(e.slice(-500)));};
+window.alAddEntry=function(e){const l=alGetLog();l.push({...e,id:Date.now()+Math.random().toString(36).slice(2,6)});alSaveLog(l);};
+window.alClearLog=function(){localStorage.removeItem('bl_activity_log');};
+
+/* ── Inject Bar ── */
+(function(){
+  if(document.getElementById('cc-bar'))return;
+  const b=document.createElement('div');b.id='cc-bar';
+  b.innerHTML=`<span class="cc-label">Active Case</span><div id="cc-no-case">No case set</div><div id="cc-active-pill" style="display:none" onclick="ccOpenPanel('list')"><span class="cc-pill-name" id="cc-pill-name"></span><span class="cc-pill-case" id="cc-pill-case"></span><span class="cc-pill-chapter" id="cc-pill-chapter"></span></div><button id="cc-new-btn" onclick="ccOpenPanel('form')">+ New Case</button><button id="al-btn" onclick="alOpenPanel()">&#128203; Log<span id="al-badge"></span></button><button id="cc-switch-btn" onclick="ccOpenPanel('list')">Switch Case</button>`;
+  const s=document.getElementById('app-screen');const h=s&&s.querySelector('header');
+  if(h&&h.parentNode)h.parentNode.insertBefore(b,h.nextSibling);else document.body.insertBefore(b,document.body.firstChild);
+})();
+
+/* ── Inject CC Overlay ── */
+(function(){
+  if(document.getElementById('cc-overlay'))return;
+  const o=document.createElement('div');o.id='cc-overlay';
+  o.innerHTML=`<div id="cc-panel"><div id="cc-panel-header"><h2 id="cc-panel-title">Case Context</h2><button class="cc-close" onclick="ccClosePanel()">&#x2715;</button></div><div id="cc-tabs"><button class="cc-tab active" onclick="ccShowTab('form')">New Case</button><button class="cc-tab" onclick="ccShowTab('list')">Saved Cases&nbsp;<span id="cc-count" style="font-size:10px;color:#9a8a70"></span></button></div><div id="cc-tab-form" class="cc-tab-panel active"><div class="cc-form-grid"><div class="cc-form-group cc-full"><label>Filing Type</label><select id="cc-joint" onchange="ccToggleJoint(this.value)"><option value="single">Single Filing</option><option value="joint">Joint Filing</option></select></div><div class="cc-form-group"><label>Primary Debtor Name</label><input id="cc-debtor1" type="text" placeholder="First M. Last"></div><div class="cc-form-group" id="cc-debtor2-row"><label>Co-Debtor Name</label><input id="cc-debtor2" type="text" placeholder="First M. Last"></div><div class="cc-form-group"><label>Case Number</label><input id="cc-casenum" type="text" placeholder="25-00000-tmr13"></div><div class="cc-form-group"><label>Chapter</label><select id="cc-chapter"><option value="7">Chapter 7</option><option value="13" selected>Chapter 13</option><option value="11">Chapter 11</option><option value="12">Chapter 12</option></select></div><div class="cc-form-group cc-full"><label>Trustee Name</label><input id="cc-trustee" type="text" placeholder="Trustee Full Name"></div><div class="cc-form-group cc-full"><label>Client Street Address</label><input id="cc-addr1" type="text" placeholder="123 Main St"></div><div class="cc-form-group cc-full"><label>City, State ZIP</label><input id="cc-addr2" type="text" placeholder="Portland, OR 97201"></div><div class="cc-form-group"><label>Client Email</label><input id="cc-email" type="email" placeholder="client@email.com"></div><div class="cc-form-group"><label>Client Phone</label><input id="cc-phone" type="tel" placeholder="(503) 555-0000"></div></div><div class="cc-save-bar"><button class="cc-btn-ghost" onclick="ccClosePanel()">Cancel</button><button class="cc-btn-primary" id="cc-save-btn" onclick="ccSaveAndActivate()">Save &amp; Set Active</button></div></div><div id="cc-tab-list" class="cc-tab-panel"><div id="cc-cases-list"></div></div></div>`;
+  o.addEventListener('click',e=>{if(e.target===o)ccClosePanel();});document.body.appendChild(o);
+})();
+
+/* ── Inject AL Overlay ── */
+(function(){
+  if(document.getElementById('al-overlay'))return;
+  const o=document.createElement('div');o.id='al-overlay';
+  o.innerHTML=`<div id="al-panel"><div id="al-header"><h2>&#128203; Activity Log</h2><div id="al-header-actions"><button id="al-export-btn" onclick="alExportCSV()">&#8595; CSV</button><button id="al-clear-btn" onclick="alConfirmClear()">&#128465; Clear</button><button id="al-close-btn" onclick="alClosePanel()">&#x2715;</button></div></div><div id="al-filters"><select id="al-filter-case" onchange="alRender()"><option value="">All Cases</option></select><select id="al-filter-cat" onchange="alRender()"><option value="">All Types</option><option value="document">Document</option><option value="send">Send</option><option value="other">Other</option></select><input id="al-filter-search" type="text" placeholder="Search&hellip;" oninput="alRender()"></div><span id="al-stat-bar"></span><div id="al-entries"></div></div>`;
+  o.addEventListener('click',e=>{if(e.target===o)alClosePanel();});document.body.appendChild(o);
+})();
+
+/* ── Case Context Logic ── */
+window._ccEditingCase=null;
+window.ccUpdateBar=function(){
+  const n=ccGetActive(),d=n?ccGetCase(n):null;
+  const nc=document.getElementById('cc-no-case'),p=document.getElementById('cc-active-pill');
+  if(d){if(nc)nc.style.display='none';if(p)p.style.display='flex';
+    const pn=document.getElementById('cc-pill-name'),pc=document.getElementById('cc-pill-case'),ph=document.getElementById('cc-pill-chapter');
+    if(pn)pn.textContent=d.debtor_name+(d.debtor2_name?' & '+d.debtor2_name:'');
+    if(pc)pc.textContent=d.case_number;if(ph)ph.textContent='Ch. '+d.chapter;
+  }else{if(nc)nc.style.display='';if(p)p.style.display='none';}
+};
+window.ccOpenPanel=function(tab){
+  const ov=document.getElementById('cc-overlay');if(!ov)return;
+  ov.classList.add('open');window._ccEditingCase=null;
+  const t=document.getElementById('cc-panel-title');if(t)t.textContent='Case Context';
+  const sb=document.getElementById('cc-save-btn');if(sb){sb.textContent='Save & Set Active';sb.onclick=ccSaveAndActivate;}
+  if(tab!=='list'){
+    ['cc-debtor1','cc-debtor2','cc-casenum','cc-trustee','cc-addr1','cc-addr2','cc-email','cc-phone'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+    const j=document.getElementById('cc-joint');if(j){j.value='single';ccToggleJoint('single');}
+    const ch=document.getElementById('cc-chapter');if(ch)ch.value='13';
+  }
+  ccShowTab(tab||'form');
+};
+window.ccClosePanel=function(){const o=document.getElementById('cc-overlay');if(o)o.classList.remove('open');};
+window.ccShowTab=function(tab){
+  document.querySelectorAll('.cc-tab').forEach((b,i)=>b.classList.toggle('active',(tab==='form'&&i===0)||(tab==='list'&&i===1)));
+  document.querySelectorAll('.cc-tab-panel').forEach(p=>p.classList.remove('active'));
+  const a=document.getElementById('cc-tab-'+tab);if(a)a.classList.add('active');
+  if(tab==='list')ccRenderList();
+};
+window.ccRenderList=function(){
+  const c=document.getElementById('cc-cases-list');if(!c)return;
+  const all=ccGetAll(),keys=Object.keys(all);
+  const ce=document.getElementById('cc-count');if(ce)ce.textContent=keys.length?'('+keys.length+')':'';
+  if(!keys.length){c.innerHTML='<div class="cc-empty-state">No saved cases yet.<br>Use the New Case tab to add one.</div>';return;}
+  const act=ccGetActive();
+  c.innerHTML=keys.sort().map(no=>{const d=all[no],ia=no===act;
+    return `<div class="cc-case-card ${ia?'cc-active-card':''}"><div class="cc-case-card-body"><div class="cc-case-card-name">${d.debtor_name}${d.debtor2_name?' &amp; '+d.debtor2_name:''}</div><div class="cc-case-card-meta">${no} &middot; Ch. ${d.chapter}${d.trustee_name?' &middot; '+d.trustee_name:''}</div></div><div class="cc-case-actions">${ia?'<span style="font-size:10px;color:#c9a84c;padding:3px 6px">&#x2713; Active</span>':`<button onclick="ccActivateCase('${no}')">Set Active</button>`}<button onclick="ccEditCase('${no}')">Edit</button><button onclick="ccConfirmDelete('${no}')">Delete</button></div></div>`;
+  }).join('');
+};
+window.ccActivateCase=function(n){ccSetActive(n);ccUpdateBar();ccClosePanel();};
+window.ccEditCase=function(no){
+  const d=ccGetCase(no);if(!d)return;
+  window._ccEditingCase=no;ccShowTab('form');
+  const t=document.getElementById('cc-panel-title');if(t)t.textContent='Edit Case';
+  const f=id=>document.getElementById(id);
+  if(f('cc-debtor1'))f('cc-debtor1').value=d.debtor_name||'';
+  if(f('cc-debtor2'))f('cc-debtor2').value=d.debtor2_name||'';
+  if(f('cc-casenum'))f('cc-casenum').value=d.case_number||'';
+  if(f('cc-chapter'))f('cc-chapter').value=d.chapter||'13';
+  if(f('cc-trustee'))f('cc-trustee').value=d.trustee_name||'';
+  if(f('cc-addr1'))f('cc-addr1').value=d.client_address1||'';
+  if(f('cc-addr2'))f('cc-addr2').value=d.client_address2||'';
+  if(f('cc-email'))f('cc-email').value=d.client_email||'';
+  if(f('cc-phone'))f('cc-phone').value=d.client_phone||'';
+  if(f('cc-joint')){f('cc-joint').value=d.joint_filing||'single';ccToggleJoint(d.joint_filing||'single');}
+  const sb=document.getElementById('cc-save-btn');if(sb){sb.textContent='Save Changes';sb.onclick=ccSaveAndActivate;}
+};
+window.ccConfirmDelete=function(no){
+  const d=ccGetCase(no);if(!d)return;
+  if(confirm('Delete case '+no+' ('+d.debtor_name+')? This cannot be undone.')){ccDeleteCase(no);ccRenderList();ccUpdateBar();}
+};
+window.ccToggleJoint=function(v){const r=document.getElementById('cc-debtor2-row');if(r)r.style.display=v==='joint'?'flex':'none';};
+window.ccSaveAndActivate=function(){
+  const no=document.getElementById('cc-casenum')?.value.trim();
+  const d1=document.getElementById('cc-debtor1')?.value.trim();
+  if(!no||!d1){alert('Case number and debtor name are required.');return;}
+  const jt=document.getElementById('cc-joint')?.value||'single';
+  const data={
+    case_number:no,chapter:document.getElementById('cc-chapter')?.value||'13',
+    joint_filing:jt,debtor_name:d1,
+    debtor2_name:jt==='joint'?(document.getElementById('cc-debtor2')?.value.trim()||''):'',
+    trustee_name:document.getElementById('cc-trustee')?.value.trim()||'',
+    client_address1:document.getElementById('cc-addr1')?.value.trim()||'',
+    client_address2:document.getElementById('cc-addr2')?.value.trim()||'',
+    client_email:document.getElementById('cc-email')?.value.trim()||'',
+    client_phone:document.getElementById('cc-phone')?.value.trim()||'',
+    saved_at:new Date().toISOString()
+  };
+  if(window._ccEditingCase&&window._ccEditingCase!==no)ccDeleteCase(window._ccEditingCase);
+  ccSaveCase(no,data);ccSetActive(no);ccUpdateBar();ccClosePanel();
+};
+window.ccPrefillForm=function(){
+  const no=ccGetActive();if(!no)return;
+  const data=ccGetCase(no);if(!data)return;
+  const fields={'debtor_name':data.debtor_name,'debtor2_name':data.debtor2_name,'case_number':data.case_number,'trustee_name':data.trustee_name,'client_address1':data.client_address1,'client_address2':data.client_address2};
+  let filled=0;
+  Object.entries(fields).forEach(([id,val])=>{
+    if(!val)return;const el=document.getElementById(id);
+    if(el&&!el.value){el.value=val;el.classList.add('cc-autofilled');el.addEventListener('input',()=>el.classList.remove('cc-autofilled'),{once:true});filled++;}
+  });
+  const je=document.getElementById('joint_filing');
+  if(je&&data.joint_filing){const tv=data.joint_filing==='joint'?'Joint debtors':'Single debtor';if(je.value!==tv){je.value=tv;je.dispatchEvent(new Event('change'));}}
+  if(filled>0){
+    const ff=document.getElementById('formFields');
+    if(ff&&!document.getElementById('cc-prefill-notice')){
+      const n=document.createElement('div');n.id='cc-prefill-notice';
+      n.innerHTML=`<span class="cc-pn-icon">&#9889;</span> Auto-filled from active case: <strong>${data.debtor_name}</strong> &middot; ${data.case_number}`;
+      ff.insertBefore(n,ff.firstChild);
+    }
+  }
+};
+
+/* ── Service List Logic ── */
+window.slRenderTags=function(caseNo,container){
+  const lists=slGetForCase(caseNo),el=container||document.getElementById('sl-list-tags');if(!el)return;
+  if(!lists.length){el.innerHTML='<span style="font-size:11px;color:#9a8a70;font-style:italic">No saved lists yet.</span>';return;}
+  el.innerHTML=lists.map((sl,i)=>`<span class="sl-tag" onclick="slLoadList(${i})">${sl.name} <span style="color:#9a8a70">(${sl.addresses.length})</span><span class="sl-tag-del" onclick="event.stopPropagation();slManageDelete(${i})">&#x2715;</span></span>`).join('');
+};
+window.slInjectPanel=function(){
+  if(document.getElementById('sl-panel'))return;
+  const cosOv=document.getElementById('cosOverlay');if(!cosOv)return;
+  const caseNo=ccGetActive();
+  const panel=document.createElement('div');panel.id='sl-panel';
+  panel.innerHTML=`<div class="sl-header"><span class="sl-title">Saved Service Lists</span>${caseNo?'<span class="sl-active-case-note" style="font-size:10px;color:#9a8a70">Case: <span class="sl-case-label">'+caseNo+'</span></span>':'<span style="font-size:10px;color:#c9a84c">No active case</span>'}</div><div class="sl-list" id="sl-list-tags"></div><div class="sl-save-row"><input id="sl-list-name" type="text" placeholder="Name this list (e.g. Step 1 Creditors)"><button onclick="slSaveCurrent()">Save Current</button></div>`;
+  cosOv.appendChild(panel);
+  if(caseNo)slRenderTags(caseNo);
+};
+window.slLoadList=function(idx){
+  const caseNo=ccGetActive();if(!caseNo)return;
+  const lists=slGetForCase(caseNo);const sl=lists[idx];if(!sl)return;
+  if(typeof cosAddresses!=='undefined'){cosAddresses.length=0;sl.addresses.forEach(a=>cosAddresses.push(a));}
+  if(typeof renderCOSTable==='function')renderCOSTable();
+  else if(typeof window.renderCOSTable==='function')window.renderCOSTable();
+};
+window.slSaveCurrent=function(){
+  const caseNo=ccGetActive();
+  if(!caseNo){alert('No active case set. Set a case first.');return;}
+  const nameEl=document.getElementById('sl-list-name');
+  const name=(nameEl&&nameEl.value.trim())||'Service List';
+  let addrs=[];
+  if(typeof cosAddresses!=='undefined')addrs=[...cosAddresses];
+  if(!addrs.length){alert('No addresses in the current list to save.');return;}
+  const lists=slGetForCase(caseNo);
+  lists.push({name,addresses:addrs,saved_at:new Date().toISOString()});
+  slSaveForCase(caseNo,lists);
+  if(nameEl)nameEl.value='';
+  slRenderTags(caseNo);
+  const btn=document.querySelector('#sl-panel .sl-save-row button');
+  if(btn){const orig=btn.textContent;btn.textContent='Saved!';setTimeout(()=>btn.textContent=orig,1500);}
+};
+window.slManageDelete=function(idx){
+  const caseNo=ccGetActive();if(!caseNo)return;
+  const lists=slGetForCase(caseNo);
+  if(!confirm('Delete "'+lists[idx].name+'"?'))return;
+  lists.splice(idx,1);slSaveForCase(caseNo,lists);slRenderTags(caseNo);
+};
+
+/* ── Activity Log Logic ── */
+window.alOpenPanel=function(){const o=document.getElementById('al-overlay');if(o){o.classList.add('open');alPopulateFilters();alRender();}};
+window.alClosePanel=function(){const o=document.getElementById('al-overlay');if(o)o.classList.remove('open');};
+window.alUpdateBadge=function(){
+  const log=alGetLog(),badge=document.getElementById('al-badge');if(!badge)return;
+  if(log.length>0){badge.textContent=log.length>99?'99+':log.length;badge.classList.add('visible');}
+  else badge.classList.remove('visible');
+};
+window.alPopulateFilters=function(){
+  const log=alGetLog(),sel=document.getElementById('al-filter-case');if(!sel)return;
+  const cases=[...new Set(log.map(e=>e.case_number).filter(Boolean))].sort();
+  const cur=sel.value;sel.innerHTML='<option value="">All Cases</option>'+cases.map(c=>`<option value="${c}">${c}</option>`).join('');
+  if(cases.includes(cur))sel.value=cur;
+};
+window.alGetSendDests=function(e){
+  const d=[];
+  if(e.send_email)d.push('Email');if(e.send_lob)d.push('Mail');
+  if(e.send_fax)d.push('Fax');if(e.send_sign)d.push('Sign');if(e.send_pay)d.push('Pay');
+  return d.join(', ');
+};
+window.alRender=function(){
+  const log=alGetLog();
+  const fCase=(document.getElementById('al-filter-case')||{}).value||'';
+  const fCat=(document.getElementById('al-filter-cat')||{}).value||'';
+  const fSrch=((document.getElementById('al-filter-search')||{}).value||'').toLowerCase();
+  let filtered=log.filter(e=>{
+    if(fCase&&e.case_number!==fCase)return false;
+    if(fCat&&e.category!==fCat)return false;
+    if(fSrch&&!(e.title||'').toLowerCase().includes(fSrch)&&!(e.case_number||'').toLowerCase().includes(fSrch))return false;
+    return true;
+  }).reverse();
+  const stat=document.getElementById('al-stat-bar');
+  if(stat)stat.textContent=filtered.length+' of '+log.length+' entr'+(log.length===1?'y':'ies');
+  const entries=document.getElementById('al-entries');if(!entries)return;
+  if(!filtered.length){entries.innerHTML='<div class="al-empty"><div class="al-empty-icon">&#128203;</div>No entries match your filters.</div>';return;}
+  const groups={};
+  filtered.forEach(e=>{
+    const d=new Date(e.ts||e.id);
+    const label=d.toLocaleDateString('en-US',{weekday:'long',month:'long',day:'numeric'});
+    if(!groups[label])groups[label]=[];groups[label].push(e);
+  });
+  entries.innerHTML=Object.entries(groups).map(([day,items])=>`
+    <div class="al-day-group"><div class="al-day-label">${day}</div>
+    ${items.map(e=>{
+      const t=new Date(e.ts||e.id);
+      const time=t.toLocaleTimeString('en-US',{hour:'numeric',minute:'2-digit'});
+      const dest=alGetSendDests(e);
+      return `<div class="al-entry"><div class="al-entry-time">${time}</div><div class="al-entry-body"><div class="al-entry-title">${e.title||'Untitled'}</div><div class="al-entry-meta">${e.case_number?'<span class="al-entry-case">'+e.case_number+'</span>':''}${e.category?'<span class="al-entry-cat">'+e.category+'</span>':''}${dest?'<span>&#8594; '+dest+'</span>':''}</div></div></div>`;
+    }).join('')}</div>`).join('');
+};
+window.alConfirmClear=function(){if(confirm('Clear all '+alGetLog().length+' log entries? This cannot be undone.')){alClearLog();alUpdateBadge();alRender();}};
+window.alExportCSV=function(){
+  const log=alGetLog();if(!log.length){alert('No log entries to export.');return;}
+  const rows=[['Timestamp','Title','Case Number','Category','Destinations'],...log.map(e=>[new Date(e.ts||e.id).toISOString(),e.title||'',e.case_number||'',e.category||'',alGetSendDests(e)])];
+  const csv=rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob=new Blob([csv],{type:'text/csv'});const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');a.href=url;a.download='activity-log-'+new Date().toISOString().slice(0,10)+'.csv';a.click();URL.revokeObjectURL(url);
+};
+
+/* ── Send Panel Pre-fill Helpers ── */
+window._parseCSZ=function(csz){
+  if(!csz)return{city:'',state:'',zip:''};
+  const m=csz.match(/^(.+),\s*([A-Z]{2})\s+(\d{5}(?:-\d{4})?)$/);
+  return m?{city:m[1].trim(),state:m[2],zip:m[3]}:{city:csz,state:'',zip:''};
+};
+window._getActiveData=function(){
+  const no=ccGetActive();return no?ccGetCase(no):null;
+};
+window._setIfEmpty=function(id,val,autofill){
+  if(!val)return;const el=document.getElementById(id);if(!el||el.value)return;
+  el.value=val;
+  if(autofill){el.style.background='#fdf4e3';el.style.borderColor='#c9a84c';
+    el.addEventListener('input',()=>{el.style.background='';el.style.borderColor='';},{once:true});}
+};
+window._injectPanelNotice=function(overlayId,d){
+  const ov=document.getElementById(overlayId);if(!ov||!d)return;
+  ov.querySelectorAll('.cc-send-notice').forEach(n=>n.remove());
+  const first=ov.querySelector('input,select,textarea');if(!first)return;
+  const par=first.closest('.form-group,.field-group,div')||first.parentNode;if(!par)return;
+  const n=document.createElement('div');n.className='cc-send-notice';
+  n.innerHTML=`&#9889; Auto-filled: <strong>${d.debtor_name}</strong> &middot; ${d.case_number}`;
+  par.parentNode.insertBefore(n,par);
+};
+
+/* ── Per-panel pre-fill ── */
+window.prefillSendPanel=function(){
+  const d=window._getActiveData();if(!d)return;
+  const csz=window._parseCSZ(d.client_address2);
+  window._setIfEmpty('sendRecipientName',d.debtor_name,true);
+  window._setIfEmpty('sendEmailAddr',d.client_email,true);
+  window._setIfEmpty('sendLobStreet',d.client_address1,true);
+  window._setIfEmpty('sendLobCity',csz.city,true);
+  window._setIfEmpty('sendLobState',csz.state,true);
+  window._setIfEmpty('sendLobZip',csz.zip,true);
+  window._injectPanelNotice('sendPanelOverlay',d);
+};
+window.prefillEmailPanel=function(){
+  const d=window._getActiveData();if(!d)return;
+  window._setIfEmpty('emailToName',d.debtor_name,true);
+  window._setIfEmpty('emailToAddr',d.client_email,true);
+  window._setIfEmpty('emailCaseNo',d.case_number,true);
+  window._injectPanelNotice('emailOverlay',d);
+};
+window.prefillLobPanel=function(){
+  const d=window._getActiveData();if(!d)return;
+  const csz=window._parseCSZ(d.client_address2);
+  window._setIfEmpty('lobToName',d.debtor_name,true);
+  window._setIfEmpty('lobToAddr1',d.client_address1,true);
+  window._setIfEmpty('lobToCity',csz.city,true);
+  window._setIfEmpty('lobToState',csz.state,true);
+  window._setIfEmpty('lobToZip',csz.zip,true);
+  window._injectPanelNotice('lobOverlay',d);
+};
+window.prefillDsignPanel=function(){
+  const d=window._getActiveData();if(!d)return;
+  window._setIfEmpty('dsignC1Name',d.debtor_name,true);
+  window._setIfEmpty('dsignC1Email',d.client_email,true);
+  if(d.joint_filing==='joint'&&d.debtor2_name){
+    window._setIfEmpty('dsignC2Name',d.debtor2_name,true);
+  }
+  window._injectPanelNotice('dsignOverlay',d);
+};
+window.prefillPayPanel=function(){
+  const d=window._getActiveData();if(!d)return;
+  window._setIfEmpty('payClientName',d.debtor_name,true);
+  window._setIfEmpty('payClientEmail',d.client_email,true);
+  window._setIfEmpty('payReference',d.case_number,true);
+  window._injectPanelNotice('payPanelOverlay',d);
+};
+
+/* ── Patch opener functions for send panels ── */
+(function(){
+  const patches=[
+    ['openSendPanel','sendPanelOverlay','prefillSendPanel'],
+    ['openEmail','emailOverlay','prefillEmailPanel'],
+    ['openLob','lobOverlay','prefillLobPanel'],
+    ['openDsign','dsignOverlay','prefillDsignPanel'],
+    ['openPayPanel','payPanelOverlay','prefillPayPanel']
+  ];
+  patches.forEach(([fn,ovId,pf])=>{
+    if(typeof window[fn]==='function'){
+      const orig=window[fn];
+      window[fn]=function(...args){orig.apply(this,args);setTimeout(()=>window[pf]&&window[pf](),80);};
+    }
+    const el=document.getElementById(ovId);
+    if(el){new MutationObserver(()=>{if(el.style.display==='block')setTimeout(()=>window[pf]&&window[pf](),60);}).observe(el,{attributes:true,attributeFilter:['style']});}
+  });
+})();
+
+/* ── Patch openModal to run ccPrefillForm + log entry ── */
+(function(){
+  if(typeof window.openModal==='function'){
+    const orig=window.openModal;
+    window.openModal=function(...args){
+      orig.apply(this,args);
+      setTimeout(()=>{if(typeof ccPrefillForm==='function')ccPrefillForm();},80);
+    };
+  }
+})();
+
+/* ── Patch showSuccess to log activity ── */
+(function(){
+  let _lastLogTime=0,_lastLogTitle='';
+  if(typeof window.showSuccess==='function'){
+    const orig=window.showSuccess;
+    window.showSuccess=function(title,...rest){
+      orig.apply(this,[title,...rest]);
+      const now=Date.now();
+      if(title!==_lastLogTitle||now-_lastLogTime>2000){
+        _lastLogTitle=title;_lastLogTime=now;
+        alAddEntry({ts:new Date().toISOString(),title:title,case_number:ccGetActive()||'',category:'document'});
+        alUpdateBadge();
+      }
+    };
+  }
+})();
+
+/* ── COS Observer for Service List Panel ── */
+(function(){
+  const cosOv=document.getElementById('cosOverlay');
+  if(cosOv){
+    new MutationObserver(()=>{
+      if(cosOv.classList.contains('open')||cosOv.style.display==='block'){
+        setTimeout(()=>{if(typeof slInjectPanel==='function')slInjectPanel();},100);
+      }
+    }).observe(cosOv,{attributes:true,attributeFilter:['class','style']});
+  }
+})();
+
+/* ── Settings FAQ ── */
+(function(){
+  function injectFAQ(){
+    if(document.getElementById('settingsFAQ'))return;
+    const panel=document.getElementById('settingsPanel');if(!panel)return;
+    const actions=panel.querySelector('.settings-actions');if(!actions)return;
+    const faq=document.createElement('div');faq.id='settingsFAQ';
+    faq.style.cssText='margin:20px 0;border-top:1px solid #e0d8c8;padding-top:16px;';
+    faq.innerHTML=`<div style="font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:#7a6a4f;font-weight:600;margin-bottom:12px;">How to Use This System</div>
+    ${[
+      ['1. Set Up Your Firm Settings','Fill in Attorney Name, Email, Bar Number, Phone, Fax, Address, and Railway Backend URL above. Click Save Settings. These auto-populate into every document.'],
+      ['2. Set an Active Case','Click "+ New Case" in the gold bar below the header. Enter the debtor name, case number, chapter, trustee, client address, email, and phone. Click Save & Set Active.'],
+      ['3. Generate a Document','Pick a document type from the library. The form will auto-fill with your active case data (gold-highlighted fields). Complete any remaining fields and click Generate.'],
+      ['4. Send the Document','After generating, use Send Letter (email + physical mail), RedFax (to creditors), Lob (physical mail), Dropbox Sign (e-signature), or LawPay (payment request). Send panels also auto-fill from the active case.'],
+      ['5. Save a Service List','Open the Certificate of Service (ADDR button). After building your address list, find the Saved Service Lists section at the bottom. Name your list and click Save Current to reuse it later.'],
+      ['6. Review the Activity Log','Click the "📋 Log" button in the case bar to see every document generated, with timestamps and case numbers. Filter by case or category, or export to CSV for billing.'],
+      ['7. Switch Cases','Click the active case pill or "Switch Case" to open the case manager. You can set a different case active, edit details, or add new cases. All forms immediately reflect the new active case.']
+    ].map(([q,a])=>`<details style="margin-bottom:8px;border:1px solid #e0d8c8;border-radius:6px;overflow:hidden;">
+      <summary style="padding:10px 14px;cursor:pointer;font-size:13px;font-weight:600;color:#3a2e1f;background:#f8f4ed;list-style:none;display:flex;justify-content:space-between;">${q}<span style="color:#c9a84c;font-size:11px;">&#9660;</span></summary>
+      <div style="padding:10px 14px;font-size:12px;color:#5a4a30;line-height:1.6;">${a}</div>
+    </details>`).join('')}`;
+    actions.parentNode.insertBefore(faq,actions);
+  }
+  if(typeof window.openSettings==='function'){
+    const orig=window.openSettings;
+    window.openSettings=function(...args){orig.apply(this,args);setTimeout(injectFAQ,60);};
+  }
+})();
+
+/* ── Initialize ── */
+ccUpdateBar();
+alUpdateBadge();
+
+})(); // end IIFE
+</script>
 </body>
   </html>
