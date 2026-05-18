@@ -2360,7 +2360,8 @@ function loadSettingsToForm(){
 function applySettingsToPage(s){
   var fn=document.querySelector('.firm-name');
   if(fn&&s.firmName) fn.textContent=s.firmName;
-  if(s.railwayUrl!==undefined) localStorage.setItem('pdf_service_url',s.railwayUrl||'');
+  var _rwUrl=s.railwayUrl||'https://web-production-ac315f.up.railway.app';
+  localStorage.setItem('pdf_service_url',_rwUrl);
 }
 // Auto-load settings on page start
 (function(){
