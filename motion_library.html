@@ -2366,7 +2366,7 @@ function applySettingsToPage(s){
 // Auto-load settings on page start
 (function(){
   var s=getSettings();
-  if(s&&s.firmName) applySettingsToPage(s);
+  applySettingsToPage(s||{});
 })();
 
 </script>
