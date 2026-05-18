@@ -98,7 +98,7 @@
    // ----------------------------------------------------------
    // CARD PILLS — add ECF link to every court-filing card
    // ----------------------------------------------------------
-   var SKIP_PREFIXES = ['letter_', 'agree_', 'lbf_'];
+   var SKIP_PREFIXES = ['letter_', 'agree_'];
     var SKIP_IDS      = ['cos_address_builder'];
 
    function shouldShowPill(id) {
