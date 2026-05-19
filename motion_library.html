@@ -3027,27 +3027,6 @@ window.ccSaveAndActivate=function(){
   if(window._ccEditingCase&&window._ccEditingCase!==no)ccDeleteCase(window._ccEditingCase);
   ccSaveCase(no,data);ccSetActive(no);ccUpdateBar();ccClosePanel();
 };
-window.ccPrefillForm=function(){
-  const no=ccGetActive();if(!no)return;
-  const data=ccGetCase(no);if(!data)return;
-  const fields={'debtor_name':data.debtor_name,'debtor2_name':data.debtor2_name,'case_number':data.case_number,'trustee_name':data.trustee_name,'client_address1':data.client_address1,'client_address2':data.client_address2};
-  let filled=0;
-  Object.entries(fields).forEach(([id,val])=>{
-    if(!val)return;const el=document.getElementById(id);
-    if(el&&!el.value){el.value=val;el.classList.add('cc-autofilled');el.addEventListener('input',()=>el.classList.remove('cc-autofilled'),{once:true});filled++;}
-  });
-  const je=document.getElementById('joint_filing');
-  if(je&&data.joint_filing){const tv=data.joint_filing==='joint'?'Joint debtors':'Single debtor';if(je.value!==tv){je.value=tv;je.dispatchEvent(new Event('change'));}}
-  if(filled>0){
-    const ff=document.getElementById('formFields');
-    if(ff&&!document.getElementById('cc-prefill-notice')){
-      const n=document.createElement('div');n.id='cc-prefill-notice';
-      n.innerHTML=`<span class="cc-pn-icon">&#9889;</span> Auto-filled from active case: <strong>${data.debtor_name}</strong> &middot; ${data.case_number}`;
-      ff.insertBefore(n,ff.firstChild);
-    }
-  }
-};
-
 /* ── Service List Logic ── */
 window.slRenderTags=function(caseNo,container){
   const lists=slGetForCase(caseNo),el=container||document.getElementById('sl-list-tags');if(!el)return;
@@ -3240,17 +3219,6 @@ window.prefillPayPanel=function(){
     const el=document.getElementById(ovId);
     if(el){new MutationObserver(()=>{if(el.style.display==='block')setTimeout(()=>window[pf]&&window[pf](),60);}).observe(el,{attributes:true,attributeFilter:['style']});}
   });
-})();
-
-/* ── Patch openModal to run ccPrefillForm + log entry ── */
-(function(){
-  if(typeof window.openModal==='function'){
-    const orig=window.openModal;
-    window.openModal=function(...args){
-      orig.apply(this,args);
-      setTimeout(()=>{if(typeof ccPrefillForm==='function')ccPrefillForm();},80);
-    };
-  }
 })();
 
 /* ── Patch showSuccess to log activity ── */
