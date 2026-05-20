@@ -91,6 +91,14 @@ textarea{resize:vertical;min-height:80px;line-height:1.5}
 .btn-generate{font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:600;color:white;background:var(--accent);border:none;padding:10px 24px;border-radius:2px;cursor:pointer;display:flex;align-items:center;gap:8px}
 .btn-generate:hover{background:var(--al)}
 .btn-generate:disabled{background:var(--rule);cursor:not-allowed}
+.btn-preview{font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:600;padding:9px 18px;border:1.5px solid var(--ink);border-radius:3px;background:transparent;color:var(--ink);cursor:pointer;letter-spacing:.04em}
+.btn-preview:hover{background:var(--ink);color:var(--paper)}
+#docPreviewPanel{display:none;position:fixed;top:0;right:0;bottom:0;width:520px;max-width:90vw;background:var(--paper);border-left:2px solid var(--rule);z-index:1100;overflow-y:auto;box-shadow:-4px 0 20px rgba(0,0,0,.18)}
+#docPreviewPanel .preview-header{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--rule);background:var(--card)}
+#docPreviewPanel .preview-title{font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+#docPreviewPanel .preview-close{background:none;border:none;font-size:18px;cursor:pointer;color:var(--muted);line-height:1;padding:2px 6px}
+#docPreviewPanel .preview-close:hover{color:var(--ink)}
+#docPreviewBody{padding:32px 28px;font-family:'DM Mono',monospace;font-size:11.5px;line-height:1.7;white-space:pre-wrap;color:var(--ink)}
 .btn-sign{font-family:'Instrument Sans',sans-serif;font-size:13px;font-weight:600;color:white;background:var(--gold);border:none;padding:10px 24px;border-radius:2px;cursor:pointer;display:flex;align-items:center;gap:8px}
 .btn-sign:hover{background:#b8872e}
 .spinner{width:14px;height:14px;border:2px solid rgba(255,255,255,.3);border-top-color:white;border-radius:50%;animation:spin .7s linear infinite;display:none}
@@ -437,7 +445,7 @@ footer{margin-top:64px;padding:24px 32px;border-top:1px solid var(--rule);text-a
   </div>
   <footer>Butcher Law Office Internal Use Only &nbsp;&middot;&nbsp; Not for Distribution</footer>
 </div>
-<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)"><div class="modal"><div class="modal-header"><div><div class="modal-pretitle" id="modalPretitle"></div><div class="modal-title" id="modalTitle"></div></div><button class="modal-close" onclick="closeModal()">&#x2715;</button></div><div id="modalBody"><div class="guidance-box"><div class="guidance-label">When to Use</div><div class="guidance-text" id="guidanceText"></div><div class="guidance-rules" id="guidanceRules"></div></div><form class="modal-form" id="docForm" onsubmit="handleSubmit(event)"><div id="formFields"></div></form></div><div class="success-panel" id="successPanel"><div class="ok-icon">&#x2713;</div><div class="ok-title" id="okTitle">Documents Generated</div><div class="ok-msg" id="okMsg"></div><div class="ok-actions"><button class="btn-another" onclick="resetModal()">Generate Another</button><button class="btn-generate" id="downloadPdfBtn" style="display:none" onclick="downloadCurrentPDF()">&#x2193; Download PDF</button><button class="btn-generate" onclick="closeModal()">Done</button></div></div><div class="modal-footer" id="modalFooter"><button class="btn-cancel" type="button" onclick="closeModal()">Cancel</button><button class="btn-generate" type="submit" form="docForm" id="generateBtn"><span class="spinner" id="spinner"></span><span id="generateBtnText">Generate Documents</span></button></div></div></div>
+<div class="modal-overlay" id="modalOverlay" onclick="handleOverlayClick(event)"><div class="modal"><div class="modal-header"><div><div class="modal-pretitle" id="modalPretitle"></div><div class="modal-title" id="modalTitle"></div></div><button class="modal-close" onclick="closeModal()">&#x2715;</button></div><div id="modalBody"><div class="guidance-box"><div class="guidance-label">When to Use</div><div class="guidance-text" id="guidanceText"></div><div class="guidance-rules" id="guidanceRules"></div></div><form class="modal-form" id="docForm" onsubmit="handleSubmit(event)"><div id="formFields"></div></form></div><div class="success-panel" id="successPanel"><div class="ok-icon">&#x2713;</div><div class="ok-title" id="okTitle">Documents Generated</div><div class="ok-msg" id="okMsg"></div><div class="ok-actions"><button class="btn-another" onclick="resetModal()">Generate Another</button><button class="btn-generate" id="downloadPdfBtn" style="display:none" onclick="downloadCurrentPDF()">&#x2193; Download PDF</button><button class="btn-generate" onclick="closeModal()">Done</button></div></div><div class="modal-footer" id="modalFooter"><button class="btn-preview" type="button" onclick="previewDoc()">&#128065; Preview</button><button class="btn-cancel" type="button" onclick="closeModal()">Cancel</button><button class="btn-generate" type="submit" form="docForm" id="generateBtn"><span class="spinner" id="spinner"></span><span id="generateBtnText">Generate Documents</span></button></div></div></div>
 <div class="cos-overlay" id="cosOverlay"><div class="cos-modal"><div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--rule)"><div><div style="font-family:'DM Mono',monospace;font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:4px">Other</div><div style="font-family:'Libre Baskerville',serif;font-size:18px;font-weight:700">Certificate of Service &mdash; Address Builder</div></div><button onclick="closeCos()" style="background:none;border:1px solid var(--rule);width:32px;height:32px;border-radius:2px;cursor:pointer;color:var(--muted);font-size:16px;display:flex;align-items:center;justify-content:center">&#x2715;</button></div><div style="background:var(--cream);border-left:3px solid var(--gold);padding:10px 14px;margin-bottom:20px;font-size:12px;color:var(--muted)">Paste HTML from CM/ECF or any creditor matrix page to auto-extract addresses. Add manual entries, remove duplicates, then copy the formatted output.</div><div class="cos-sec">Step 1 &mdash; Paste HTML source</div><textarea id="cosHtmlIn" style="width:100%;min-height:90px;font-family:'DM Mono',monospace;font-size:12px;padding:8px;border:1px solid var(--rule);border-radius:2px;background:white;resize:vertical" placeholder="Paste HTML from CM/ECF mailing info, creditor matrix, or any webpage..."></textarea><div style="display:flex;gap:8px;margin-top:8px;margin-bottom:20px"><button class="cos-btn" onclick="cosExtract()">Extract addresses</button><button class="cos-btn-sec" onclick="document.getElementById('cosHtmlIn').value=''">Clear</button></div><div class="cos-sec">Step 2 &mdash; Add manual entries</div><div style="display:flex;gap:8px;margin-bottom:4px"><input type="text" id="cosManualInput" style="flex:1;padding:7px 10px;border:1px solid var(--rule);border-radius:2px;font-size:12px;background:white" placeholder="Name, Address, City State ZIP" onkeydown="if(event.key==='Enter')cosAddManual()"><button class="cos-btn-sec" onclick="cosAddManual()">Add</button></div><div class="cos-sec" style="margin-top:20px">Step 3 &mdash; Review list <span id="cosCount" style="color:var(--accent);font-size:10px"></span></div><div style="display:flex;gap:6px;margin-bottom:10px;flex-wrap:wrap"><button class="cos-btn-sec" onclick="cosDedupe()">Remove duplicates</button><button class="cos-btn-sec" onclick="cosSort()">Sort A-Z</button><button class="cos-btn-sec" style="color:var(--accent)" onclick="cosClearAll()">Clear all</button></div><div id="cosAddrList" style="max-height:220px;overflow-y:auto;margin-bottom:4px"></div><div class="cos-sec" style="margin-top:20px">Step 4 &mdash; Output</div><div style="display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;align-items:center"><select id="cosFmt" style="padding:6px 10px;border:1px solid var(--rule);border-radius:2px;font-size:12px;background:white"><option value="plain">Plain text (one block per address)</option><option value="certified">Certified mail list</option><option value="cos">Full certificate of service</option></select><button class="cos-btn" onclick="cosGenerate()">Generate</button><button class="cos-btn-sec" onclick="cosCopy()">Copy to clipboard</button></div><div class="cos-output" id="cosOutput">Output will appear here...</div></div></div>
 <script>
 const PASSWORD='Butcher2026';
@@ -2157,6 +2165,60 @@ function toggleSendDest(el){
   }
 }
 
+function previewDoc(){
+  var doc=window._activeDoc||{};
+  var title=doc.title||(document.getElementById('modalTitle')||{}).textContent||'Document';
+  var formEl=document.getElementById('formFields');
+  var inputs=formEl?Array.from(formEl.querySelectorAll('input,select,textarea')):[];
+  var vals={};
+  inputs.forEach(function(el){if(el.id)vals[el.id]=el.value||'';});
+  var dateStr=new Date().toLocaleDateString('en-US',{month:'long',day:'numeric',year:'numeric'});
+  var ch=inferChapter(vals.case_number||'');
+  var isJoint=vals.joint_filing==='Joint debtors';
+  var debtorStr=(vals.debtor_name||'_____________')+(vals.debtor2_name?' and '+vals.debtor2_name:'');
+  var firmRaw=localStorage.getItem('dee_firm_settings');
+  var attyName='Counsel for Debtor(s)';
+  try{var fs=JSON.parse(firmRaw||'{}');attyName=(fs.attorneyName||attyName)+(fs.barNumber?' (Bar No. '+fs.barNumber+')':'');}catch(e){}
+  var L=[];
+  L.push('                IN THE UNITED STATES BANKRUPTCY COURT');
+  L.push('                     FOR THE DISTRICT OF OREGON');
+  L.push('');
+  L.push('In re:                                  )');
+  L.push('                                        )  Case No. '+(vals.case_number||'__________'));
+  L.push('  '+(vals.debtor_name||'_____________________')+',  )');
+  if(vals.debtor2_name){L.push('  '+vals.debtor2_name+',                    )');}
+  L.push('                                        )  Chapter '+ch);
+  L.push('                      Debtor'+(isJoint?'s':'')+'.     )');
+  L.push('__________________________________________)');
+  L.push('');
+  L.push('         '+title.toUpperCase());
+  L.push('');
+  L.push('  COMES NOW the Debtor'+(isJoint?'s':'')+', '+debtorStr+', by and through');
+  L.push('the undersigned counsel, and respectfully moves this Court:');
+  L.push('');
+  var skip={joint_filing:1,debtor_name:1,debtor2_name:1,case_number:1};
+  inputs.forEach(function(el){
+    if(el.id&&el.value&&!skip[el.id]){
+      var lbl=el.labels&&el.labels[0]?el.labels[0].textContent.replace(/\*/g,'').trim():el.id.replace(/_/g,' ');
+      L.push('  [ '+lbl.toUpperCase()+' ]');
+      L.push('  '+el.value);
+      L.push('');
+    }
+  });
+  L.push('');
+  L.push('                              Respectfully submitted,');
+  L.push('');
+  L.push('  Dated: '+dateStr);
+  L.push('');
+  L.push('  '+attyName);
+  L.push('');
+  L.push('─'.repeat(48));
+  L.push('  FIELD-ENTRY PREVIEW — click Generate Documents for the final formatted filing.');
+  var panel=document.getElementById('docPreviewPanel');
+  var body=document.getElementById('docPreviewBody');
+  if(panel&&body){body.textContent=L.join('\n');panel.style.display='block';}
+}
+
 async function handleSubmit(e){
   e.preventDefault();
   var btn=document.getElementById('generateBtn');
@@ -3285,5 +3347,6 @@ alUpdateBadge();
 
 })(); // end IIFE
 </script>
+<div id="docPreviewPanel"><div class="preview-header"><span class="preview-title">&#128065; Document Preview</span><button class="preview-close" onclick="document.getElementById('docPreviewPanel').style.display='none'">&times;</button></div><div id="docPreviewBody"></div></div>
 </body>
   </html>
