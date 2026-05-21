@@ -2949,15 +2949,6 @@ window.alSaveLog=function(e){localStorage.setItem('bl_activity_log',JSON.stringi
 window.alAddEntry=function(e){const l=alGetLog();l.push({...e,id:Date.now()+Math.random().toString(36).slice(2,6)});alSaveLog(l);};
 window.alClearLog=function(){localStorage.removeItem('bl_activity_log');};
 
-/* ── Inject Bar ── */
-(function(){
-  if(document.getElementById('cc-bar'))return;
-  const b=document.createElement('div');b.id='cc-bar';
-  b.innerHTML=`<span class="cc-label">Active Case</span><div id="cc-no-case">No case set</div><div id="cc-active-pill" style="display:none" onclick="ccOpenPanel('list')"><span class="cc-pill-name" id="cc-pill-name"></span><span class="cc-pill-case" id="cc-pill-case"></span><span class="cc-pill-chapter" id="cc-pill-chapter"></span></div><button id="cc-new-btn" onclick="ccOpenPanel('form')">+ New Case</button><button id="al-btn" onclick="alOpenPanel()">&#128203; Log<span id="al-badge"></span></button><button id="cc-switch-btn" onclick="ccOpenPanel('list')">Switch Case</button>`;
-  const s=document.getElementById('app-screen');const h=s&&s.querySelector('header');
-  if(h&&h.parentNode)h.parentNode.insertBefore(b,h.nextSibling);else document.body.insertBefore(b,document.body.firstChild);
-})();
-
 /* ── Inject CC Overlay ── */
 (function(){
   if(document.getElementById('cc-overlay'))return;
