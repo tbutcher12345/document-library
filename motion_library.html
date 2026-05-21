@@ -1969,7 +1969,7 @@ function openModal(id){
     var rq = f.req?'<span class="req">*</span>':'';
     var inp='';
     if(f.type==='select'){ inp='<select id="'+f.id+'" name="'+f.id+'" '+(f.req?'required':'')+'>'+(f.options||[]).map(function(o){return '<option value="'+o+'">'+o+'</option>';}).join('')+'</select>'; }
-    else if(f.type==='textarea'){ inp='<textarea id="'+f.id+'" name="'+f.id+'" placeholder="'+(f.placeholder||'')+'" '+(f.req?'required':'')+'></textarea>'; }
+    else if(f.type==='textarea'){ inp='<div class="ai-polish-wrap"><textarea id="'+f.id+'" name="'+f.id+'" placeholder="'+(f.placeholder||'')+'" '+(f.req?'required':'')+'>  </textarea><button type="button" class="ai-polish-btn" onclick="aiPolish(\''+f.id+'\',event)">AI Polish</button></div>'; }
     else{ inp='<input type="'+(f.type||'text')+'" id="'+f.id+'" name="'+f.id+'" placeholder="'+(f.placeholder||'')+'" '+(f.req?'required':'')+'>';}
     var ht = f.hint?'<div class="hint">'+f.hint+'</div>':'';
     html += '<div class="'+cc+'"><label for="'+f.id+'">'+f.label+rq+'</label>'+inp+ht+'</div>';
