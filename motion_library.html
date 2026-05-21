@@ -2075,61 +2075,28 @@ function inferChapter(caseNum){
   return '';
 }
 
-function aiPolish(fieldId, e){
+function aiPolish(fieldId,e){
   e.preventDefault();e.stopPropagation();
-  var ta = document.getElementById(fieldId);
-  if(!ta || !ta.value.trim()){
-    alert('Please enter some text first, then click AI Polish.');
-    return;
-  }
-  var btn = e.target;
-  var original = ta.value;
-  btn.textContent = 'Polishing...';
-  btn.classList.add('loading');
-  btn.disabled = true;
-
-  // Build context from other form fields
-  var debtorName = (document.getElementById('debtor_name')||document.getElementById('client_name'));
-  var caseNum = document.getElementById('case_number');
-  var docTitle = activeDoc ? activeDoc.title : 'bankruptcy motion';
-
-  var context = 'You are a bankruptcy attorney drafting legal documents for the U.S. Bankruptcy Court, District of Oregon. '
-    + 'The document is: ' + docTitle + '. '
-    + (debtorName&&debtorName.value ? 'Debtor: '+debtorName.value+'. ' : '')
-    + (caseNum&&caseNum.value ? 'Case No.: '+caseNum.value+'. ' : '');
-
-  var prompt = context
-    + 'Rewrite the following text into polished, professional legal language suitable for a bankruptcy court filing. '
-    + 'Keep it concise and factual. Do not add facts not present. Output only the rewritten text, no preamble:\n\n'
-    + original;
-
-  fetch('https://api.anthropic.com/v1/messages', {
-    method: 'POST',
-    headers: {'Content-Type': 'application/json'},
-    body: JSON.stringify({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 1000,
-      messages: [{role: 'user', content: prompt}]
-    })
+  var ta=document.getElementById(fieldId);
+  if(!ta||!ta.value.trim()){alert("Please enter some text first.");return;}
+  var btn=e.target;
+  var orig=ta.value;
+  var dEl=document.getElementById("debtor_name")||document.getElementById("client_name");
+  var cEl=document.getElementById("case_number");
+  var dt=typeof activeDoc!=="undefined"&&activeDoc?activeDoc.title:"bankruptcy motion";
+  btn.textContent="Polishing…";btn.classList.add("loading");btn.disabled=true;
+  fetch("https://web-production-ac315f.up.railway.app/ai_polish",{
+    method:"POST",
+    headers:{"Content-Type":"application/json"},
+    body:JSON.stringify({text:orig,doc_title:dt,debtor:dEl?dEl.value:"",case_num:cEl?cEl.value:""})
   })
-  .then(function(r){ return r.json(); })
-  .then(function(data){
-    if(data.content && data.content[0] && data.content[0].text){
-      ta.value = data.content[0].text.trim();
-      ta.style.borderColor = 'var(--gold)';
-      setTimeout(function(){ ta.style.borderColor = ''; }, 2000);
-    } else {
-      alert('AI Polish failed. Please try again.');
-    }
+  .then(function(r){return r.json();})
+  .then(function(d){
+    if(d.polished){ta.value=d.polished;ta.dispatchEvent(new Event("input",{bubbles:true}));}
+    else if(d.error){alert("AI Polish error: "+d.error);}
   })
-  .catch(function(){
-    alert('AI Polish unavailable — check your connection.');
-  })
-  .finally(function(){
-    btn.textContent = 'AI Polish';
-    btn.classList.remove('loading');
-    btn.disabled = false;
-  });
+  .catch(function(){alert("AI Polish unavailable — check connection.");})
+  .finally(function(){btn.textContent="AI Polish";btn.classList.remove("loading");btn.disabled=false;});
 }
 
 
