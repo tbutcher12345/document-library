@@ -11,6 +11,7 @@ from datetime import date
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import urllib.request
+import requests
 
 app = Flask(__name__)
 CORS(app)
@@ -37,6 +38,7 @@ FIRM_ADDRESS1  = os.environ.get('FIRM_ADDRESS1', '116 Hwy 99 N #101')
 FIRM_CITY      = os.environ.get('FIRM_CITY', 'Eugene')
 FIRM_STATE     = os.environ.get('FIRM_STATE', 'OR')
 FIRM_ZIP       = os.environ.get('FIRM_ZIP', '97402')
+ANTHROPIC_API_KEY = os.environ.get('ANTHROPIC_API_KEY', '')
 
 # Dropbox Sign API key (for verifying webhook signatures)
 DSIGN_API_KEY = os.environ.get('DSIGN_API_KEY', '4270ba333e457cc394bd924de0bdebda30c603bb3d8bddb4cd445876629cce54')
@@ -815,6 +817,37 @@ def send_mail():
         logger.error(f'Mail error: {e}', exc_info=True)
         return jsonify({'error': str(e)}), 500
 
+
+
+
+@app.route('/ai_polish', methods=['POST', 'OPTIONS'])
+def ai_polish_route():
+    if request.method == 'OPTIONS': return '', 204
+    try:
+        data = request.get_json(force=True)
+        text = (data or {}).get('text', '').strip()
+        doc_title = (data or {}).get('doc_title', 'bankruptcy motion')
+        debtor = (data or {}).get('debtor', '')
+        case_num = (data or {}).get('case_num', '')
+        if not text: return jsonify({'error': 'No text provided'}), 400
+        if not ANTHROPIC_API_KEY: return jsonify({'error': 'AI not configured'}), 503
+        ctx = f'You are a bankruptcy attorney drafting a {doc_title}.'
+        if debtor: ctx += f' Client: {debtor}.'
+        if case_num: ctx += f' Case No.: {case_num}.'
+        prompt = (ctx + ' Rewrite the following text into polished, professional legal language'
+            ' suitable for a U.S. bankruptcy court filing. Keep it concise and factual.'
+            ' Do not add facts not present. Output only the rewritten text:\n\n' + text)
+        resp = requests.post('https://api.anthropic.com/v1/messages',
+            headers={'x-api-key': ANTHROPIC_API_KEY, 'anthropic-version': '2023-06-01',
+                     'content-type': 'application/json'},
+            json={'model': 'claude-haiku-4-5', 'max_tokens': 600,
+                  'messages': [{'role': 'user', 'content': prompt}]}, timeout=30)
+        result = resp.json()
+        if resp.status_code != 200:
+            return jsonify({'error': result.get('error', {}).get('message', 'AI error')}), resp.status_code
+        return jsonify({'polished': result['content'][0]['text'].strip()}), 200
+    except Exception as ex:
+        return jsonify({'error': str(ex)}), 500
 
 @app.route('/health', methods=['GET'])
 def health():
