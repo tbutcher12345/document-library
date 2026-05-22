@@ -2216,7 +2216,7 @@ async function handleSubmit(e){
       var labels={'email':'Email','fax':'Fax','mail':'Physical Mail','download':'Download'};
       var channelList=sendDests.map(function(d){return labels[d]||d;}).join(', ');
       showSuccess(body,result);
-      if(sendDests.indexOf('download')>=0&&result.pdf_url){window.open(result.pdf_url,'_blank');}
+      if(sendDests.indexOf('download')>=0){if(result.pdf_url){window.open(result.pdf_url,'_blank');}else if(result.pdf_b64){var _bc=atob(result.pdf_b64);var _bn=new Uint8Array(_bc.length);for(var _i=0;_i<_bc.length;_i++){_bn[_i]=_bc.charCodeAt(_i);}downloadBlob(new Blob([_bn],{type:'application/pdf'}),(activeDoc.id||'document')+'.pdf');}}
     } else {
       showError(result.error||'Generation failed');
     }
