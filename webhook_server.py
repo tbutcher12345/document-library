@@ -243,6 +243,23 @@ DOCS = {
 def index():
     return send_from_directory(BASE_DIR, 'motion_library.html')
 
+# Attorney signature — set ATTORNEY_SIGNATURE_B64 in Railway environment variables
+import os as _os
+SIGNATURE_B64 = _os.environ.get('ATTORNEY_SIGNATURE_B64', '')
+
+def _sig_img():
+    """Return a ReportLab Image element from the attorney signature base64."""
+    import io as _io
+    try:
+        raw = __import__('base64').b64decode(SIGNATURE_B64)
+        buf = _io.BytesIO(raw)
+        img = RLImage(buf, width=2.0*72, height=0.75*72)
+        img.hAlign = 'LEFT'
+        return img
+    except Exception:
+        from reportlab.platypus import Spacer
+        return Spacer(1, 0.4*72)
+
 def generate_documents(motion_type, data):
     doc_info = DOCS.get(motion_type)
     if not doc_info:
@@ -253,7 +270,7 @@ def generate_documents(motion_type, data):
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     from reportlab.lib.units import inch
     from reportlab.lib import colors
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.platypus import Image as RLImage, SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
     from reportlab.lib.enums import TA_CENTER, TA_LEFT, TA_RIGHT, TA_JUSTIFY
 
     buf = io.BytesIO()
@@ -335,7 +352,7 @@ def generate_documents(motion_type, data):
             style_justify))
         story.append(Spacer(1, 0.3*inch))
         story.append(Paragraph('Sincerely,', style_normal))
-        story.append(Spacer(1, 0.4*inch))
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Oregon State Bar No. {bar}', style_normal))
@@ -374,7 +391,7 @@ def generate_documents(motion_type, data):
             style_justify))
         story.append(Spacer(1, 0.3*inch))
         story.append(Paragraph('Sincerely,', style_normal))
-        story.append(Spacer(1, 0.4*inch))
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Oregon State Bar No. {bar}', style_normal))
@@ -414,7 +431,7 @@ def generate_documents(motion_type, data):
             story.append(Paragraph(f'<b>{label_k}:</b> {v}', style_normal))
         story.append(Spacer(1, 0.4*inch))
         story.append(Paragraph(f'Respectfully submitted,', style_normal))
-        story.append(Spacer(1, 0.4*inch))
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Oregon State Bar No. {bar}', style_normal))
