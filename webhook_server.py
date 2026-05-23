@@ -252,11 +252,18 @@ def _sig_img():
     import io as _io
     try:
         raw = __import__('base64').b64decode(SIGNATURE_B64)
-        buf = _io.BytesIO(raw)
-        img = RLImage(buf, width=2.0*72, height=0.75*72)
+        # Use PIL to open and re-encode as PNG for reliable ReportLab rendering
+        from PIL import Image as _PILImage
+        pil_img = _PILImage.open(_io.BytesIO(raw)).convert('RGBA')
+        png_buf = _io.BytesIO()
+        pil_img.save(png_buf, format='PNG')
+        png_buf.seek(0)
+        img = RLImage(png_buf, width=2.0*72, height=0.75*72)
         img.hAlign = 'LEFT'
         return img
-    except Exception:
+    except Exception as _e:
+        import logging as _logging
+        _logging.getLogger(__name__).warning(f'_sig_img failed: {_e}')
         from reportlab.platypus import Spacer
         return Spacer(1, 0.4*72)
 
