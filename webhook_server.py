@@ -1004,7 +1004,6 @@ def generate_documents(motion_type, data):
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Vehicle_Turnover_{client.replace(" ","_")}'
-e
 
 
     else:
