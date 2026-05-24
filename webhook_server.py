@@ -731,7 +731,7 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.15*inch))
         story.append(Paragraph(f'To Whom It May Concern,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        story.append(Paragraph(f'This letter is submitted on behalf of {client}, who received a bankruptcy discharge on {disc_date}. The following account is being reported inaccurately on {client}'s credit report:', style_normal))
+        story.append(Paragraph(f"This letter is submitted on behalf of {client}, who received a bankruptcy discharge on {disc_date}. The following account is being reported inaccurately on {client}'s credit report:", style_normal))
         story.append(Spacer(1, 0.1*inch))
         story.append(Paragraph(dispute, style_normal))
         story.append(Spacer(1, 0.1*inch))
