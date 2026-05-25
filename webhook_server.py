@@ -269,6 +269,7 @@ SIGNATURE_B64 = _os.environ.get('ATTORNEY_SIGNATURE_B64', '')
 def _sig_img():
     """Return a ReportLab Image element from the attorney signature base64."""
     import io as _io
+    from reportlab.platypus import Image as RLImage
     try:
         raw = __import__('base64').b64decode(SIGNATURE_B64)
         # Use PIL to open and re-encode as PNG for reliable ReportLab rendering
