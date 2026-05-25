@@ -1053,6 +1053,25 @@ def generate_documents(motion_type, data):
 
 
 
+
+
+def handle_request(motion_type):
+    try:
+        payload = request.get_json(force=True) or {}
+        entry   = payload.get('entry', payload)
+        data    = {**ATTORNEY_DEFAULTS, **entry}
+        for f in ['delay_days', 'payments_due', 'payments_made']:
+            if f in data:
+                try: data[f] = int(data[f])
+                except: pass
+        _, pdf_bytes, base = generate_documents(motion_type, data)
+        import base64 as _b64
+        pdf_b64 = _b64.b64encode(pdf_bytes).decode('utf-8')
+        return jsonify({'success': True, 'pdf_b64': pdf_b64, 'filename': base + '.pdf'})
+    except Exception as e:
+        logger.error(f'handle_request error for {motion_type}: {e}')
+        return jsonify({'success': False, 'error': str(e)}), 500
+
 @app.route('/webhook/motion-extend-time',               methods=['POST'])
 def r01(): return handle_request('extend_time')
 @app.route('/webhook/motion-extend-time-pre341-pancic', methods=['POST'])
