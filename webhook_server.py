@@ -160,7 +160,7 @@ def dropbox_sign_webhook():
     client_email = payment.get('client_email', '')
     amount_str   = payment.get('amount', '0')
     account_type = payment.get('account_type', 'operating')
-    description  = payment.get('description', 'Legal Services ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ Fee Agreement')
+    description  = payment.get('description', 'Legal Services &  Fee Agreement')
 
     try:
         amount_cents = round(float(amount_str) * 100)
@@ -319,7 +319,8 @@ def generate_documents(motion_type, data):
     email = data.get('firm_email',      ATTORNEY_EMAIL)
     phone = data.get('firm_phone',      '(541) 762-1967')
     fax_n = data.get('firm_fax',        '(541) 762-1968')
-    addr  = data.get('firm_address',    FIRM_ADDRESS1 + ', ' + FIRM_CITY + ', ' + FIRM_STATE + ' ' + FIRM_ZIP)
+    addr  = data.get('firm_address',    FIRM_ADDRESS1)
+    addr2 = FIRM_CITY + ', ' + FIRM_STATE + ' ' + FIRM_ZIP
     bar   = data.get('attorney_bar',    '082807')
 
     def letterhead():
@@ -327,6 +328,7 @@ def generate_documents(motion_type, data):
         elems.append(Paragraph(firm, ParagraphStyle('FirmName', parent=styles['Normal'],
             fontSize=14, fontName='Helvetica-Bold', alignment=TA_CENTER, spaceAfter=2)))
         elems.append(Paragraph(addr, style_centered))
+        elems.append(Paragraph(addr2, style_centered))
         elems.append(Paragraph(f'Phone: {phone} | Fax: {fax_n} | {email}', style_centered))
         elems.append(Spacer(1, 0.05*inch))
         elems.append(Table([['']], colWidths=[6.5*inch],
@@ -385,7 +387,7 @@ def generate_documents(motion_type, data):
         base = f'Authorization_Letter_Mortgage_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_cease_collection':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         creditor = data.get('creditor_name','[CREDITOR NAME]')
         acct     = data.get('account_number','')
@@ -394,7 +396,7 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.15*inch))
         story.append(Paragraph(creditor, style_bold))
         story.append(Spacer(1, 0.15*inch))
-        story.append(Paragraph('RE: NOTICE OF BANKRUPTCY FILING ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ¢ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ AUTOMATIC STAY IN EFFECT', style_bold))
+        story.append(Paragraph('RE: NOTICE OF BANKRUPTCY FILING — AUTOMATIC STAY IN EFFECT', style_bold))
         story.append(Paragraph(f'Debtor: {client}', style_normal))
         if acct: story.append(Paragraph(f'Account No.: {acct}', style_normal))
         story.append(Paragraph(f'Bankruptcy Case No.: {case_no}', style_normal))
@@ -403,7 +405,7 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.08*inch))
         story.append(Paragraph(
             f'Please be advised that {client} has filed a petition for relief under the United States '
-            f'Bankruptcy Code. As of the date of filing, the automatic stay provisions of 11 U.S.C. ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ 362(a) '
+            f'Bankruptcy Code. As of the date of filing, the automatic stay provisions of 11 U.S.C. § 362(a) '
             f'are in full force and effect.',
             style_justify))
         story.append(Paragraph(
@@ -413,7 +415,7 @@ def generate_documents(motion_type, data):
         story.append(Paragraph(
             f'DEMAND IS HEREBY MADE that you immediately cease and desist all collection activity against '
             f'{client}. Failure to comply with the automatic stay may subject your organization to sanctions '
-            f'under 11 U.S.C. ÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂÃÂ§ 362(k).',
+            f'under 11 U.S.C. § 362(k).',
             style_justify))
         story.append(Spacer(1, 0.3*inch))
         story.append(Paragraph('Sincerely,', style_normal))
@@ -424,7 +426,7 @@ def generate_documents(motion_type, data):
         base = f'Cease_Collection_Letter_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_stay_violation':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         creditor = data.get('creditor_name','[CREDITOR NAME]')
         acct     = data.get('account_number','')
@@ -456,14 +458,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Stay_Violation_Letter_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_client_general':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         addr1    = data.get('client_address1','')
         addr2    = data.get('client_address2','')
@@ -486,14 +488,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Sincerely,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Client_Letter_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_to_court':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         re_line  = data.get('re_line','[RE LINE]')
         body     = data.get('body','[LETTER BODY]')
@@ -512,14 +514,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Letter_to_Court_{case_no.replace(" ","_")}'
 
     elif motion_type == 'letter_notice_bankruptcy':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         creditor = data.get('creditor_name','[CREDITOR NAME]')
         acct     = data.get('account_number','')
@@ -541,14 +543,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Notice_Bankruptcy_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_notice_representation':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         client2  = data.get('client2_name','')
         jt       = data.get('joint_filing','Single debtor')
         case_no  = data.get('case_number','[CASE NO.]')
@@ -573,14 +575,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Notice_Representation_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_qwr':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         servicer = data.get('servicer_name','[SERVICER NAME]')
         dept     = data.get('servicer_contact','QWR Department')
@@ -615,14 +617,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'QWR_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_case_dismissed':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         client2  = data.get('client2_name','')
         jt       = data.get('joint_filing','Single debtor')
         case_no  = data.get('case_number','[CASE NO.]')
@@ -661,14 +663,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Sincerely,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Case_Dismissed_Letter_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_credit_report_dispute':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         disc_date= data.get('discharge_date','[DISCHARGE DATE]')
         creditor = data.get('creditor_name','[CREDITOR NAME]')
@@ -696,14 +698,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Credit_Report_Dispute_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_escrow_accounting':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         servicer = data.get('servicer_name','[SERVICER NAME]')
         loan_no  = data.get('loan_number','[LOAN NUMBER]')
@@ -731,14 +733,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Escrow_Accounting_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_fdcpa_validation':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         collector= data.get('collector_name','[DEBT COLLECTOR NAME]')
         acct     = data.get('account_number','')
@@ -764,14 +766,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'FDCPA_Validation_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_garnishment_recovery':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         employer = data.get('employer_name','[EMPLOYER NAME]')
         garn_amt = data.get('garnishment_amount','')
@@ -800,14 +802,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Garnishment_Recovery_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_no_default_notice':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         servicer = data.get('servicer_name','[SERVICER NAME]')
         loan_no  = data.get('loan_number','[LOAN NUMBER]')
@@ -830,14 +832,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'No_Default_Notice_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_notice_taxing_authority':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         authority= data.get('taxing_authority','[TAXING AUTHORITY]')
         tax_type = data.get('tax_type','')
@@ -861,14 +863,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Notice_Taxing_Authority_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_omitted_creditor':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         creditor = data.get('creditor_name','[CREDITOR NAME]')
         acct     = data.get('account_number','')
@@ -891,14 +893,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Omitted_Creditor_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_payoff_request':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         servicer = data.get('servicer_name','[SERVICER NAME]')
         loan_no  = data.get('loan_number','[LOAN NUMBER]')
@@ -924,14 +926,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Payoff_Request_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_plan_confirmation':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         client2  = data.get('client2_name','')
         jt       = data.get('joint_filing','Single debtor')
         case_no  = data.get('case_number','[CASE NO.]')
@@ -964,14 +966,14 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Sincerely,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
         base = f'Plan_Confirmation_{client.replace(" ","_")}'
 
     elif motion_type == 'letter_vehicle_turnover':
-        client   = data.get('client_name','[CLIENT NAME]')
+        client   = data.get('debtor_name', data.get('client_name','[CLIENT NAME]'))
         case_no  = data.get('case_number','[CASE NO.]')
         creditor = data.get('creditor_name','[CREDITOR NAME / LIENHOLDER]')
         vehicle  = data.get('vehicle_description','[VEHICLE DESCRIPTION]')
@@ -999,7 +1001,7 @@ def generate_documents(motion_type, data):
         story.append(Spacer(1, 0.2*inch))
         story.append(Paragraph('Respectfully submitted,', style_normal))
         story.append(Spacer(1, 0.1*inch))
-        _sig_img(story)
+        story.append(_sig_img())
         story.append(Paragraph(f'{atty}', style_bold))
         story.append(Paragraph(f'{firm}', style_normal))
         story.append(Paragraph(f'Bar No. {bar}', style_normal))
