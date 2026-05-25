@@ -267,18 +267,37 @@ import os as _os
 SIGNATURE_B64 = _os.environ.get('ATTORNEY_SIGNATURE_B64', '')
 
 def _sig_img():
-    """Return a ReportLab Image element from the attorney signature base64."""
+    """Return a ReportLab Image element from the attorney signature base64.
+    Removes white/near-white background so signature looks natural on paper."""
     import io as _io
     from reportlab.platypus import Image as RLImage
     try:
         raw = __import__('base64').b64decode(SIGNATURE_B64)
-        # Use PIL to open and re-encode as PNG for reliable ReportLab rendering
         from PIL import Image as _PILImage
+        import numpy as _np
+        # Open as RGBA for transparency support
         pil_img = _PILImage.open(_io.BytesIO(raw)).convert('RGBA')
+        data = _np.array(pil_img)
+        r, g, b, a = data[:,:,0], data[:,:,1], data[:,:,2], data[:,:,3]
+        # Mark near-white pixels as fully transparent (threshold: all channels >= 220)
+        white_mask = (r >= 220) & (g >= 220) & (b >= 220)
+        data[white_mask, 3] = 0
+        # Slightly feather the edges of ink pixels for a natural look
+        result_img = _PILImage.fromarray(data, 'RGBA')
+        # Auto-crop to tight bounding box of signature content
+        bbox = result_img.getbbox()
+        if bbox:
+            result_img = result_img.crop(bbox)
+        # Save as PNG with transparency
         png_buf = _io.BytesIO()
-        pil_img.save(png_buf, format='PNG')
+        result_img.save(png_buf, format='PNG')
         png_buf.seek(0)
-        img = RLImage(png_buf, width=2.0*72, height=0.75*72)
+        # Size: 2.2 inches wide, proportional height based on cropped image
+        w_in, h_in = result_img.width, result_img.height
+        target_w = 2.2 * 72  # points
+        target_h = target_w * (h_in / max(w_in, 1))
+        target_h = min(target_h, 0.9 * 72)  # cap at 0.9 inch tall
+        img = RLImage(png_buf, width=target_w, height=target_h)
         img.hAlign = 'LEFT'
         return img
     except Exception as _e:
