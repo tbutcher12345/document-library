@@ -267,10 +267,10 @@ import os as _os
 SIGNATURE_B64 = _os.environ.get('ATTORNEY_SIGNATURE_B64', '')
 
 def _sig_img():
-    """Return a ReportLab Image element from the attorney signature base64.
-    Removes white/near-white background so signature looks natural on paper."""
+    """Return a ReportLab Flowable that renders the attorney signature image floating
+    above a printed signature line, like a real handwritten signature on paper."""
     import io as _io
-    from reportlab.platypus import Image as RLImage
+    from reportlab.platypus import Image as RLImage, Flowable
     try:
         raw = __import__('base64').b64decode(SIGNATURE_B64)
         from PIL import Image as _PILImage
@@ -282,7 +282,6 @@ def _sig_img():
         # Mark near-white pixels as fully transparent (threshold: all channels >= 220)
         white_mask = (r >= 220) & (g >= 220) & (b >= 220)
         data[white_mask, 3] = 0
-        # Slightly feather the edges of ink pixels for a natural look
         result_img = _PILImage.fromarray(data, 'RGBA')
         # Auto-crop to tight bounding box of signature content
         bbox = result_img.getbbox()
@@ -297,15 +296,43 @@ def _sig_img():
         target_w = 2.2 * 72  # points
         target_h = target_w * (h_in / max(w_in, 1))
         target_h = min(target_h, 0.9 * 72)  # cap at 0.9 inch tall
-        img = RLImage(png_buf, width=target_w, height=target_h)
-        img.hAlign = 'LEFT'
-        return img
+        sig_png_bytes = png_buf.getvalue()
+
+        class FloatingSig(Flowable):
+            """Draws signature image floating above a horizontal signature line."""
+            def __init__(self, png_data, img_w, img_h):
+                Flowable.__init__(self)
+                self.png_data = png_data
+                self.img_w = img_w
+                self.img_h = img_h
+                self.line_len = 2.5 * 72   # 2.5-inch line in points
+                self.line_y = 4            # line sits 4pt above bottom of block
+                self.width = self.line_len
+                self.height = img_h + self.line_y + 4  # sig + line gap
+
+            def draw(self):
+                from reportlab.lib import colors as _c
+                from reportlab.lib.utils import ImageReader
+                import io as _io2
+                # Draw horizontal signature line
+                self.canv.setStrokeColor(_c.black)
+                self.canv.setLineWidth(0.75)
+                self.canv.line(0, self.line_y, self.line_len, self.line_y)
+                # Draw signature image floating above the line
+                # Bottom of image aligns at line_y + 3pt (overlaps the line slightly)
+                img_reader = ImageReader(_io2.BytesIO(self.png_data))
+                self.canv.drawImage(
+                    img_reader, 0, self.line_y + 3,
+                    width=self.img_w, height=self.img_h,
+                    mask='auto', preserveAspectRatio=False
+                )
+
+        return FloatingSig(sig_png_bytes, target_w, target_h)
     except Exception as _e:
         import logging as _logging
         _logging.getLogger(__name__).warning(f'_sig_img failed: {_e}')
         from reportlab.platypus import Spacer
         return Spacer(1, 0.4*72)
-
 def generate_documents(motion_type, data):
     doc_info = DOCS.get(motion_type)
     if not doc_info:
