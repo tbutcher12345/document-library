@@ -1,16 +1,15 @@
 /* ============================================================
-   CASE AUTOCOMPLETE v2.0 — Butcher Law Document Engine
-   1. Typeahead on cc-debtor1 (Case Context panel)
-   2. Search bar on Saved Cases tab
-   3. Typeahead on client_name in document forms → auto-fills
-      case_number, debtor2_name, address fields from saved cases
+   CASE AUTOCOMPLETE v3.0 — Butcher Law Document Engine
+   Covers ALL 20 document types. Attaches typeahead to every
+   name field (client_name, debtor_name) across the entire
+   engine and auto-fills all case fields on selection.
    2026-06-16
 ============================================================ */
 (function () {
 
-  /* ── Shared helpers ─────────────────────────────────────── */
+  /* ── Helpers ─────────────────────────────────────────────── */
 
-  function escHtml(str) {
+  function esc(str) {
     return String(str || '').replace(/[&<>"']/g, function (m) {
       return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
     });
@@ -20,9 +19,17 @@
     return (typeof window.ccGetAll === 'function') ? window.ccGetAll() : [];
   }
 
-  function makeDropdown(anchorEl, onSelect) {
-    var existing = anchorEl.parentElement.querySelector('.bhq-ac-drop');
-    if (existing) existing.remove();
+  function setVal(id, val) {
+    var el = document.getElementById(id);
+    if (el && val !== undefined && val !== null) el.value = val;
+  }
+
+  /* ── Build a dropdown on any name input ──────────────────── */
+
+  function attachDropdown(inputEl) {
+    if (!inputEl || inputEl._bhqAC) return;
+    inputEl._bhqAC = true;
+    inputEl.parentElement.style.position = 'relative';
 
     var drop = document.createElement('div');
     drop.className = 'bhq-ac-drop';
@@ -33,31 +40,32 @@
       'max-height:260px','overflow-y:auto','display:none',
       'font-family:inherit','font-size:13px'
     ].join(';');
-
-    anchorEl.parentElement.style.position = 'relative';
-    anchorEl.parentElement.appendChild(drop);
+    inputEl.parentElement.appendChild(drop);
 
     function render(query) {
       var q = query.toLowerCase().trim();
       if (!q) { drop.style.display = 'none'; return; }
       var matches = getCases().filter(function (c) {
-        return (c.debtor_name||'').toLowerCase().includes(q) ||
-               (c.debtor2_name||'').toLowerCase().includes(q) ||
-               (c.case_number||'').toLowerCase().includes(q);
+        return (c.debtor_name  || '').toLowerCase().includes(q) ||
+               (c.debtor2_name || '').toLowerCase().includes(q) ||
+               (c.case_number  || '').toLowerCase().includes(q);
       }).slice(0, 12);
       if (!matches.length) { drop.style.display = 'none'; return; }
-
       drop.innerHTML = '';
       matches.forEach(function (c) {
         var item = document.createElement('div');
-        item.style.cssText = 'padding:9px 14px;cursor:pointer;border-bottom:1px solid #f0e8d8;display:flex;justify-content:space-between;align-items:center;line-height:1.3;';
+        item.style.cssText = 'padding:9px 14px;cursor:pointer;border-bottom:1px solid #f0e8d8;display:flex;justify-content:space-between;align-items:center;line-height:1.35;';
         item.innerHTML =
-          '<span style="font-weight:600;color:#2a1f0f;">' + escHtml(c.debtor_name) +
-          (c.debtor2_name ? '<span style="color:#7a6a4f;font-weight:400;"> & ' + escHtml(c.debtor2_name) + '</span>' : '') +
+          '<span style="font-weight:600;color:#2a1f0f;">' + esc(c.debtor_name) +
+          (c.debtor2_name ? '<span style="color:#7a6a4f;font-weight:400;"> &amp; ' + esc(c.debtor2_name) + '</span>' : '') +
           '</span>' +
           '<span style="color:#8b6914;font-size:11px;margin-left:12px;white-space:nowrap;flex-shrink:0;">' +
-          escHtml(c.case_number) + ' · Ch. ' + escHtml(c.chapter||'7') + '</span>';
-        item.addEventListener('mousedown', function (e) { e.preventDefault(); onSelect(c); drop.style.display = 'none'; });
+          esc(c.case_number) + ' · Ch. ' + esc(c.chapter || '7') + '</span>';
+        item.addEventListener('mousedown', function (e) {
+          e.preventDefault();
+          fillFromCase(c);
+          drop.style.display = 'none';
+        });
         item.addEventListener('mouseenter', function () { item.style.background = '#fdf6e3'; });
         item.addEventListener('mouseleave', function () { item.style.background = ''; });
         drop.appendChild(item);
@@ -65,10 +73,10 @@
       drop.style.display = 'block';
     }
 
-    anchorEl.addEventListener('input', function () { render(this.value); });
-    anchorEl.addEventListener('focus', function () { if (this.value.trim()) render(this.value); });
-    anchorEl.addEventListener('blur',  function () { setTimeout(function () { drop.style.display = 'none'; }, 160); });
-    anchorEl.addEventListener('keydown', function (e) {
+    inputEl.addEventListener('input',  function () { render(this.value); });
+    inputEl.addEventListener('focus',  function () { if (this.value.trim()) render(this.value); });
+    inputEl.addEventListener('blur',   function () { setTimeout(function () { drop.style.display = 'none'; }, 160); });
+    inputEl.addEventListener('keydown', function (e) {
       var items = Array.from(drop.querySelectorAll('div'));
       var idx   = items.findIndex(function (i) { return i.hasAttribute('data-sel'); });
       if (e.key === 'ArrowDown') {
@@ -85,37 +93,145 @@
         e.preventDefault(); items[idx].dispatchEvent(new MouseEvent('mousedown'));
       } else if (e.key === 'Escape') { drop.style.display = 'none'; }
     });
-
-    return drop;
   }
 
-  /* ── 1. Case Context panel: cc-debtor1 typeahead ───────── */
+  /* ── Fill ALL case fields found in the current form ─────── */
 
-  function installCCTypeahead() {
-    var debtor1 = document.getElementById('cc-debtor1');
-    if (!debtor1 || debtor1._bhqAC) return;
-    debtor1._bhqAC = true;
+  function fillFromCase(c) {
+    // Primary name fields (two variants used across docs)
+    setVal('client_name',    c.debtor_name    || '');
+    setVal('debtor_name',    c.debtor_name    || '');
 
-    makeDropdown(debtor1, function (c) {
-      var set = function (id, val) { var el = document.getElementById(id); if (el) el.value = val; };
-      set('cc-debtor1',  c.debtor_name    || '');
-      set('cc-debtor2',  c.debtor2_name   || '');
-      set('cc-casenum',  c.case_number    || '');
-      set('cc-chapter',  c.chapter        || '7');
-      set('cc-trustee',  c.trustee_name   || '');
-      set('cc-addr1',    c.client_address1|| '');
-      set('cc-addr2',    c.client_address2|| '');
-      set('cc-email',    c.client_email   || '');
-      set('cc-phone',    c.client_phone   || '');
-      var joint = document.getElementById('cc-joint');
-      if (joint) { joint.value = c.joint_filing || 'single'; if (typeof ccToggleJoint === 'function') ccToggleJoint(joint.value); }
-      debtor1.focus();
-      var cn = document.getElementById('cc-casenum');
-      if (cn) { cn.style.transition = 'background .15s'; cn.style.background = '#fffbe6'; setTimeout(function () { cn.style.background = ''; }, 900); }
+    // Joint/co-debtor name fields
+    setVal('debtor2_name',   c.debtor2_name   || '');
+    setVal('client2_name',   c.debtor2_name   || '');
+
+    // Case identifiers
+    setVal('case_number',    c.case_number    || '');
+    setVal('case_name',      c.debtor_name    || '');  // used in motion forms
+
+    // Chapter/filing details
+    setVal('chapter',        c.chapter        || '7');
+    setVal('filing_date',    c.filing_date    || '');
+
+    // Client address
+    setVal('client_address1', c.client_address1 || '');
+    setVal('client_address2', c.client_address2 || '');
+
+    // Trustee
+    setVal('trustee_name',   c.trustee_name   || '');
+
+    // Joint filing dropdown
+    var jf = document.getElementById('joint_filing');
+    if (jf) jf.value = (c.joint_filing === 'joint') ? 'Joint debtors' : 'Single debtor';
+
+    // Flash case number to confirm fill
+    var cn = document.getElementById('case_number') || document.getElementById('case_name');
+    if (cn) {
+      cn.style.transition = 'background .15s';
+      cn.style.background = '#fffbe6';
+      setTimeout(function () { cn.style.background = ''; }, 900);
+    }
+
+    // Re-focus the name field we typed in
+    var active = document.activeElement;
+    if (active && active._bhqAC) active.focus();
+  }
+
+  /* ── Scan the open form and attach dropdowns ─────────────── */
+
+  function installOnForm() {
+    // All possible name trigger fields across all 20 doc types
+    ['client_name', 'debtor_name'].forEach(function (id) {
+      var el = document.getElementById(id);
+      if (el) attachDropdown(el);
     });
   }
 
-  /* ── 2. Saved Cases tab: search bar ────────────────────── */
+  /* ── Case Context panel: cc-debtor1 typeahead ────────────── */
+
+  function installCCTypeahead() {
+    var d1 = document.getElementById('cc-debtor1');
+    if (!d1 || d1._bhqAC) return;
+    attachDropdown(d1);
+    // Override fillFromCase for CC panel (fills different field IDs)
+    var drop = d1.parentElement.querySelector('.bhq-ac-drop');
+    if (drop) {
+      Array.from(drop.querySelectorAll('div')).forEach(function (item) {
+        item.replaceWith(item.cloneNode(true)); // remove old listener
+      });
+    }
+    // Re-bind with CC-specific fill
+    d1._bhqAC = false; // reset so we can re-attach
+    attachDropdownCC(d1);
+  }
+
+  function attachDropdownCC(inputEl) {
+    if (!inputEl || inputEl._bhqAC) return;
+    inputEl._bhqAC = true;
+    inputEl.parentElement.style.position = 'relative';
+    var drop = document.createElement('div');
+    drop.className = 'bhq-ac-drop';
+    drop.style.cssText = [
+      'position:absolute','top:100%','left:0','right:0','z-index:99999',
+      'background:#fff','border:1px solid #c9a84c','border-top:none',
+      'border-radius:0 0 6px 6px','box-shadow:0 8px 24px rgba(0,0,0,.2)',
+      'max-height:240px','overflow-y:auto','display:none',
+      'font-family:inherit','font-size:13px'
+    ].join(';');
+    inputEl.parentElement.appendChild(drop);
+
+    function render(query) {
+      var q = query.toLowerCase().trim();
+      if (!q) { drop.style.display = 'none'; return; }
+      var matches = getCases().filter(function (c) {
+        return (c.debtor_name||'').toLowerCase().includes(q)||
+               (c.debtor2_name||'').toLowerCase().includes(q)||
+               (c.case_number||'').toLowerCase().includes(q);
+      }).slice(0,12);
+      if (!matches.length) { drop.style.display='none'; return; }
+      drop.innerHTML='';
+      matches.forEach(function(c){
+        var item=document.createElement('div');
+        item.style.cssText='padding:9px 14px;cursor:pointer;border-bottom:1px solid #f0e8d8;display:flex;justify-content:space-between;align-items:center;';
+        item.innerHTML='<span style="font-weight:600;color:#2a1f0f;">'+esc(c.debtor_name)+(c.debtor2_name?'<span style="color:#7a6a4f;font-weight:400;"> &amp; '+esc(c.debtor2_name)+'</span>':'')+'</span><span style="color:#8b6914;font-size:11px;margin-left:12px;white-space:nowrap;">'+esc(c.case_number)+' · Ch. '+esc(c.chapter||'7')+'</span>';
+        item.addEventListener('mousedown',function(e){
+          e.preventDefault();
+          inputEl.value=c.debtor_name||'';
+          setVal('cc-debtor2',c.debtor2_name||'');
+          setVal('cc-casenum',c.case_number||'');
+          setVal('cc-chapter',c.chapter||'7');
+          setVal('cc-trustee',c.trustee_name||'');
+          setVal('cc-addr1',c.client_address1||'');
+          setVal('cc-addr2',c.client_address2||'');
+          setVal('cc-email',c.client_email||'');
+          setVal('cc-phone',c.client_phone||'');
+          var jt=document.getElementById('cc-joint');
+          if(jt){jt.value=c.joint_filing||'single';if(typeof ccToggleJoint==='function')ccToggleJoint(jt.value);}
+          drop.style.display='none';
+          var cn=document.getElementById('cc-casenum');
+          if(cn){cn.style.transition='background .15s';cn.style.background='#fffbe6';setTimeout(function(){cn.style.background='';},900);}
+        });
+        item.addEventListener('mouseenter',function(){item.style.background='#fdf6e3';});
+        item.addEventListener('mouseleave',function(){item.style.background='';});
+        drop.appendChild(item);
+      });
+      drop.style.display='block';
+    }
+    inputEl.addEventListener('input',function(){render(this.value);});
+    inputEl.addEventListener('focus',function(){if(this.value.trim())render(this.value);});
+    inputEl.addEventListener('blur',function(){setTimeout(function(){drop.style.display='none';},160);});
+    inputEl.addEventListener('keydown',function(e){
+      var items=Array.from(drop.querySelectorAll('div'));
+      var idx=items.findIndex(function(i){return i.hasAttribute('data-sel');});
+      if(e.key==='ArrowDown'){e.preventDefault();if(idx>=0){items[idx].removeAttribute('data-sel');items[idx].style.background='';}var nxt=items[(idx+1)%items.length];if(nxt){nxt.setAttribute('data-sel','1');nxt.style.background='#fdf6e3';nxt.scrollIntoView({block:'nearest'});}}
+      else if(e.key==='ArrowUp'){e.preventDefault();if(idx>=0){items[idx].removeAttribute('data-sel');items[idx].style.background='';}var prv=items[(idx-1+items.length)%items.length];if(prv){prv.setAttribute('data-sel','1');prv.style.background='#fdf6e3';prv.scrollIntoView({block:'nearest'});}}
+      else if(e.key==='Enter'&&idx>=0){e.preventDefault();items[idx].dispatchEvent(new MouseEvent('mousedown'));}
+      else if(e.key==='Escape'){drop.style.display='none';}
+    });
+  }
+
+  /* ── Saved Cases search bar ──────────────────────────────── */
 
   function installSavedCasesSearch() {
     var savedPanel = document.getElementById('cc-tab-list');
@@ -134,62 +250,32 @@
     });
   }
 
-  /* ── 3. Document form: client_name typeahead ────────────── */
+  /* ── Boot ────────────────────────────────────────────────── */
 
-  function installDocFormTypeahead() {
-    var clientName = document.getElementById('client_name');
-    if (!clientName || clientName._bhqAC) return;
-    clientName._bhqAC = true;
-
-    makeDropdown(clientName, function (c) {
-      // Fill the document form fields
-      var set = function (id, val) { var el = document.getElementById(id); if (el && val) el.value = val; };
-      clientName.value = c.debtor_name || '';
-      set('debtor2_name', c.debtor2_name   || '');
-      set('case_number',  c.case_number    || '');
-
-      // Fill address if field exists
-      set('client_address', (c.client_address1 || '') + (c.client_address2 ? ', ' + c.client_address2 : ''));
-
-      // Joint filing dropdown
-      var joint = document.getElementById('joint_filing');
-      if (joint) joint.value = (c.joint_filing === 'joint') ? 'joint' : 'single';
-
-      // Flash the case number field to confirm
-      var cn = document.getElementById('case_number');
-      if (cn) {
-        cn.style.transition = 'background .15s';
-        cn.style.background = '#fffbe6';
-        setTimeout(function () { cn.style.background = ''; }, 900);
-      }
-
-      clientName.focus();
-    });
-  }
-
-  /* ── Observe document form opens (modal is reused) ──────── */
-
-  var modalObserver = new MutationObserver(function () {
-    installDocFormTypeahead();
-  });
-
-  var overlay = document.querySelector('.modal-overlay');
-  if (overlay) {
-    modalObserver.observe(overlay, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
-  }
-
-  /* ── Boot: poll for CC panel + run doc form check ───────── */
-
+  // Poll for CC panel elements
   var attempts = 0;
   var iv = setInterval(function () {
     installCCTypeahead();
     installSavedCasesSearch();
-    installDocFormTypeahead();
+    installOnForm();
     if (++attempts > 60) clearInterval(iv);
   }, 500);
 
-  // Re-hook when CC panel opens (may rebuild DOM)
-  var _wrap = setInterval(function () {
+  // Hook openModal so every doc form gets the typeahead on open
+  var _mwrap = setInterval(function () {
+    if (typeof window.openModal === 'function' && !window.openModal._bhqACWrapped) {
+      var origM = window.openModal;
+      window.openModal = function () {
+        origM.apply(this, arguments);
+        setTimeout(installOnForm, 120);
+      };
+      window.openModal._bhqACWrapped = true;
+      clearInterval(_mwrap);
+    }
+  }, 100);
+
+  // Hook CC panel open
+  var _cwrap = setInterval(function () {
     if (typeof window.ccOpenPanel === 'function' && !window.ccOpenPanel._bhqACWrapped) {
       var orig = window.ccOpenPanel;
       window.ccOpenPanel = function () {
@@ -197,21 +283,15 @@
         setTimeout(function () { installCCTypeahead(); installSavedCasesSearch(); }, 80);
       };
       window.ccOpenPanel._bhqACWrapped = true;
-      clearInterval(_wrap);
+      clearInterval(_cwrap);
     }
-  }, 300);
+  }, 100);
 
-  // Re-hook when a doc modal opens (openModal is called each time)
-  var _mwrap = setInterval(function () {
-    if (typeof window.openModal === 'function' && !window.openModal._bhqACWrapped) {
-      var origM = window.openModal;
-      window.openModal = function () {
-        origM.apply(this, arguments);
-        setTimeout(installDocFormTypeahead, 120);
-      };
-      window.openModal._bhqACWrapped = true;
-      clearInterval(_mwrap);
-    }
-  }, 300);
+  // MutationObserver on modal for extra reliability
+  var overlay = document.querySelector('.modal-overlay');
+  if (overlay) {
+    new MutationObserver(function () { setTimeout(installOnForm, 80); })
+      .observe(overlay, { childList: true, subtree: true, attributes: true, attributeFilter: ['class'] });
+  }
 
 })();
