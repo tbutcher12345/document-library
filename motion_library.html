@@ -2084,20 +2084,29 @@ function aiPolish(fieldId,e){
   var orig=ta.value;
   var dEl=document.getElementById("debtor_name")||document.getElementById("client_name");
   var cEl=document.getElementById("case_number");
-  var dt=typeof activeDoc!=="undefined"&&activeDoc?activeDoc.title:"bankruptcy motion";
-  btn.textContent="Polishing…";btn.classList.add("loading");btn.disabled=true;
-  fetch("http://178.105.247.138.nip.io:5678/webhook/ai-polish",{
+  var dt=document.querySelector(".modal-title, h2")?.textContent||"Legal Document";
+  btn.textContent="Polishing...";btn.disabled=true;
+  fetch("https://inference-api.nousresearch.com/v1/chat/completions",{
     method:"POST",
-    headers:{"Content-Type":"application/json"},
-    body:JSON.stringify({text:orig,doc_title:dt,debtor:dEl?dEl.value:"",case_num:cEl?cEl.value:""})
+    headers:{"Content-Type":"application/json","Authorization":"Bearer sk-nous-NZjlRQXnTWpJIiiPFg5qpliAn3ZqGOpR"},
+    body:JSON.stringify({
+      model:"openai/gpt-4.1-mini",
+      max_tokens:2000,
+      messages:[
+        {role:"system",content:"You are a professional legal document editor for a bankruptcy law firm. Polish the provided text to be clear, professional, and legally appropriate. Preserve all factual content, names, case numbers, and legal references exactly. Return ONLY the polished text with no explanation or commentary."},
+        {role:"user",content:"Document: "+dt+"\nDebtor: "+(dEl?dEl.value:"")+"\nCase: "+(cEl?cEl.value:"")+"\n\nText to polish:\n"+orig}
+      ]
+    })
   })
   .then(function(r){return r.json();})
   .then(function(d){
-    if(d.polished){ta.value=d.polished;ta.dispatchEvent(new Event("input",{bubbles:true}));}
-    else if(d.error){alert("AI Polish error: "+d.error);}
+    btn.textContent="AI Polish";btn.disabled=false;
+    if(d.choices&&d.choices[0]&&d.choices[0].message){
+      ta.value=d.choices[0].message.content.trim();
+      ta.dispatchEvent(new Event("input",{bubbles:true}));
+    }else if(d.error){alert("AI Polish error: "+d.error.message);}
   })
-  .catch(function(){alert("AI Polish unavailable — check connection.");})
-  .finally(function(){btn.textContent="AI Polish";btn.classList.remove("loading");btn.disabled=false;});
+  .catch(function(){btn.textContent="AI Polish";btn.disabled=false;alert("AI Polish unavailable — check connection.");})
 }
 
 
@@ -2390,7 +2399,7 @@ function loadSettingsToForm(){
 function applySettingsToPage(s){
   var fn=document.querySelector('.firm-name');
   if(fn&&s.firmName) fn.textContent=s.firmName;
-  var _rwUrl=s.railwayUrl||'http://178.105.247.138.nip.io:5678/webhook/ai-polish';
+  var _rwUrl=s.railwayUrl||'https://inference-api.nousresearch.com/v1/chat/completions';
   localStorage.setItem('pdf_service_url',_rwUrl);
 }
 // Auto-load settings on page start
