@@ -1,7 +1,7 @@
 /* ============================================================
-   BHQ INTEGRATION — BankruptcyHQ Case Import for Document Engine
+   BHQ INTEGRATION - BankruptcyHQ Case Import for Document Engine
    Fetches cases from n8n webhook cache and imports to Case Context
-   
+
    To re-sync cases, run in BankruptcyHQ browser console (F12):
    (function(){fetch('https://cases.thebankruptcyhq.com/api/cases?status=OPEN&limit=200',{credentials:'include'}).then(r=>r.json()).then(d=>{const c=d?.data?.data||[];fetch('https://178.105.247.138.nip.io/webhook/bankruptcyhq-cases',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({action:'push',cases:c.map(x=>({caseNumber:x.case_number,debtorName:x.case_name,chapter:(x.type||'CH7').replace('CH',''),joint:'single'}))})}).then(r=>r.json()).then(j=>alert('Synced: '+j.stored+' cases'));});})()
    ============================================================ */
@@ -27,10 +27,18 @@ async function bhqImportCases() {
 }
 
 function importCasesToDocEngine(cases) {
-  var existing = [];
-  try { existing = JSON.parse(localStorage.getItem('bl_case_contexts') || '[]'); } catch(x) {}
   var existingMap = {};
-  existing.forEach(function(c) { if (c.case_number) existingMap[c.case_number] = c; });
+  try {
+    var _raw = localStorage.getItem('bl_case_contexts');
+    if (_raw) {
+      var _p = JSON.parse(_raw);
+      if (Array.isArray(_p)) {
+        _p.forEach(function(c) { if (c.case_number) existingMap[c.case_number] = c; });
+      } else if (_p && typeof _p === 'object') {
+        existingMap = _p;
+      }
+    }
+  } catch(x) {}
   var added = 0, updated = 0;
   cases.forEach(function(bhqCase) {
     var chapter = String(bhqCase.chapter || '7').replace(/^ch/i, '').trim();
